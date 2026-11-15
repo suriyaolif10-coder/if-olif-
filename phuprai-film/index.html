@@ -11,6 +11,7 @@
   {"id":"navy","type":"color","label":"กรมท่า","default":"#1d2c8c","group":"สี"},
   {"id":"olive","type":"color","label":"เขียวขวด","default":"#353615","group":"สี"},
   {"id":"cream","type":"color","label":"ครีม","default":"#f8f5e3","group":"สี"},
+  {"id":"maker","type":"string","label":"ผู้จัดจำหน่าย","default":"จัดจำหน่ายโดย บริษัท กู๊ดไลฟ์พาวเวอร์กรุ๊ป จำกัด"},
   {"id":"endHold","type":"number","label":"ค้างท้าย (วินาที)","default":1.4,"min":0.5,"max":6,"step":0.1,"group":"จังหวะ"}
 ]'>
 <head>
@@ -63,6 +64,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
 .mfield{position:absolute;inset:0}
 .band{position:absolute;left:-60px;right:-60px;top:760px;height:400px;background:var(--gold);transform:rotate(-4deg)}
 .shot{position:absolute;inset:0;visibility:hidden}
+.vb{display:inline-block}
 .shot .k{position:absolute;left:0;right:0;top:600px;text-align:center;font:500 46px Kanit;letter-spacing:6px}
 .shot .big{position:absolute;left:0;right:0;top:810px;text-align:center;font:900 190px/1.15 Kanit;color:var(--navy);white-space:nowrap}
 .shot .num{position:absolute;left:0;right:0;top:1200px;text-align:center;font:700 96px Kanit}
@@ -72,7 +74,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
 .snip .hl{position:absolute;left:4px;right:4px;height:64px;border:6px solid var(--gold);border-radius:10px;box-shadow:0 0 0 999px #12111940}
 .pill{display:inline-block;background:var(--navy);color:var(--cream);border-radius:28px;padding:0 70px}
 .flash .big{font-size:520px;top:620px}
-.medal{position:absolute;left:50%;top:1180px;width:520px;transform:translateX(-50%)}
+.medal{position:absolute;left:50%;top:1180px;width:520px;transform:translateX(-50%);-webkit-mask-image:radial-gradient(closest-side,#000 80%,transparent 99%);mask-image:radial-gradient(closest-side,#000 80%,transparent 99%)}
 
 /* bottle */
 #bottleL{visibility:hidden}
@@ -93,13 +95,15 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
 .etag{top:1575px;font:500 66px Kanit;color:var(--cream)}
 .eclaim{top:1675px;font:300 40px Kanit;color:#e8e3c4}
 .echips{top:1755px;font:500 34px Kanit;color:var(--cream)}
+.emaker{top:1815px;font:300 30px Kanit;color:#e8e3c4cc}
+.mmaker{position:absolute;left:0;right:0;top:1760px;text-align:center;font:500 38px Kanit;color:var(--navy)}
 .echips span{display:inline-block;border:2px solid var(--gold);color:var(--gold);border-radius:30px;padding:2px 26px;margin:0 8px}
 .sheen{position:absolute;left:0;top:300px;width:260px;height:1400px;transform:rotate(18deg);background:linear-gradient(90deg,transparent,#f8f5e333,transparent);mix-blend-mode:screen}
 .emedal{position:absolute;left:70px;top:520px;width:190px}
 </style>
 </head>
 <body>
-<div id="film" data-composition-id="film" data-width="1080" data-height="1920">
+<div id="film" data-composition-id="film" data-width="1080" data-height="1920" data-fps="60" data-om-signature="top-right">
   <audio id="om-sound" src="assets/sound.wav" data-start="0" data-duration="30.432" data-track-index="8" data-volume="1"></audio>
 
   <!-- 1 · hook: the knot -->
@@ -139,12 +143,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
     <div class="shot" data-om-id="m-thaimed"><div class="k" style="color:var(--cream)">ตำรับ</div><div class="big" style="font-size:150px;top:840px"><span class="pill">ยาแผนไทย</span></div></div>
     <div class="shot" data-om-id="m-gmp"><div class="k" style="color:var(--cream)">ผลิตตามมาตรฐาน</div><div class="big">PIC/S GMP</div>
       <div class="snip" style="width:400px;height:230px;top:1260px"><img src="assets/crop-pics.png"></div></div>
-    <div class="shot" data-om-id="m-reg"><div class="k">เลขทะเบียน</div><div class="big">G 326/69</div></div>
-    <div class="shot flash" data-om-id="m-ta"><div class="big" style="color:var(--ink)">ทา</div></div>
-    <div class="shot flash" data-om-id="m-thu"><div class="big" style="color:var(--gold)">ถู</div></div>
-    <div class="shot flash" data-om-id="m-nuad"><div class="big" style="color:var(--navy)">นวด</div></div>
-    <div class="shot flash" data-om-id="m-klai"><div class="big" style="color:var(--cream);font-weight:300;font-size:380px;top:700px">คลาย</div></div>
-    <div class="shot" data-om-id="m-brand"><div class="k">ตำรับจาก</div><div class="big" style="font-family:Taviraj;font-weight:700">สุขกาล</div><img class="medal" src="assets/crop-medallion.png"></div>
+    <div class="shot" data-om-id="m-verbs"><div class="k">วิธีใช้</div><div class="big" style="font-size:200px"><span class="vb">ทา</span> <span class="vb">ถู</span> <span class="vb">นวด</span></div></div>
+    <div class="shot" data-om-id="m-brand"><div class="k">ตำรับจาก</div><div class="big" style="font-family:Taviraj;font-weight:700">สุขกาย</div><img class="medal" src="assets/crop-medallion.png"><div class="mmaker" data-var-text="maker">จัดจำหน่ายโดย บริษัท กู๊ดไลฟ์พาวเวอร์กรุ๊ป จำกัด</div></div>
   </section>
 
   <!-- 6 · the bottle -->
@@ -168,7 +168,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
     <div class="sheen" id="sheen"></div>
     <div class="ctr etag" data-om-id="end-tagline" data-var-text="tagline">น้ำมันนวดคลายเส้น</div>
     <div class="ctr eclaim" data-om-id="end-claim" data-var-text="claim">บรรเทาอาการปวดเมื่อยตามร่างกาย</div>
-    <div class="ctr echips" data-om-id="end-chips"><span>ยาแผนไทย</span><span>สุขกาล</span></div>
+    <div class="ctr echips" data-om-id="end-chips"><span>ยาแผนไทย</span><span>สุขกาย</span></div>
+    <div class="ctr emaker" data-om-id="end-maker" data-var-text="maker">จัดจำหน่ายโดย บริษัท กู๊ดไลฟ์พาวเวอร์กรุ๊ป จำกัด</div>
   </section>
 </div>
 
@@ -237,25 +238,32 @@ const hide = (el, t) => tl.set(el, { visibility: 'hidden' }, t);
 /* ── 1 · hook (bars 1–2, beats 0–8): the knot is there at frame 0 and shudders on every kick ── */
 tl.addLabel('scene:hook', 0);
 tl.fromTo('#hookcam', { scale: 1 }, { scale: 1.12, duration: B(4), ease: 'none' }, 0);
-tl.fromTo('#hookcam', { scale: 1.45, rotation: -3 }, { scale: 1.6, rotation: -3, duration: B(4), ease: 'none' }, B(4)); // punch-in on bar 2
+tl.fromTo('#hookcam', { scale: 1.12, rotation: 0 }, { scale: 1.55, rotation: -3, duration: B(4), ease: 'power2.inOut' }, B(4)); // smooth push on bar 2
 [0, 2, 4, 6, 7].forEach((b, i) => {
-  tl.fromTo('#knot', { scaleX: .74, x: (i % 2 ? 14 : -14) }, { scaleX: .62, x: 0, duration: B(1) * .9, ease: 'elastic.out(1.2,.35)' }, B(b));
+  tl.fromTo('#knot', { scaleX: .74, x: (i % 2 ? 14 : -14) }, { scaleX: .62, x: 0, duration: B(1.4), ease: 'power3.out' }, B(b));
 });
-tl.fromTo('#knot .g', { y: 0 }, { y: (i) => (i % 2 ? -12 : 12), duration: B(.5), ease: 'sine.inOut', repeat: 15, yoyo: true }, 0);
+tl.fromTo('#knot .g', { y: 0 }, { y: (i) => (i % 2 ? -10 : 10), duration: B(1), ease: 'sine.inOut', repeat: 7, yoyo: true }, 0);
 tl.fromTo('.tag', { opacity: 1, x: 0 }, { opacity: 1, x: 0, duration: .01 }, 0);
 tl.fromTo('.hint', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: B(1) }, B(2));
 OM.sfx('thud', B(4), { gain: .5 });
 
 /* ── 2 · build (bars 3–4, beats 8–16): one tense word per two beats, each its own scale and move ── */
 tl.addLabel('scene:build', B(8));
-hide('#hookL', B(8));
+hide('#hookL', B(8) + .02);
 const W = ['.w1', '.w2', '.w3', '.w4'];
-W.forEach((w, i) => { show(w, B(8 + i * 2)); if (i < 3) hide(w, B(10 + i * 2)); });
+W.forEach((w, i) => {
+  const t0 = B(8 + i * 2) - B(.5);
+  show(w, t0);
+  tl.fromTo(w, { yPercent: 100 }, { yPercent: 0, duration: B(.5), ease: 'power3.inOut' }, t0);
+  if (i < 3) hide(w, B(10 + i * 2) + .02);
+});
+tl.fromTo('#hookcam', { opacity: 1 }, { opacity: 1, duration: .01 }, 0);
+tl.fromTo('.w4', { opacity: 1 }, { opacity: 0, duration: B(.75), ease: 'power2.in' }, B(15.25));
 hide('.w4', B(16));
 tl.fromTo('.w1 .t', { scaleX: .8, rotation: -6 }, { scaleX: .55, rotation: -6, duration: B(2), ease: 'power2.out' }, B(8));
 tl.fromTo('#la', { y: -60, rotation: 0 }, { y: 120, rotation: 8, duration: B(2), ease: 'power2.in' }, B(10));
 tl.fromTo('.w3 .t', { x: 260, rotation: -14, scaleY: 1.5 }, { x: -180, rotation: -14, scaleY: 1.5, duration: B(2), ease: 'none' }, B(12));
-tl.fromTo('#puad', { x: -10 }, { x: 10, duration: B(.25), ease: 'none', repeat: 7, yoyo: true }, B(14));
+tl.fromTo('#puad', { x: -14 }, { x: 14, duration: B(1), ease: 'sine.inOut', repeat: 1, yoyo: true }, B(14));
 tl.fromTo('#puad', { scale: 1.25 }, { scale: 1, duration: B(2), ease: 'expo.out' }, B(14));
 [8, 10, 12, 14].forEach((b, i) => OM.sfx('hit', B(b), { gain: .4, pan: [-.3, .3, -.15, .15][i], pitch: 1 + i * .05 }));
 
@@ -293,24 +301,33 @@ tl.addLabel('scene:montage', B(28));
 hide('#relaxL', B(28));
 show('#montage', B(28));
 const shots = gsap.utils.toArray('#montage .shot');
-const beats = [2, 2, 1, 1, 1, 1, .5, .5, .5, .5, 2];
-const fields = ['#f8f5e3', '#f8f5e3', '#f8f5e3', '#353615', '#353615', '#f8f5e3', '#f8f5e3', '#1d2c8c', '#f8f5e3', '#353615', '#f8f5e3'];
-const bandOn = [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1];
+const beats = [2, 1.5, 1.5, 1.5, 1.5, 2, 2];
+const fields = ['#f8f5e3', '#f8f5e3', '#f8f5e3', '#353615', '#353615', '#f8f5e3', '#f8f5e3'];
+const X = .35;                                   // crossfade length (s)
 let t = B(28);
+tl.set('#mfield', { backgroundColor: fields[0] }, t);
 shots.forEach((el, i) => {
-  show(el, t);
-  if (i) hide(shots[i - 1], t);
-  tl.set('#mfield', { backgroundColor: fields[i] }, t);
-  tl.set('#band', { autoAlpha: bandOn[i] }, t);
-  tl.fromTo(el.querySelector('.big'), { scale: 1.35 }, { scale: 1, duration: Math.min(B(beats[i]), B(1)), ease: 'expo.out' }, t);
-  tl.fromTo(el, { y: 0 }, { y: -18, duration: B(beats[i]), ease: 'none' }, t);
+  const t0 = i ? t - X : t;
+  show(el, t0);
+  tl.fromTo(el, { x: i ? 420 : 0, opacity: i ? 0 : 1 }, { x: 0, opacity: 1, duration: X, ease: 'power3.out' }, t0);
+  if (i) {
+    tl.fromTo(shots[i - 1], { x: 0, opacity: 1 }, { x: -420, opacity: 0, duration: X, ease: 'power3.in' }, t0);
+    hide(shots[i - 1], t);
+    tl.fromTo('#mfield', { backgroundColor: fields[i - 1] }, { backgroundColor: fields[i], duration: X, ease: 'none' }, t0);
+  }
+  tl.fromTo(el.querySelector('.big'), { scale: 1.12 }, { scale: 1, duration: B(1.5), ease: 'power3.out' }, t0);
   const snip = el.querySelector('.snip');
-  if (snip) tl.fromTo(snip, { y: 260, opacity: 0 }, { y: 0, opacity: 1, duration: B(.75), ease: 'expo.out' }, t + B(.25));
+  if (snip) tl.fromTo(snip, { y: 200, opacity: 0 }, { y: 0, opacity: 1, duration: B(1), ease: 'power3.out' }, t + B(.25));
   const medal = el.querySelector('.medal');
-  if (medal) tl.fromTo(medal, { scale: .4, rotation: -30, opacity: 0 }, { scale: 1, rotation: 0, opacity: 1, duration: B(1), ease: 'back.out(1.6)' }, t + B(.25));
-  OM.sfx(beats[i] < 1 ? 'tick' : 'hit', t, { gain: beats[i] < 1 ? .55 : .45, pan: (i % 2 ? .25 : -.25), pitch: 1 + i * .03 });
+  if (medal) tl.fromTo(medal, { scale: .6, rotation: -20, opacity: 0 }, { scale: 1, rotation: 0, opacity: 1, duration: B(1.25), ease: 'power3.out' }, t + B(.25));
+  el.querySelectorAll('.vb').forEach((v, k) => {
+    tl.fromTo(v, { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: B(.6), ease: 'power3.out' }, t + B(k * .6));
+    OM.sfx('pop', t + B(k * .6), { gain: .45, note: k * 2 + 1 });
+  });
+  OM.sfx(i ? 'whoosh' : 'hit', t0, { gain: i ? .3 : .45, pan: (i % 2 ? .25 : -.25) });
   t += B(beats[i]);
 });
+tl.fromTo(shots[shots.length - 1], { opacity: 1 }, { opacity: 0, duration: X, ease: 'power2.in' }, B(40) - X);
 tl.fromTo('#band', { rotation: -4, y: 0 }, { rotation: -2, y: 20, duration: B(12), ease: 'none' }, B(28));
 hide(shots[shots.length - 1], B(40));
 hide('#montage', B(40));
@@ -319,7 +336,7 @@ hide('#montage', B(40));
 tl.addLabel('scene:bottle', B(40));
 show('#bottleL', B(40));
 tl.fromTo('#stroke2', { scaleX: 0, transformOrigin: '0% 50%' }, { scaleX: 1, duration: B(1), ease: 'expo.out' }, B(40));
-tl.fromTo('#bottle', { y: 1300, rotation: 6 }, { y: 0, rotation: 0, duration: B(1.25), ease: 'expo.out' }, B(40));
+tl.fromTo('#bottle', { y: 1300, rotation: 6 }, { y: 0, rotation: 0, duration: B(2), ease: 'power4.out' }, B(40));
 OM.sfx('thud', B(40) + .18, { gain: .7 });
 tl.fromTo('#bottle', { scale: 1 }, { scale: 1.05, duration: B(8), ease: 'none' }, B(40));
 tl.fromTo('.use1', { opacity: 0, y: -40 }, { opacity: 1, y: 0, duration: B(1) }, B(41));
@@ -328,16 +345,17 @@ OM.sfx('pop', B(41), { gain: .45, note: 1 });
 OM.sfx('pop', B(43), { gain: .45, note: 5 });
 tl.fromTo('#leafA', { x: 300, y: 80 }, { x: -260, y: -40, duration: B(8), ease: 'none' }, B(40));
 tl.fromTo('.leafB', { x: -60 }, { x: 80, duration: B(8), ease: 'none' }, B(40));
-tl.fromTo('#bottleL', { scale: 1 }, { scale: 1.55, duration: B(.6), ease: 'expo.out', transformOrigin: '540px 1120px' }, B(44));
+tl.fromTo('#bottleL', { scale: 1 }, { scale: 1.55, duration: B(1.5), ease: 'power3.inOut', transformOrigin: '540px 1120px' }, B(44));
 tl.fromTo('#bottleL', { rotation: 0 }, { rotation: -2, duration: B(4), ease: 'none' }, B(44));
 OM.sfx('whip', B(44), { gain: .5 });
-hide('#bottleL', B(48));
+hide('#bottleL', B(48) + .4);
 
 /* ── 7 · logo (bars 13–15 + hold): olive flood, the same bottle carried, the wordmark ── */
 tl.addLabel('scene:logo', B(48));
 show('#endL', B(48));
-tl.fromTo('#flood', { clipPath: 'circle(0% at 50% 60%)' }, { clipPath: 'circle(130% at 50% 60%)', duration: B(1.5), ease: 'expo.out' }, B(48));
-tl.fromTo('#ebottle', { y: 40, scale: 1.12 }, { y: 0, scale: 1, duration: B(2), ease: 'expo.out' }, B(48));
+tl.fromTo('#flood', { clipPath: 'circle(0% at 50% 60%)' }, { clipPath: 'circle(130% at 50% 60%)', duration: B(2), ease: 'power3.inOut' }, B(48));
+tl.fromTo('#ebottle', { y: 40, scale: 1.12, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: B(2), ease: 'power3.out' }, B(48));
+tl.fromTo('.disc', { opacity: 0 }, { opacity: 1, duration: B(2) }, B(48));
 tl.fromTo('#ebottle', { scale: 1 }, { scale: 1.05, duration: B(10), ease: 'none' }, B(50));
 tl.fromTo('#sheen', { x: -700 }, { x: 1500, duration: B(3), ease: 'power2.inOut' }, B(56));
 OM.sfx('sparkle', B(57), { gain: .4 });
@@ -345,6 +363,7 @@ tl.fromTo('.wm', { opacity: 0, y: 60, letterSpacing: '40px' }, { opacity: 1, y: 
 tl.fromTo('.wmEn', { opacity: 0 }, { opacity: 1, duration: B(2) }, B(50));
 tl.fromTo('.etag', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: B(1.5) }, B(52));
 tl.fromTo('.eclaim', { opacity: 0 }, { opacity: 1, duration: B(1.5) }, B(53));
+tl.fromTo('.emaker', { opacity: 0 }, { opacity: 1, duration: B(1.5) }, B(55.5));
 tl.fromTo('.echips span', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: B(1), stagger: B(.5) }, B(54));
 OM.sfx('chime', B(49), { gain: .5 });
 tl.fromTo('#endL', { scale: 1 }, { scale: 1.07, duration: B(60) - B(49) + V.endHold, ease: 'none' }, B(49));
