@@ -34,6 +34,10 @@ S = [
  dict(k="full", img="j-ending.jpg", d=5, z=(1.22, 1.0), c=((.5, .62), (.5, .5)), hl="ผู้**ไม่มีอาลัย**", sub="หลวงปู่ขาว อนาลโย · 2431–2526", bell=True, top=True),
 ]
 
+if os.environ.get("DURS"):
+    for _sh, _d in zip(S, os.environ["DURS"].split(",")):
+        _sh["d"] = float(_d)
+
 def ease(u):  # ease in-out sine
     return 0.5 - 0.5 * math.cos(math.pi * max(0, min(1, u)))
 

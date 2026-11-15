@@ -6,7 +6,8 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 LOGO, IN, OUT = sys.argv[1:4]
-W, H, FPS, DUR = 1080, 1920, 30, 5.0
+W, H, FPS = 1080, 1920, 30
+DUR = float(os.environ.get("ENDDUR", "5.0"))
 FB = os.path.expanduser("~/.fonts/Kanit-Bold.ttf")
 FM = os.path.expanduser("~/.fonts/Kanit-Medium.ttf")
 BG = (8, 18, 34)
