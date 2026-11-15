@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ทริคทำซับไวรัล</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFF8E8; --ink:#1B1B1B;
+    --orange:#FF7A45; --yellow:#FFD93D; --blue:#5B8DEF; --green:#7ED6A0;
+    --skin:#F6C9A2; --hair:#4A2C1A;
+  }
+  html,body{margin:0;height:100%;}
+  body{
+    background:#2A2420;
+    font-family:"IBM Plex Sans Thai",system-ui,sans-serif;
+    color:var(--ink);
+    overflow-x:hidden;
+    display:flex;align-items:center;justify-content:center;
+  }
+  /* wrapper takes the scaled size so the page never scrolls sideways */
+  #fit{position:relative;}
+  #stage{
+    position:absolute;top:0;left:0;
+    transform-origin:top left;
+    background:
+      radial-gradient(120% 80% at 20% 10%, #FFFDF5 0%, transparent 60%),
+      radial-gradient(90% 70% at 90% 100%, #F3E4C4 0%, transparent 65%),
+      var(--paper);
+  }
+  #grain{position:absolute;inset:0;pointer-events:none;opacity:.35;mix-blend-mode:multiply;}
+
+  .sticker{position:absolute;filter:drop-shadow(3px 4px 0 rgba(0,0,0,.18));transition:transform .35s cubic-bezier(.3,1.6,.5,1);}
+  .sticker.focus{animation:wiggle .6s ease-in-out infinite;}
+  @keyframes wiggle{0%,100%{transform:rotate(var(--r)) scale(1.18)}50%{transform:rotate(calc(var(--r) + 8deg)) scale(1.24)}}
+  .sticker{transform:rotate(var(--r));}
+  .float{animation:float 3.2s ease-in-out infinite;}
+  @keyframes float{0%,100%{translate:0 0}50%{translate:0 -6px}}
+
+  /* character poses */
+  #girl .arm{transform-box:view-box;transition:transform .35s cubic-bezier(.3,1.5,.5,1);}
+  #girl #armR{transform-origin:138px 168px;}
+  #girl #armL{transform-origin:62px 168px;}
+  #girl.point #armR{transform:rotate(-118deg);}
+  #girl.point #armL{transform:rotate(8deg);}
+  #girl.explain #armR{transform:rotate(-62deg);}
+  #girl.explain #armL{transform:rotate(62deg);}
+  #girl.cheer #armR{transform:rotate(-150deg);}
+  #girl.cheer #armL{transform:rotate(150deg);}
+  #girl #head{transform-box:view-box;transform-origin:100px 150px;animation:nod 1.6s ease-in-out infinite;}
+  @keyframes nod{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(3deg)}}
+  #mouth{transform-box:fill-box;transform-origin:center;}
+  .talking #mouth{animation:talk .22s steps(2) infinite;}
+  @keyframes talk{0%{transform:scaleY(1)}100%{transform:scaleY(.35)}}
+
+  /* subtitles */
+  #sub{
+    font-size:25px;font-weight:700;line-height:1.35;text-align:center;
+    background:#fff;border:3px solid var(--ink);border-radius:14px;
+    padding:8px 16px;box-shadow:4px 5px 0 var(--ink);
+    white-space:nowrap;
+  }
+  .pop-in{animation:pop .32s cubic-bezier(.2,1.8,.4,1) both;}
+  @keyframes pop{0%{transform:scale(.4) rotate(-6deg);opacity:0}70%{opacity:1}100%{transform:scale(1) rotate(var(--sr,0deg));opacity:1}}
+  .hl{
+    display:inline-block;padding:0 8px;margin:0 2px;
+    border:2px solid var(--ink);border-radius:8px;
+    box-shadow:2px 3px 0 var(--ink);
+    animation:stamp .38s .12s cubic-bezier(.2,1.8,.4,1) both;
+  }
+  @keyframes stamp{0%{transform:scale(1.5) rotate(0deg)}100%{transform:scale(1) rotate(var(--hr,1deg))}}
+
+  #trick{transition:background .3s;}
+  #trick.swap{animation:pop .4s cubic-bezier(.2,1.8,.4,1) both;}
+
+  #overlay{transition:opacity .25s;}
+  #overlay.hide{opacity:0;pointer-events:none;}
+  .btn{border:3px solid var(--ink);box-shadow:4px 5px 0 var(--ink);transition:transform .1s, box-shadow .1s;}
+  .btn:active{transform:translate(3px,4px);box-shadow:1px 1px 0 var(--ink);}
+  .btn:focus-visible{outline:3px dashed var(--blue);outline-offset:4px;}
+
+  @media (prefers-reduced-motion: reduce){
+    .float,#girl #head,.sticker.focus{animation:none!important;}
+  }
+</style>
+</head>
+<body>
+<div id="fit">
+<div id="stage" class="w-[390px] h-[844px] overflow-hidden rounded-[28px]">
+
+  <!-- paper grain -->
+  <svg id="grain" width="390" height="844" aria-hidden="true">
+    <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="3" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .45  0 0 0 0 .35  0 0 0 0 .2  0 0 0 .55 0"/></filter>
+    <rect width="100%" height="100%" filter="url(#noise)"/>
+  </svg>
+
+  <!-- header -->
+  <div class="absolute top-10 left-0 right-0 flex flex-col items-center gap-2">
+    <div id="trick" class="px-3 py-0.5 text-sm font-bold border-2 border-black rounded-lg -rotate-2 shadow-[2px_3px_0_#1B1B1B]" style="background:var(--yellow)">INTRO</div>
+    <h1 class="text-[30px] font-bold leading-tight text-center">ทำซับให้คน<span class="relative inline-block">ดูจำได้<svg class="absolute -bottom-2 left-0 w-full" height="10" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M2 6 Q25 1 50 6 T98 5" stroke="#FF7A45" stroke-width="4" fill="none" stroke-linecap="round"/></svg></span></h1>
+  </div>
+
+  <!-- doodle arrows -->
+  <svg class="absolute left-[46px] top-[150px]" width="70" height="60" viewBox="0 0 70 60" aria-hidden="true">
+    <path d="M6 8 C 20 40, 40 46, 60 40" fill="none" stroke="#1B1B1B" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 7"/>
+    <path d="M50 32 L62 40 L50 48" fill="none" stroke="#1B1B1B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <svg class="absolute right-[40px] top-[420px]" width="60" height="70" viewBox="0 0 60 70" aria-hidden="true">
+    <path d="M50 6 C 56 30, 30 50, 10 56" fill="none" stroke="#1B1B1B" stroke-width="3" stroke-linecap="round"/>
+    <path d="M20 46 L8 57 L22 63" fill="none" stroke="#1B1B1B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <!-- sparkles -->
+  <svg class="absolute left-[300px] top-[150px] float" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><path d="M17 2 L20 14 L32 17 L20 20 L17 32 L14 20 L2 17 L14 14Z" fill="#FFD93D" stroke="#1B1B1B" stroke-width="2.5" stroke-linejoin="round"/></svg>
+  <svg class="absolute left-[30px] top-[470px] float" style="animation-delay:-1.4s" width="24" height="24" viewBox="0 0 34 34" aria-hidden="true"><path d="M17 2 L20 14 L32 17 L20 20 L17 32 L14 20 L2 17 L14 14Z" fill="#7ED6A0" stroke="#1B1B1B" stroke-width="3" stroke-linejoin="round"/></svg>
+
+  <!-- character -->
+  <div class="absolute left-1/2 -translate-x-1/2 top-[172px] w-[236px] h-[236px] rounded-full bg-white border-[3px] border-black overflow-hidden shadow-[5px_6px_0_rgba(0,0,0,.18)]">
+    <svg id="girl" class="explain talking" viewBox="0 0 200 200" width="230" height="230" aria-label="ผู้หญิงเสื้อเหลือง">
+      <circle cx="100" cy="100" r="100" fill="#FFF3D1"/>
+      <!-- arms behind body -->
+      <g id="armL" class="arm">
+        <line x1="62" y1="168" x2="62" y2="214" stroke="#1B1B1B" stroke-width="25" stroke-linecap="round"/>
+        <line x1="62" y1="168" x2="62" y2="214" stroke="#FFD93D" stroke-width="19" stroke-linecap="round"/>
+        <circle cx="62" cy="224" r="10" fill="#F6C9A2" stroke="#1B1B1B" stroke-width="3"/>
+      </g>
+      <!-- body -->
+      <path d="M42 205 C 44 168, 66 150, 100 150 C 134 150, 156 168, 158 205 Z" fill="#FFD93D" stroke="#1B1B1B" stroke-width="3"/>
+      <path d="M86 151 L100 168 L114 151" fill="#FFF8E8" stroke="#1B1B1B" stroke-width="3" stroke-linejoin="round"/>
+      <!-- right arm (pointing) -->
+      <g id="armR" class="arm">
+        <line x1="138" y1="168" x2="138" y2="214" stroke="#1B1B1B" stroke-width="25" stroke-linecap="round"/>
+        <line x1="138" y1="168" x2="138" y2="214" stroke="#FFD93D" stroke-width="19" stroke-linecap="round"/>
+        <circle cx="138" cy="222" r="9" fill="#F6C9A2" stroke="#1B1B1B" stroke-width="3"/>
+        <path d="M138 228 L138 240" stroke="#1B1B1B" stroke-width="9" stroke-linecap="round"/>
+        <path d="M138 228 L138 240" stroke="#F6C9A2" stroke-width="4" stroke-linecap="round"/>
+      </g>
+      <!-- head -->
+      <g id="head">
+        <rect x="91" y="132" width="18" height="22" rx="6" fill="#F6C9A2" stroke="#1B1B1B" stroke-width="3"/>
+        <!-- hair back (short bob) -->
+        <path d="M52 92 C 50 50, 150 50, 148 92 L150 128 C 140 138, 128 136, 124 128 L76 128 C 72 136, 60 138, 50 128 Z" fill="#4A2C1A" stroke="#1B1B1B" stroke-width="3" stroke-linejoin="round"/>
+        <ellipse cx="100" cy="100" rx="38" ry="40" fill="#F6C9A2" stroke="#1B1B1B" stroke-width="3"/>
+        <!-- bangs -->
+        <path d="M60 92 C 62 58, 138 54, 142 92 C 126 84, 112 72, 104 66 C 96 78, 80 88, 60 92 Z" fill="#4A2C1A" stroke="#1B1B1B" stroke-width="3" stroke-linejoin="round"/>
+        <!-- eyes -->
+        <ellipse cx="86" cy="102" rx="3.6" ry="5" fill="#1B1B1B"/>
+        <ellipse cx="114" cy="102" rx="3.6" ry="5" fill="#1B1B1B"/>
+        <circle cx="87.2" cy="100" r="1.2" fill="#fff"/><circle cx="115.2" cy="100" r="1.2" fill="#fff"/>
+        <path d="M80 92 Q86 89 92 92 M108 92 Q114 89 120 92" stroke="#1B1B1B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- blush -->
+        <ellipse cx="76" cy="114" rx="7" ry="4" fill="#FF7A45" opacity=".35"/>
+        <ellipse cx="124" cy="114" rx="7" ry="4" fill="#FF7A45" opacity=".35"/>
+        <!-- mouth -->
+        <path id="mouth" d="M90 118 Q100 130 110 118 Z" fill="#B23A2B" stroke="#1B1B1B" stroke-width="2.5" stroke-linejoin="round"/>
+      </g>
+    </svg>
+  </div>
+  <!-- tape on circle -->
+  <div class="absolute left-[150px] top-[160px] w-[90px] h-[24px] -rotate-6 border-2 border-black/30" style="background:rgba(255,217,61,.55)" aria-hidden="true"></div>
+
+  <!-- stopwatch -->
+  <div id="st-stopwatch" class="sticker left-[30px] top-[214px]" style="--r:-12deg" aria-hidden="true">
+    <svg width="72" height="82" viewBox="0 0 72 82">
+      <rect x="29" y="2" width="14" height="10" rx="3" fill="#FF7A45" stroke="#1B1B1B" stroke-width="3"/>
+      <circle cx="36" cy="46" r="31" fill="#fff" stroke="#1B1B1B" stroke-width="3.5"/>
+      <circle cx="36" cy="46" r="24" fill="none" stroke="#1B1B1B" stroke-width="1.5" stroke-dasharray="2 8.2"/>
+      <line id="hand" x1="36" y1="46" x2="36" y2="26" stroke="#FF7A45" stroke-width="4" stroke-linecap="round" style="transform-origin:36px 46px"/>
+      <circle cx="36" cy="46" r="4" fill="#1B1B1B"/>
+    </svg>
+  </div>
+
+  <!-- scissors -->
+  <div id="st-scissors" class="sticker left-[290px] top-[250px]" style="--r:18deg" aria-hidden="true">
+    <svg width="76" height="76" viewBox="0 0 76 76">
+      <path d="M30 40 L70 8" stroke="#1B1B1B" stroke-width="8" stroke-linecap="round"/>
+      <path d="M30 40 L70 8" stroke="#d9dde3" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M36 30 L70 62" stroke="#1B1B1B" stroke-width="8" stroke-linecap="round"/>
+      <path d="M36 30 L70 62" stroke="#d9dde3" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="18" cy="50" r="12" fill="#5B8DEF" stroke="#1B1B1B" stroke-width="3.5"/>
+      <circle cx="18" cy="50" r="5" fill="#FFF8E8" stroke="#1B1B1B" stroke-width="2"/>
+      <circle cx="24" cy="20" r="12" fill="#5B8DEF" stroke="#1B1B1B" stroke-width="3.5"/>
+      <circle cx="24" cy="20" r="5" fill="#FFF8E8" stroke="#1B1B1B" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <!-- highlighter -->
+  <div id="st-highlighter" class="sticker left-[36px] top-[392px]" style="--r:-34deg" aria-hidden="true">
+    <svg width="40" height="110" viewBox="0 0 40 110">
+      <path d="M12 6 L28 6 L28 20 L12 20Z" fill="#7ED6A0" stroke="#1B1B1B" stroke-width="3"/>
+      <rect x="6" y="20" width="28" height="62" rx="5" fill="#7ED6A0" stroke="#1B1B1B" stroke-width="3"/>
+      <rect x="12" y="34" width="16" height="30" rx="3" fill="#fff" opacity=".6"/>
+      <path d="M8 82 L32 82 L28 96 L12 96Z" fill="#fff" stroke="#1B1B1B" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M14 96 L26 96 L24 106 L16 104Z" fill="#7ED6A0" stroke="#1B1B1B" stroke-width="3" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- 50% tag -->
+  <div id="st-tag" class="sticker left-[280px] top-[350px]" style="--r:14deg" aria-hidden="true">
+    <svg width="96" height="62" viewBox="0 0 96 62">
+      <path d="M22 4 L90 4 L90 58 L22 58 L4 31 Z" fill="#FF7A45" stroke="#1B1B1B" stroke-width="3.5" stroke-linejoin="round"/>
+      <circle cx="20" cy="31" r="5" fill="#FFF8E8" stroke="#1B1B1B" stroke-width="2.5"/>
+      <text x="58" y="41" text-anchor="middle" font-family="IBM Plex Sans Thai, sans-serif" font-weight="700" font-size="26" fill="#1B1B1B">50%</text>
+    </svg>
+  </div>
+
+  <!-- phone mockup -->
+  <div id="st-phone" class="sticker left-[148px] top-[440px]" style="--r:-6deg" aria-hidden="true">
+    <svg width="94" height="150" viewBox="0 0 94 150">
+      <rect x="3" y="3" width="88" height="144" rx="16" fill="#1B1B1B"/>
+      <rect x="9" y="12" width="76" height="126" rx="10" fill="#FFF8E8"/>
+      <rect x="34" y="6" width="26" height="4" rx="2" fill="#555"/>
+      <circle cx="47" cy="56" r="20" fill="#FFD93D" stroke="#1B1B1B" stroke-width="2"/>
+      <circle cx="47" cy="50" r="8" fill="#4A2C1A"/>
+      <rect x="18" y="92" width="58" height="18" rx="5" fill="#fff" stroke="#1B1B1B" stroke-width="2"/>
+      <rect x="23" y="97" width="16" height="8" rx="2" fill="#555"/>
+      <rect x="42" y="96" width="28" height="10" rx="3" fill="#7ED6A0" stroke="#1B1B1B" stroke-width="1.5" transform="rotate(-3 56 101)"/>
+      <rect x="20" y="120" width="54" height="5" rx="2.5" fill="#e5d9bd"/>
+      <rect x="20" y="120" width="24" height="5" rx="2.5" fill="#FF7A45"/>
+    </svg>
+  </div>
+
+  <!-- paper clip -->
+  <svg class="absolute left-[312px] top-[440px] rotate-[24deg]" width="26" height="64" viewBox="0 0 26 64" aria-hidden="true">
+    <path d="M18 18 L18 48 a6 6 0 0 1 -12 0 L6 12 a8 8 0 0 1 16 0 L22 52 a9 9 0 0 1 -18 0 L4 22" fill="none" stroke="#5B5B5B" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+
+  <!-- subtitle (TRICK 01 + 02 live here) -->
+  <div class="absolute bottom-24 left-1/2 -translate-x-1/2 flex justify-center w-full px-4">
+    <div id="sub" aria-live="polite">&nbsp;</div>
+  </div>
+
+  <!-- progress + controls -->
+  <div class="absolute bottom-8 left-6 right-6 flex items-center gap-3">
+    <button id="ctrl" class="btn shrink-0 w-11 h-11 rounded-full flex items-center justify-center" style="background:var(--green)" aria-label="เล่น">
+      <svg id="ctrlIcon" width="18" height="18" viewBox="0 0 18 18"><path d="M4 2 L16 9 L4 16Z" fill="#1B1B1B"/></svg>
+    </button>
+    <div class="flex-1 h-3 rounded-full border-2 border-black bg-white overflow-hidden">
+      <div id="bar" class="h-full" style="width:0;background:var(--orange)"></div>
+    </div>
+    <span id="time" class="text-sm font-bold tabular-nums w-10 text-right">0.0s</span>
+  </div>
+
+  <!-- start / replay overlay -->
+  <div id="overlay" class="absolute inset-0 flex flex-col items-center justify-center gap-4" style="background:rgba(255,248,232,.72);backdrop-filter:blur(2px)">
+    <button id="big" class="btn px-7 py-3 rounded-2xl text-2xl font-bold flex items-center gap-3" style="background:var(--yellow)">
+      <svg width="22" height="22" viewBox="0 0 18 18"><path d="M4 2 L16 9 L4 16Z" fill="#1B1B1B"/></svg>
+      <span id="bigLabel">เล่นคลิป</span>
+    </button>
+    <p class="text-sm font-bold opacity-70">คลิปจำลอง ~21 วินาที · 9:16</p>
+  </div>
+</div>
+</div>
+
+<script>
+const C = { orange:"#FF7A45", yellow:"#FFD93D", blue:"#5B8DEF", green:"#7ED6A0" };
+
+// TRICK 01: every chunk ≤ 5 words, 0.6–1.2s.  TRICK 02: highlight words with the 4-color palette.
+const timeline = [
+  { text:"รู้ไหม?", duration:700, pose:"point" },
+  { text:"ซับยาวๆ", highlight:{word:"ซับยาว", color:C.yellow}, duration:800, pose:"explain" },
+  { text:"ทำคนเลื่อนผ่าน", duration:900, pose:"explain" },
+  { text:"ใน 3 วินาที", highlight:{word:"3 วินาที", color:C.orange}, duration:1000, pose:"point", focus:"stopwatch" },
+  { text:"วันนี้มี 2 ทริค", highlight:{word:"2 ทริค", color:C.orange}, duration:1000, pose:"cheer" },
+  { text:"ทริคแรก", highlight:{word:"ทริคแรก", color:C.yellow}, duration:800, pose:"point", trick:"TRICK 01", trickColor:C.yellow },
+  { text:"ซับต้องสั้น", highlight:{word:"สั้น", color:C.yellow}, duration:900, pose:"explain", focus:"scissors" },
+  { text:"ตัดประโยคยาว", highlight:{word:"ตัด", color:C.green}, duration:900, pose:"point", focus:"scissors" },
+  { text:"เป็นท่อนสั้นๆ", duration:800, pose:"explain", focus:"scissors" },
+  { text:"ไม่เกิน 5 คำ", highlight:{word:"5 คำ", color:C.orange}, duration:900, pose:"point" },
+  { text:"อ่านจบ", duration:600, pose:"explain", focus:"stopwatch" },
+  { text:"ในพริบตาเดียว", highlight:{word:"พริบตา", color:C.blue}, duration:1000, pose:"cheer", focus:"stopwatch" },
+  { text:"ไม่ต้องหยุดคลิป", highlight:{word:"ไม่ต้องหยุด", color:C.blue}, duration:1000, pose:"explain", focus:"phone" },
+  { text:"ทริคที่สอง", highlight:{word:"ทริคที่สอง", color:C.yellow}, duration:800, pose:"point", trick:"TRICK 02", trickColor:C.blue },
+  { text:"เน้นคำสำคัญ", highlight:{word:"คำสำคัญ", color:C.yellow}, duration:900, pose:"explain", focus:"highlighter" },
+  { text:"ใส่กล่องสี", highlight:{word:"กล่องสี", color:C.green}, duration:800, pose:"point", focus:"highlighter" },
+  { text:"ตัวเลขใช้สีส้ม", highlight:{word:"สีส้ม", color:C.orange}, duration:900, pose:"explain", focus:"tag" },
+  { text:"ลดเหลือ 50%", highlight:{word:"50%", color:C.orange}, duration:1000, pose:"point", focus:"tag" },
+  { text:"ผลลัพธ์ใช้สีฟ้า", highlight:{word:"สีฟ้า", color:C.blue}, duration:900, pose:"explain" },
+  { text:"คนดูจำได้ทันที", highlight:{word:"จำได้", color:C.blue}, duration:1000, pose:"cheer", focus:"phone" },
+  { text:"Action ใช้สีเขียว", highlight:{word:"สีเขียว", color:C.green}, duration:900, pose:"explain", focus:"highlighter" },
+  { text:"ลองทำตามดู", highlight:{word:"ทำตาม", color:C.green}, duration:800, pose:"point" },
+  { text:"แล้วกดเซฟไว้เลย", highlight:{word:"เซฟ", color:C.green}, duration:1100, pose:"cheer", focus:"phone", trick:"SAVE!", trickColor:C.green },
+];
+const TOTAL = timeline.reduce((s,c)=>s+c.duration,0);
+
+const $ = id => document.getElementById(id);
+const sub=$("sub"), girl=$("girl"), bar=$("bar"), timeEl=$("time"), trick=$("trick");
+const overlay=$("overlay"), bigLabel=$("bigLabel"), ctrlIcon=$("ctrlIcon"), ctrl=$("ctrl"), hand=$("hand");
+const stickers=["stopwatch","scissors","highlighter","tag","phone"].map(n=>$("st-"+n));
+
+const esc = s => s.replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+function renderChunk(c){
+  let html = esc(c.text);
+  if (c.highlight){
+    const w = esc(c.highlight.word), tilt = (Math.random()*3-1).toFixed(1); // -1..2deg
+    html = html.replace(w, `<span class="hl" style="background:${c.highlight.color};--hr:${tilt}deg">${w}</span>`);
+  }
+  sub.innerHTML = html;
+  sub.style.setProperty("--sr", (Math.random()*4-2).toFixed(1)+"deg");
+  sub.classList.remove("pop-in"); void sub.offsetWidth; sub.classList.add("pop-in");
+}
+
+let idx=0, timer=null, playing=false, startAt=0, elapsedBefore=0, chunkLeft=0, chunkStart=0, raf=null;
+
+function show(i){
+  const c = timeline[i];
+  renderChunk(c);
+  girl.setAttribute("class", (c.pose||"explain")+" talking");
+  stickers.forEach(s=>s.classList.toggle("focus", s.id==="st-"+c.focus));
+  if (c.trick){
+    trick.textContent=c.trick; trick.style.background=c.trickColor;
+    trick.classList.remove("swap"); void trick.offsetWidth; trick.classList.add("swap");
+  }
+}
+function schedule(ms){
+  chunkStart=performance.now(); chunkLeft=ms;
+  timer=setTimeout(()=>{
+    idx++;
+    if (idx>=timeline.length){ finish(); return; }
+    show(idx); schedule(timeline[idx].duration);
+  }, ms);
+}
+function tick(){
+  const t = Math.min(TOTAL, elapsedBefore + (performance.now()-startAt));
+  bar.style.width = (t/TOTAL*100)+"%";
+  timeEl.textContent = (t/1000).toFixed(1)+"s";
+  hand.style.transform = `rotate(${t/TOTAL*720}deg)`;
+  if (playing) raf=requestAnimationFrame(tick);
+}
+function setIcon(isPlaying){
+  ctrlIcon.innerHTML = isPlaying
+    ? '<rect x="3" y="2" width="4" height="14" fill="#1B1B1B"/><rect x="11" y="2" width="4" height="14" fill="#1B1B1B"/>'
+    : '<path d="M4 2 L16 9 L4 16Z" fill="#1B1B1B"/>';
+  ctrl.setAttribute("aria-label", isPlaying ? "หยุดชั่วคราว" : "เล่น");
+}
+function play(){
+  overlay.classList.add("hide");
+  playing=true; setIcon(true);
+  startAt=performance.now();
+  if (chunkLeft>0){ girl.classList.add("talking"); schedule(chunkLeft); }
+  else { show(idx); schedule(timeline[idx].duration); }
+  tick();
+}
+function pause(){
+  playing=false; setIcon(false);
+  clearTimeout(timer); cancelAnimationFrame(raf);
+  elapsedBefore += performance.now()-startAt;
+  chunkLeft = Math.max(0, chunkLeft - (performance.now()-chunkStart));
+  girl.classList.remove("talking");
+}
+function reset(){
+  clearTimeout(timer); cancelAnimationFrame(raf);
+  idx=0; elapsedBefore=0; chunkLeft=0;
+  trick.textContent="INTRO"; trick.style.background=C.yellow;
+}
+function finish(){
+  playing=false; setIcon(false); cancelAnimationFrame(raf);
+  elapsedBefore=TOTAL; tick();
+  girl.setAttribute("class","cheer");
+  stickers.forEach(s=>s.classList.remove("focus"));
+  bigLabel.textContent="เล่นซ้ำ";
+  overlay.classList.remove("hide");
+  idx=timeline.length;
+}
+function toggle(){
+  if (playing) pause();
+  else { if (idx>=timeline.length) reset(); play(); }
+}
+$("big").addEventListener("click", ()=>{ reset(); play(); });
+ctrl.addEventListener("click", toggle);
+document.addEventListener("keydown", e=>{ if(e.code==="Space"){ e.preventDefault(); toggle(); }});
+
+// scale the 390×844 stage to fit any screen without horizontal scroll
+function fit(){
+  const s = Math.min(window.innerWidth/390, window.innerHeight/844, 1.25);
+  $("stage").style.transform = `scale(${s})`;
+  $("fit").style.width = 390*s+"px"; $("fit").style.height = 844*s+"px";
+}
+window.addEventListener("resize", fit); fit();
+show(0); girl.classList.remove("talking"); sub.classList.remove("pop-in");
+</script>
+</body>
+</html>
