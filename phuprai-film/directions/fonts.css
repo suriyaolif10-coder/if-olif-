@@ -1,0 +1,11 @@
+@font-face{font-family:Kanit;src:url(../assets/fonts/Kanit-Light.ttf);font-weight:300}
+@font-face{font-family:Kanit;src:url(../assets/fonts/Kanit-Medium.ttf);font-weight:500}
+@font-face{font-family:Kanit;src:url(../assets/fonts/Kanit-Bold.ttf);font-weight:700}
+@font-face{font-family:Kanit;src:url(../assets/fonts/Kanit-Black.ttf);font-weight:900}
+@font-face{font-family:Sarabun;src:url(../assets/fonts/Sarabun-Regular.ttf);font-weight:400}
+@font-face{font-family:Sarabun;src:url(../assets/fonts/Sarabun-SemiBold.ttf);font-weight:600}
+@font-face{font-family:Taviraj;src:url(../assets/fonts/Taviraj-SemiBold.ttf);font-weight:600}
+@font-face{font-family:Taviraj;src:url(../assets/fonts/Taviraj-Bold.ttf);font-weight:700}
+:root{--cream:#f8f5e3;--label:#e8e3c4;--gold:#ebbe1d;--navy:#1d2c8c;--olive:#353615;--olive2:#566008;--ink:#121119;--wood:#c4a165;--wall:#ebdfd3}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden}
+.f{position:relative;width:1080px;height:1920px;overflow:hidden}
