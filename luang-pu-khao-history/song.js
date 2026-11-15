@@ -32,7 +32,7 @@ for (const t of sc.bells) {
 for (const s of sc.SHOTS) if (s.i > 0) fx.addMono(I.paperFwip(0.7, s.i), s.t - 0.02, 0.06);
 
 // the user's voiceover, with the music ducked underneath it
-const voice = MIX.loadAudio(path.join(__dirname, 'assets/voice.wav'), { at: sc.VO_AT, gain: 1 });
+const voice = MIX.loadAudio(path.join(__dirname, 'assets/voice.wav'), { at: sc.VO_AT, gain: 1, length: DURATION });
 MIX.duck([pad, bass, keys, bell, verb, dly], voice, { depth: 0.55, attack: 0.05, release: 0.4 });
 const stems = { voice, pad, bass, keys, bell, fx, verb: reverb(verb, { room: 0.88, damp: 0.4 }), dly: pingpong(dly, BEAT * 0.75, 0.3, 3000) };
 const GAIN = { voice: 1.0, pad: 2.2, bass: 0.6, keys: 1.0, bell: 1.0, fx: 0.6, verb: 1, dly: 1 };
@@ -40,6 +40,6 @@ const out = path.join(__dirname, 'out');
 const mix = MIX.mixdown(stems, GAIN, { stemDir: process.env.STEMS ? out : null });
 MIX.highpass(mix, 25);
 MIX.fadeOut(mix, DURATION - 2.5, DURATION);
-const M = MIX.master(mix, 0.7, undefined, { lufs: -14 });
+const M = MIX.master(mix, 0.7, 0.7, { lufs: -14 });
 MIX.writeWav(path.join(out, 'music.wav'), mix);
 console.log(`wrote out/music.wav (${DURATION}s, ${M.lufs.toFixed(1)} LUFS)`);

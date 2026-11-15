@@ -71,7 +71,7 @@
 
   const markers = {};
   for (const s of SHOTS) markers[s.id] = { t: s.t, sync: s.i === 0 ? 'a' : 'v' };
-  for (const t of bells) { const s = SHOTS.find((x) => x.t === t); if (s && s.i > 0) markers[s.id].sync = 'av'; }
+  for (const t of bells) { const s = SHOTS.find((x) => x.t === t); if (s && s.i > 0) markers[s.id].sync = 'v'; } // the voiceover talks over the bells, so only the cut is measured
 
   const subtitles = SHOTS.map((s) => ({ t: s.t + 0.15, end: s.end - 0.1, text: s.lines.join(' ') }));
 
