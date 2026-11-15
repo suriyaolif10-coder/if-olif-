@@ -1,0 +1,22 @@
+[
+  {"shot":1,"time":"00:00-00:03","dialogue":"ชายคนหนึ่ง มีเมีย มีลูกสามคน มีนา มีบ้าน","search_query_en":"Isan village rice field 1900s old photo","text_overlay":"มีครบทุกอย่าง","motion":"Ken Burns slow zoom-in"},
+  {"shot":2,"time":"00:03-00:06","dialogue":"แต่วันหนึ่ง เขาทิ้งทุกอย่าง แล้วเดินเข้าป่า","search_query_en":"barefoot monk walking into dark forest path","text_overlay":"ทิ้งทุกอย่าง","motion":"Parallax 3D dolly forward"},
+  {"shot":3,"time":"00:06-00:09","dialogue":"เขาคือ หลวงปู่ขาว อนาลโย","search_query_en":"Luang Pu Khao Analayo portrait","text_overlay":"หลวงปู่ขาว อนาลโย","motion":"zoom-in + parallax (หน้าท่านแยกจากพื้นหลัง)"},
+  {"shot":4,"time":"00:09-00:12","dialogue":"เกิด 28 ธันวาคม 2431 บ้านบ่อชะเนง อำนาจเจริญ","search_query_en":"Amnat Charoen province map Thailand","text_overlay":"พ.ศ. 2431","motion":"Map Motion: pin drop อำนาจเจริญ"},
+  {"shot":5,"time":"00:12-00:15","dialogue":"ชื่อเดิม ขาว โคระถา ลูกชาวนาธรรมดา","search_query_en":"Isan farmer buffalo rice paddy vintage","text_overlay":"ลูกชาวนาธรรมดา","motion":"Ken Burns pan left-to-right"},
+  {"shot":6,"time":"00:15-00:18","dialogue":"อายุ 20 พ่อแม่จัดให้แต่งงาน มีลูกด้วยกันสามคน","search_query_en":"traditional Thai Isan wooden stilt house","text_overlay":"แต่งงานตอนอายุ 20","motion":"zoom-in + parallax"},
+  {"shot":7,"time":"00:18-00:21","dialogue":"แต่ชีวิตคู่ไม่ราบรื่น สุดท้ายต้องแยกทางกัน","search_query_en":"broken wooden door old house shadow","text_overlay":"แยกทาง","motion":"slow zoom-out + desaturate"},
+  {"shot":8,"time":"00:21-00:24","dialogue":"เขาเห็นว่า ความรัก ความหวง คือทุกข์","search_query_en":"candle flame dark close up","text_overlay":"ความหวง = ทุกข์","motion":"Ken Burns slow zoom-in"},
+  {"shot":9,"time":"00:24-00:27","dialogue":"พ.ศ. 2462 ออกบวชที่วัดโพธิ์ศรี บ้านเกิด","search_query_en":"Thai monk ordination ceremony shaved head","text_overlay":"บวช พ.ศ. 2462","motion":"Parallax 3D"},
+  {"shot":10,"time":"00:27-00:30","dialogue":"ฉายาของท่าน อนาลโย แปลว่า ผู้ไม่มีอาลัย","search_query_en":"saffron robe texture sunlight","text_overlay":"อนาลโย = ไม่อาลัย","motion":"slow push-in + text pop"},
+  {"shot":11,"time":"00:30-00:33","dialogue":"ท่านออกตามหาครูที่ยิ่งใหญ่ที่สุดแห่งยุค","search_query_en":"forest monk umbrella klot walking","text_overlay":"ตามหาครู","motion":"Parallax 3D tracking"},
+  {"shot":12,"time":"00:33-00:36","dialogue":"หลวงปู่มั่น ภูริทัตโต","search_query_en":"Ajahn Mun Bhuridatta portrait","text_overlay":"หลวงปู่มั่น","motion":"zoom-in + parallax"},
+  {"shot":13,"time":"00:36-00:39","dialogue":"ธุดงค์เกือบทุกภาค กับหลวงปู่ฝั้น หลวงปู่แหวน หลวงปู่ตื้อ","search_query_en":"Thailand map dhutanga route mountains","text_overlay":"ธุดงค์ทั่วประเทศ","motion":"Map Motion: เส้นทางวิ่งหลายภาค"},
+  {"shot":14,"time":"00:39-00:42","dialogue":"คืนหนึ่ง ท่านนั่งสมาธิอยู่ในกลด","search_query_en":"monk meditating under umbrella tent night forest","text_overlay":"กลางป่า ตอนกลางคืน","motion":"slow zoom-in + vignette"},
+  {"shot":15,"time":"00:42-00:45","dialogue":"ช้างป่าตัวใหญ่ เดินเข้ามาหา ยื่นงวงเข้ามาใกล้","search_query_en":"wild Asian elephant at night forest","text_overlay":"ช้างป่าเข้ามาหา","motion":"Parallax 3D: ช้าง foreground ขยับเข้า"},
+  {"shot":16,"time":"00:45-00:48","dialogue":"ท่านไม่หนี นั่งแผ่เมตตาอยู่อย่างนั้น","search_query_en":"elephant trunk close up calm","text_overlay":"ไม่หนี","motion":"slow push-in + hold"},
+  {"shot":17,"time":"00:48-00:51","dialogue":"พ.ศ. 2501 ท่านมาหยุดที่ถ้ำกลองเพล หนองบัวลำภู","search_query_en":"Wat Tham Klong Phen Nong Bua Lamphu","text_overlay":"วัดถ้ำกลองเพล","motion":"Map Motion: pin drop หนองบัวลำภู"},
+  {"shot":18,"time":"00:51-00:54","dialogue":"อยู่ที่นั่นจนวาระสุดท้าย","search_query_en":"sandstone cave temple forest Thailand","text_overlay":"จนวาระสุดท้าย","motion":"Ken Burns slow zoom-out"},
+  {"shot":19,"time":"00:54-00:57","dialogue":"16 พฤษภาคม 2526 ท่านละสังขาร อายุ 95 ปี","search_query_en":"sunset over forest silhouette","text_overlay":"95 ปี · 64 พรรษา","motion":"slow zoom-out + fade"},
+  {"shot":20,"time":"00:57-01:00","dialogue":"วันนี้ อัฐิของท่าน ยังอยู่ที่พิพิธภัณฑ์ รูปทรงหินสามก้อน","search_query_en":"Luang Pu Khao Analayo museum Wat Tham Klong Phen","text_overlay":"ผู้ไม่มีอาลัย","motion":"Parallax 3D push-in → end card"}
+]
