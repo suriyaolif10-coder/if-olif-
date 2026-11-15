@@ -343,7 +343,8 @@
       const sh = S.SHOTS.find((s) => t >= s.t && t < s.end) || S.SHOTS[S.SHOTS.length - 1];
       const u = clamp((t - sh.t) / (sh.end - sh.t));
       // slow push-in on every shot (the reference's camera)
-      const z = 1 + 0.06 * ease.inOutQuad(u);
+      const len = sh.end - sh.t, half = len > 6.5 && u >= 0.5; // long shots punch in halfway (wide -> close, like the reference)
+      const z = (half ? 1.16 : 1) + 0.05 * ease.inOutQuad(half ? (u - 0.5) * 2 : len > 6.5 ? u * 2 : u);
       ctx.save(); ctx.translate(W / 2, H * 0.45); ctx.scale(z, z); ctx.translate(-W / 2, -H * 0.45);
       shots[sh.id](ctx, t, u);
       ctx.restore();
