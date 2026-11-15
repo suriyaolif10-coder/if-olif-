@@ -1,98 +1,357 @@
 <!doctype html>
-<html lang="zh-CN" data-composition-variables='[
-  {"id":"kicker","type":"string","label":"眉题","default":"HUASHU-MOTION"},
-  {"id":"title","type":"string","label":"标题","default":"一句话，变成会动的画面"},
-  {"id":"subtitle","type":"string","label":"副标题","default":"对着画面指一下，就能改"},
-  {"id":"stat","type":"number","label":"数字","default":100,"min":0,"max":9999,"step":1},
-  {"id":"statLabel","type":"string","label":"数字说明","default":"% 由代码生成，随时可改"},
-  {"id":"accent","type":"color","label":"强调色","default":"#d9480f"},
-  {"id":"paper","type":"color","label":"底色","default":"#f3eee4"},
-  {"id":"ink","type":"color","label":"文字色","default":"#1d1b18"},
-  {"id":"endHold","type":"number","label":"结尾停留（秒）","default":1.6,"min":0,"max":10,"step":0.1,"group":"节奏"}
+<html lang="th" data-composition-variables='[
+  {"id":"knotWord","type":"string","label":"คำที่ตึง (เปิดเรื่อง)","default":"ปวดตึง"},
+  {"id":"relaxWord","type":"string","label":"คำที่คลาย","default":"คลาย"},
+  {"id":"title","type":"string","label":"ชื่อสินค้า","default":"ภูไพร"},
+  {"id":"titleEn","type":"string","label":"ชื่ออังกฤษ","default":"PHU PRAI MASSAGE OIL"},
+  {"id":"tagline","type":"string","label":"คำโปรย","default":"น้ำมันนวดคลายเส้น"},
+  {"id":"claim","type":"string","label":"สรรพคุณ (ตามฉลาก)","default":"บรรเทาอาการปวดเมื่อยตามร่างกาย"},
+  {"id":"usage","type":"string","label":"วิธีใช้ (ตามฉลาก)","default":"บริเวณที่มีอาการปวดเมื่อย"},
+  {"id":"gold","type":"color","label":"ทอง","default":"#ebbe1d","group":"สี"},
+  {"id":"navy","type":"color","label":"กรมท่า","default":"#1d2c8c","group":"สี"},
+  {"id":"olive","type":"color","label":"เขียวขวด","default":"#353615","group":"สี"},
+  {"id":"cream","type":"color","label":"ครีม","default":"#f8f5e3","group":"สี"},
+  {"id":"endHold","type":"number","label":"ค้างท้าย (วินาที)","default":1.4,"min":0.5,"max":6,"step":0.1,"group":"จังหวะ"}
 ]'>
 <head>
 <meta charset="utf-8">
-<title>huashu-motion · blank</title>
+<title>ภูไพร · คลายเส้น</title>
 <script src="vendor/gsap.min.js"></script>
-<style id="om-fonts">
-@font-face { font-family: "Noto Sans SC"; src: url("assets/fonts/NotoSansSC-500.woff") format("woff"); font-weight: 500; font-style: normal; }
-@font-face { font-family: "Noto Sans SC"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; font-style: normal; }
-</style>
+<script src="vendor/om.js"></script>
 <style>
-  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
-  #film { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--paper); color: var(--ink); font-family: "Noto Sans SC", sans-serif; font-weight: 500; }
-  .grain { position: absolute; inset: 0; opacity: .5; background:
-      radial-gradient(1200px 700px at 20% 10%, #ffffff80, transparent 60%),
-      radial-gradient(900px 600px at 90% 100%, #00000010, transparent 60%); }
-  .kicker { position: absolute; left: 160px; top: 300px; font-size: 26px; letter-spacing: 10px; color: var(--accent); }
-  .title { position: absolute; margin: 0; left: 150px; top: 350px; width: 1620px; font-size: 128px; line-height: 1.12; letter-spacing: -4px; font-weight: 900; }
-  .title .ch { display: inline-block; }
-  .title .mask { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 10px; }
-  .rule { position: absolute; left: 160px; top: 528px; width: 1100px; height: 10px; background: var(--accent); transform-origin: 0 50%; }
-  .subtitle { position: absolute; left: 160px; top: 580px; font-size: 44px; opacity: .72; }
-  .stat { position: absolute; left: 160px; top: 300px; display: flex; align-items: baseline; gap: 36px; }
-  .stat .num { font-size: 360px; line-height: 1; letter-spacing: -14px; font-weight: 900; color: var(--accent); font-variant-numeric: tabular-nums; }
-  .stat .lbl { font-size: 64px; }
-  .end span { display: block; }
-  .end { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 56px; letter-spacing: 4px; }
-  .end b { color: var(--accent); font-weight: 500; }
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Light.ttf);font-weight:300}
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Medium.ttf);font-weight:500}
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Bold.ttf);font-weight:700}
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Black.ttf);font-weight:900}
+@font-face{font-family:Taviraj;src:url(assets/fonts/Taviraj-SemiBold.ttf);font-weight:600}
+@font-face{font-family:Taviraj;src:url(assets/fonts/Taviraj-Bold.ttf);font-weight:700}
+:root{--ink:#121119;--red:#b3261e}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+#film{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--cream);color:var(--ink);font-family:Kanit,sans-serif}
+.layer{position:absolute;inset:0}
+.ctr{position:absolute;left:0;right:0;text-align:center;white-space:nowrap}
+.g{display:inline-block}
+
+/* hook knot */
+#hookcam{transform-origin:540px 880px}
+.knot{top:700px;font:900 300px/1.1 Kanit;letter-spacing:-44px;transform:scaleX(.62) skewX(-8deg) rotate(-4deg)}
+.tag{position:absolute;left:90px;top:150px;font:500 40px Kanit;color:var(--red);letter-spacing:2px}
+.hint{top:1300px;font:500 60px Kanit;color:var(--navy);letter-spacing:4px}
+
+/* build words */
+.bw{visibility:hidden}
+.w1{background:var(--cream)} .w1 .t{top:420px;font:900 760px/1.1 Kanit;letter-spacing:-60px;transform:scaleX(.6) rotate(-6deg)}
+.w2{background:var(--olive);color:var(--cream)} .w2 .t{top:700px;font:900 330px/1.1 Kanit}
+.w3{background:var(--cream)} .w3 .t{top:560px;font:900 280px/1.1 Kanit;transform:rotate(-14deg) scaleY(1.5)}
+.w4{background:var(--ink);color:var(--cream)} .w4 .t{top:640px;font:900 420px/1.1 Kanit;letter-spacing:-30px;transform:scaleX(.7)}
+.bw .lab{position:absolute;left:90px;bottom:150px;font:500 38px Kanit;letter-spacing:3px;opacity:.75}
+
+/* stop + relax */
+#relaxL{visibility:hidden}
+.drop{position:absolute;left:520px;top:-80px;width:44px;height:60px;border-radius:50% 50% 50% 50%/62% 62% 38% 38%;background:radial-gradient(circle at 35% 30%,#fffc 0 12%,var(--gold) 42%,#9b770a 100%);box-shadow:0 0 34px #ebbe1daa}
+.knot2{top:640px;font:900 300px/1.1 Kanit;letter-spacing:-44px;transform:scaleX(.62) skewX(-8deg) rotate(-4deg)}
+.loose{top:640px;font:300 300px/1.1 Kanit;color:var(--olive)}
+.stroke{position:absolute;left:-200px;top:700px;width:1480px;height:300px;border-radius:200px;background:linear-gradient(90deg,#ebbe1d00,var(--gold) 16%,#f4d45a 55%,var(--gold) 84%,#ebbe1d00);transform-origin:0 50%}
+.relaxSub{top:1120px;font:500 64px Kanit;color:var(--navy);letter-spacing:4px}
+
+.rleaf{position:absolute;width:420px;opacity:0;filter:blur(3px)}
+#rleaf1{left:-500px;top:1300px}
+#rleaf2{left:1100px;top:250px;transform:rotate(140deg)}
+.eleaf{position:absolute;width:380px;filter:blur(12px) brightness(.8);opacity:.8}
+/* montage */
+#montage{visibility:hidden}
+.mfield{position:absolute;inset:0}
+.band{position:absolute;left:-60px;right:-60px;top:760px;height:400px;background:var(--gold);transform:rotate(-4deg)}
+.shot{position:absolute;inset:0;visibility:hidden}
+.shot .k{position:absolute;left:0;right:0;top:600px;text-align:center;font:500 46px Kanit;letter-spacing:6px}
+.shot .big{position:absolute;left:0;right:0;top:810px;text-align:center;font:900 190px/1.15 Kanit;color:var(--navy);white-space:nowrap}
+.shot .num{position:absolute;left:0;right:0;top:1200px;text-align:center;font:700 96px Kanit}
+.shot .num small{font:500 52px Kanit}
+.snip{position:absolute;left:50%;top:1340px;transform:translateX(-50%) rotate(3deg);border:10px solid #fff;box-shadow:0 30px 60px #0004;overflow:hidden}
+.snip img{display:block}
+.snip .hl{position:absolute;left:4px;right:4px;height:64px;border:6px solid var(--gold);border-radius:10px;box-shadow:0 0 0 999px #12111940}
+.pill{display:inline-block;background:var(--navy);color:var(--cream);border-radius:28px;padding:0 70px}
+.flash .big{font-size:520px;top:620px}
+.medal{position:absolute;left:50%;top:1180px;width:520px;transform:translateX(-50%)}
+
+/* bottle */
+#bottleL{visibility:hidden}
+.bottle{position:absolute;left:50%;top:420px;height:1180px;margin-left:-214px;filter:drop-shadow(0 40px 40px #35361555)}
+.stroke2{position:absolute;left:-200px;top:980px;width:1480px;height:340px;border-radius:200px;background:linear-gradient(90deg,#ebbe1d00,var(--gold) 16%,#f4d45a 55%,var(--gold) 84%,#ebbe1d00);transform:rotate(-8deg)}
+.use1{top:150px;font:900 150px/1.1 Kanit;color:var(--olive);letter-spacing:6px}
+.use2{top:1660px;font:500 54px Kanit;color:var(--navy)}
+.leafA{position:absolute;left:-120px;top:1450px;width:620px;filter:blur(10px);opacity:.9}
+.leafB{position:absolute;right:-180px;top:180px;width:560px;filter:blur(16px) brightness(.85);opacity:.85;transform:rotate(160deg)}
+
+/* end */
+#endL{visibility:hidden}
+.flood{position:absolute;inset:0;background:radial-gradient(900px 1100px at 50% 52%,#5d6a1c 0%,var(--olive) 55%,#16170a 100%)}
+.wm{top:120px;font:700 210px/1.15 Taviraj;color:var(--cream)}
+.wmEn{top:430px;font:500 40px Kanit;color:var(--gold);letter-spacing:16px}
+.ebottle{position:absolute;left:50%;top:500px;height:1000px;margin-left:-182px;filter:drop-shadow(0 40px 50px #000a)}
+.disc{position:absolute;left:290px;width:500px;top:1450px;height:90px;border-radius:50%;background:radial-gradient(closest-side,#c4a165,#7d6236 75%,#3a2d16)}
+.etag{top:1575px;font:500 66px Kanit;color:var(--cream)}
+.eclaim{top:1675px;font:300 40px Kanit;color:#e8e3c4}
+.echips{top:1755px;font:500 34px Kanit;color:var(--cream)}
+.echips span{display:inline-block;border:2px solid var(--gold);color:var(--gold);border-radius:30px;padding:2px 26px;margin:0 8px}
+.sheen{position:absolute;left:0;top:300px;width:260px;height:1400px;transform:rotate(18deg);background:linear-gradient(90deg,transparent,#f8f5e333,transparent);mix-blend-mode:screen}
+.emedal{position:absolute;left:70px;top:520px;width:190px}
 </style>
 </head>
 <body>
-<!--
-  huashu-motion contract (all optional, all plain HTML + GSAP):
-  1. Editable values are composition variables on <html>. The studio inspector edits their defaults.
-  2. data-om-id names things people can point at; comments arrive with the id under the pointer.
-  3. Timeline labels "scene:<id>" become the studio's scene strip.
-  No data-duration on the root: the film is as long as the timeline, so timing variables (endHold) can change it.
--->
-<div id="film" data-composition-id="film" data-width="1920" data-height="1080">
-  <div class="grain"></div>
+<div id="film" data-composition-id="film" data-width="1080" data-height="1920">
+  <audio id="om-sound" src="assets/sound.wav" data-start="0" data-duration="30.432" data-track-index="8" data-volume="1"></audio>
 
-  <section id="s-title">
-    <div class="kicker" data-om-id="kicker" data-var-text="kicker">HUASHU-MOTION</div>
-    <h1 class="title" data-om-id="title" data-om-var="title"></h1>
-    <div class="rule" data-om-id="rule"></div>
-    <div class="subtitle" data-om-id="subtitle" data-var-text="subtitle">对着画面指一下，就能改</div>
+  <!-- 1 · hook: the knot -->
+  <section id="hookL" class="layer" data-om-id="hook">
+    <div class="tag" data-om-id="hook-tag">ตึง · ล้า · ปวดเมื่อย</div>
+    <div id="hookcam" class="layer">
+      <div class="ctr knot" id="knot" data-om-id="knot" data-om-var="knotWord"></div>
+      <div class="ctr hint" data-om-id="hook-hint">เมื่อยทั้งวัน?</div>
+    </div>
   </section>
 
-  <section id="s-stat" class="stat" data-om-id="stat">
-    <span class="num" id="num">0</span>
-    <span class="lbl" data-var-text="statLabel">% 由代码生成，随时可改</span>
+  <!-- 2 · build: four tense words -->
+  <section class="layer bw w1" data-om-id="word-tung"><div class="ctr t">ตึง</div><div class="lab">01 / ตึง</div></section>
+  <section class="layer bw w2" data-om-id="word-la"><div class="ctr t" id="la">ล้า</div><div class="lab">02 / ล้า</div></section>
+  <section class="layer bw w3" data-om-id="word-muay"><div class="ctr t">เมื่อย</div><div class="lab">03 / เมื่อย</div></section>
+  <section class="layer bw w4" data-om-id="word-puad"><div class="ctr t" id="puad">ปวด</div><div class="lab">04 / ปวด</div></section>
+
+  <!-- 3–4 · stop and relax -->
+  <section id="relaxL" class="layer" data-om-id="relax">
+    <div class="stroke" id="stroke" data-om-id="oil-stroke"></div>
+    <div class="ctr knot2" id="knot2" data-om-id="knot-2"></div>
+    <div class="ctr loose" id="loose" data-om-id="relax-word" data-om-var="relaxWord"></div>
+    <div class="drop" id="drop" data-om-id="oil-drop"></div>
+    <img class="rleaf" id="rleaf1" src="assets/leaves-left.png"><img class="rleaf" id="rleaf2" src="assets/leaves-left.png">
+    <div class="ctr relaxSub" data-om-id="relax-sub" data-var-text="tagline">น้ำมันนวดคลายเส้น</div>
   </section>
 
-  <section id="s-end" class="end" data-om-id="end"><span>made with <b>huashu-motion</b></span></section>
+  <!-- 5 · montage on the gold band -->
+  <section id="montage" class="layer" data-om-id="montage">
+    <div class="mfield" id="mfield"></div>
+    <div class="band" id="band" data-om-id="band"></div>
+    <div class="shot" data-om-id="m-plai"><div class="k">ส่วนประกอบสำคัญ</div><div class="big">น้ำมันไพล</div><div class="num">4.77 <small>กรัม</small></div>
+      <div class="snip" style="width:440px;height:330px"><img src="assets/crop-ingredients.png" style="margin-top:-60px"><div class="hl" style="top:58px"></div></div></div>
+    <div class="shot" data-om-id="m-mint"><div class="k">ส่วนประกอบสำคัญ</div><div class="big" style="font-size:150px;top:830px">เกล็ดสะระแหน่</div><div class="num">0.67 <small>กรัม</small></div>
+      <div class="snip" style="width:440px;height:330px"><img src="assets/crop-ingredients.png" style="margin-top:-170px"><div class="hl" style="top:166px"></div></div></div>
+    <div class="shot" data-om-id="m-borneol"><div class="k">ส่วนประกอบสำคัญ</div><div class="big">พิมเสน</div><div class="num">0.25 <small>กรัม</small></div></div>
+    <div class="shot" data-om-id="m-thaimed"><div class="k" style="color:var(--cream)">ตำรับ</div><div class="big" style="font-size:150px;top:840px"><span class="pill">ยาแผนไทย</span></div></div>
+    <div class="shot" data-om-id="m-gmp"><div class="k" style="color:var(--cream)">ผลิตตามมาตรฐาน</div><div class="big">PIC/S GMP</div>
+      <div class="snip" style="width:400px;height:230px;top:1260px"><img src="assets/crop-pics.png"></div></div>
+    <div class="shot" data-om-id="m-reg"><div class="k">เลขทะเบียน</div><div class="big">G 326/69</div></div>
+    <div class="shot flash" data-om-id="m-ta"><div class="big" style="color:var(--ink)">ทา</div></div>
+    <div class="shot flash" data-om-id="m-thu"><div class="big" style="color:var(--gold)">ถู</div></div>
+    <div class="shot flash" data-om-id="m-nuad"><div class="big" style="color:var(--navy)">นวด</div></div>
+    <div class="shot flash" data-om-id="m-klai"><div class="big" style="color:var(--cream);font-weight:300;font-size:380px;top:700px">คลาย</div></div>
+    <div class="shot" data-om-id="m-brand"><div class="k">ตำรับจาก</div><div class="big" style="font-family:Taviraj;font-weight:700">สุขกาล</div><img class="medal" src="assets/crop-medallion.png"></div>
+  </section>
+
+  <!-- 6 · the bottle -->
+  <section id="bottleL" class="layer" data-om-id="bottle-scene">
+    <img class="leafB" src="assets/leaves-left.png">
+    <div class="stroke2" id="stroke2" data-om-id="oil-stroke-2"></div>
+    <div class="ctr use1" data-om-id="usage-verbs">ทา · ถู · นวด</div>
+    <img class="bottle" id="bottle" src="assets/bottle.png" data-om-id="bottle">
+    <div class="ctr use2" data-om-id="usage" data-var-text="usage">บริเวณที่มีอาการปวดเมื่อย</div>
+    <img class="leafA" id="leafA" src="assets/leaves-left.png">
+  </section>
+
+  <!-- 7 · end card -->
+  <section id="endL" class="layer" data-om-id="end">
+    <div class="flood" id="flood"></div>
+    <img class="eleaf" id="eleaf" src="assets/leaves-left.png" style="left:-200px;top:1500px">
+    <div class="ctr wm" data-om-id="wordmark" data-var-text="title">ภูไพร</div>
+    <div class="ctr wmEn" data-om-id="wordmark-en" data-var-text="titleEn">PHU PRAI MASSAGE OIL</div>
+    <div class="disc"></div>
+    <img class="ebottle" id="ebottle" src="assets/bottle.png" data-om-id="end-bottle">
+    <div class="sheen" id="sheen"></div>
+    <div class="ctr etag" data-om-id="end-tagline" data-var-text="tagline">น้ำมันนวดคลายเส้น</div>
+    <div class="ctr eclaim" data-om-id="end-claim" data-var-text="claim">บรรเทาอาการปวดเมื่อยตามร่างกาย</div>
+    <div class="ctr echips" data-om-id="end-chips"><span>ยาแผนไทย</span><span>สุขกาล</span></div>
+  </section>
 </div>
 
+<script type="text/vnd.abc" id="om-score">
+X:1
+T:ภูไพร · คลายเส้น (Thai folk pulse, D pentatonic)
+M:4/4
+L:1/8
+Q:1/4=124
+K:D
+V:MAR inst=marimba role=melody gain=0.8
+!mark:hook! !mf! A,2 B,A, z2 F,E, | A,2 B,A, z2 d2 |
+!mark:build! !crescendo(! A,B,DE FEDB, | A,B,DE FA B2 !crescendo)! |
+!mark:stop! z8 |
+!mark:relax! !f! d3 B A2 FE | D2 EF A2 B2 |
+!mark:montage! !ff! d/B/A/F/ d/B/A/F/ e/B/A/F/ e/B/A/F/ | d/B/A/F/ d/B/A/F/ e/B/A/F/ e/B/A/F/ | d/B/A/F/ d/B/A/F/ a/f/e/d/ B/A/F/E/ |
+!mark:bottle! !f! d3 B A2 FE | D2 EF A2 B2 |
+!mark:logo! !mf! A2 BA d4 | z2 FE D4 | [DAd]2 z6 |
+V:GLK inst=glock gain=0.4
+z8 | z8 | z8 | z8 |
+!mp! z2 a z f z d z |
+z8 | z8 | z8 | z8 | z8 |
+z4 a2 b2 | d'4 z4 |
+a2 ba d'4 | z8 | d'2 z6 |
+V:STR inst=strings gain=0.45
+z8 | z8 | !p! [A,D]8 | [B,E]8 | z8 |
+!mf! [DFAd]8 | [B,DFB]8 | [G,B,Dd]8 | [A,CEA]8 | [DFAd]8 |
+[B,DFB]8 | [G,B,DG]8 | [DFAd]8 | [A,DEA]8 | [DFAd]2 z6 |
+V:BAS inst=sinebass gain=0.8
+!mf! D,,2 z2 D,,2 z2 | D,,2 z2 D,,2 z2 | D,,D,, z D,, D,,D,, z D,, | E,,E,, z E,, E,,E,, z E,, | z8 |
+D,,2 D,2 D,,2 D,2 | B,,2 B,2 B,,2 B,2 | G,,2 G,2 G,,2 G,2 | A,,2 A,2 A,,2 A,2 | D,,2 D,2 D,,2 D,2 |
+B,,2 B,2 B,,2 B,2 | G,,2 G,2 A,,2 A,2 | D,,4 z4 | A,,4 z4 | D,,2 z6 |
+V:KK inst=drums kit=808 gain=0.9
+!mf! C,,2 z2 C,,2 z2 | C,,2 z2 C,,2 z C,, | C,,2 C,,2 C,,2 C,,2 | C,,2 C,,2 C,,2 C,,C,, | z8 |
+!hit! !ff! [^C,C,,]2 C,,2 C,,2 C,,2 | C,,2 C,,2 C,,2 C,,2 | [^C,C,,]2 C,,2 C,,2 C,,2 | C,,2 C,,2 C,,2 C,,2 | C,,2 C,,2 C,,2 C,,/C,,/C,,/C,,/ |
+[^C,C,,]2 C,,2 C,,2 C,,2 | C,,2 C,,2 C,,2 C,,2 | [^C,C,,]2 z6 | z8 | C,,2 z6 |
+V:PC inst=drums kit=folk gain=0.7
+!mf! z2 D,,2 z2 D,,2 | z2 D,,2 z D,, D,,2 | ^F,,^F,, D,,^F,, ^F,,^F,, D,,^F,, | !crescendo(! D,,D,, D,,D,, D,,/D,,/D,,/D,,/ D,,/D,,/D,,/D,,/ !crescendo)! |
+!rise(! z8 |
+!rise)! ^F,,^F,, D,,^F,, ^F,,^F,, D,,^F,, | ^F,,^F,, D,,^F,, ^F,,^F,, D,,^F,, |
+^F,,/^F,,/^F,,/^F,,/ D,,/^F,,/^F,,/^F,,/ ^F,,/^F,,/^F,,/^F,,/ D,,/^F,,/^F,,/^F,,/ | ^F,,/^F,,/^F,,/^F,,/ D,,/^F,,/^F,,/^F,,/ ^F,,/^F,,/^F,,/^F,,/ D,,/^F,,/^F,,/^F,,/ | ^F,,/^F,,/^F,,/^F,,/ D,,/^F,,/^F,,/^F,,/ A,,/A,,/A,,/A,,/ D,,/D,,/D,,/D,,/ |
+^F,,^F,, D,,^F,, ^F,,^F,, D,,^F,, | ^F,,^F,, D,,^F,, ^F,,^F,, D,,^F,, |
+z2 D,,2 z4 | z8 | z8 |
+</script>
 <script>
-  const V = OM.vars();
-  const esc = (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c] || c;
-  const title = document.querySelector('.title');
-  // Each character sits in its own mask so it can rise into place; spaces keep their width.
-  title.innerHTML = [...V.title].map((c) => c === ' ' ? ' ' : `<span class="mask"><span class="ch">${esc(c)}</span></span>`).join('');
+const V = OM.vars();
+OM.music({ bpm: 124 });
+const B = (n) => OM.beat(n);
+const seg = new Intl.Segmenter('th', { granularity: 'grapheme' });
+const graphemes = (s) => [...seg.segment(s)].map((x) => x.segment);
+const ROT = [-14, 9, -6, 12, -10, 7, -8];
+const YS = [10, -20, 16, 0, 12, -14, 8];
+function knotInto(el, word) {
+  el.innerHTML = graphemes(word).map((g, i) =>
+    `<span class="g" style="transform:rotate(${ROT[i % 7]}deg) translateY(${YS[i % 7]}px)">${g}</span>`).join('');
+}
+knotInto(document.getElementById('knot'), V.knotWord);
+knotInto(document.getElementById('knot2'), V.knotWord);
+const loose = document.getElementById('loose');
+loose.innerHTML = graphemes(V.relaxWord).map((g) => `<span class="g">${g}</span>`).join('');
 
-  const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+const tl = gsap.timeline({ paused: true, defaults: { ease: 'expo.out' } });
+const show = (el, t) => tl.set(el, { visibility: 'visible' }, t);
+const hide = (el, t) => tl.set(el, { visibility: 'hidden' }, t);
 
-  tl.addLabel('scene:title', 0)
-    .fromTo('.kicker', { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: .6 }, .15)
-    .fromTo('.title .ch', { yPercent: 110 }, { yPercent: 0, duration: .9, stagger: .045, ease: 'expo.out' }, .25)
-    .fromTo('.rule', { scaleX: 0 }, { scaleX: 1, duration: .9, ease: 'expo.inOut' }, .9)
-    .fromTo('.subtitle', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .7 }, 1.25)
-    .to('#s-title', { opacity: 0, y: -40, duration: .5, ease: 'power2.in' }, 3.1);
+/* ── 1 · hook (bars 1–2, beats 0–8): the knot is there at frame 0 and shudders on every kick ── */
+tl.addLabel('scene:hook', 0);
+tl.fromTo('#hookcam', { scale: 1 }, { scale: 1.12, duration: B(4), ease: 'none' }, 0);
+tl.fromTo('#hookcam', { scale: 1.45, rotation: -3 }, { scale: 1.6, rotation: -3, duration: B(4), ease: 'none' }, B(4)); // punch-in on bar 2
+[0, 2, 4, 6, 7].forEach((b, i) => {
+  tl.fromTo('#knot', { scaleX: .74, x: (i % 2 ? 14 : -14) }, { scaleX: .62, x: 0, duration: B(1) * .9, ease: 'elastic.out(1.2,.35)' }, B(b));
+});
+tl.fromTo('#knot .g', { y: 0 }, { y: (i) => (i % 2 ? -12 : 12), duration: B(.5), ease: 'sine.inOut', repeat: 15, yoyo: true }, 0);
+tl.fromTo('.tag', { opacity: 1, x: 0 }, { opacity: 1, x: 0, duration: .01 }, 0);
+tl.fromTo('.hint', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: B(1) }, B(2));
+OM.sfx('thud', B(4), { gain: .5 });
 
-  const counter = { v: 0 };
-  tl.addLabel('scene:stat', 3.4)
-    .fromTo('#s-stat', { opacity: 0 }, { opacity: 1, duration: .3 }, 3.4)
-    .fromTo('.stat .lbl', { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: .6 }, 3.7)
-    .fromTo(counter, { v: 0 }, { v: V.stat, duration: 1.3, ease: 'expo.out',
-        onUpdate: () => { document.getElementById('num').textContent = Math.round(counter.v); } }, 3.4)
-    .to('#s-stat', { opacity: 0, scale: .96, duration: .45, ease: 'power2.in' }, 5.8);
+/* ── 2 · build (bars 3–4, beats 8–16): one tense word per two beats, each its own scale and move ── */
+tl.addLabel('scene:build', B(8));
+hide('#hookL', B(8));
+const W = ['.w1', '.w2', '.w3', '.w4'];
+W.forEach((w, i) => { show(w, B(8 + i * 2)); if (i < 3) hide(w, B(10 + i * 2)); });
+hide('.w4', B(16));
+tl.fromTo('.w1 .t', { scaleX: .8, rotation: -6 }, { scaleX: .55, rotation: -6, duration: B(2), ease: 'power2.out' }, B(8));
+tl.fromTo('#la', { y: -60, rotation: 0 }, { y: 120, rotation: 8, duration: B(2), ease: 'power2.in' }, B(10));
+tl.fromTo('.w3 .t', { x: 260, rotation: -14, scaleY: 1.5 }, { x: -180, rotation: -14, scaleY: 1.5, duration: B(2), ease: 'none' }, B(12));
+tl.fromTo('#puad', { x: -10 }, { x: 10, duration: B(.25), ease: 'none', repeat: 7, yoyo: true }, B(14));
+tl.fromTo('#puad', { scale: 1.25 }, { scale: 1, duration: B(2), ease: 'expo.out' }, B(14));
+[8, 10, 12, 14].forEach((b, i) => OM.sfx('hit', B(b), { gain: .4, pan: [-.3, .3, -.15, .15][i], pitch: 1 + i * .05 }));
 
-  tl.addLabel('scene:end', 6.3)
-    .fromTo('.end span', { opacity: 0, y: 24, scale: .96 }, { opacity: 1, y: 0, scale: 1, duration: 1.1, ease: 'expo.out' }, 6.3)
-    .to({}, { duration: V.endHold }); // the closing hold; the film ends when the timeline does
+/* ── 3 · stop (bar 5, beats 16–20): stillness; one drop of oil falls ── */
+tl.addLabel('scene:stop', B(16));
+show('#relaxL', B(16));
+tl.set('#loose', { clipPath: 'inset(0% 100% 0% 0%)' }, 0);
+tl.set('#knot2', { clipPath: 'inset(0% 0% 0% 0%)' }, 0);
+tl.set('#stroke', { scaleX: 0 }, 0);
+tl.set('.relaxSub', { opacity: 0 }, 0);
+tl.fromTo('#drop', { y: 0, scaleY: 1 }, { y: 690, scaleY: 1.25, duration: B(3.4), ease: 'power2.in' }, B(16.6));
+tl.to('#drop', { scale: 2.4, opacity: 0, duration: B(.5), ease: 'power2.out' }, B(20));
 
-  window.__timelines['film'] = tl;
+tl.fromTo('#knot2', { scale: 1, rotation: 0 }, { scale: .82, rotation: -3, duration: B(4), ease: 'power1.in' }, B(16));
+[17, 18, 19].forEach((b) => tl.fromTo('#knot2 .g', { x: -6 }, { x: 0, duration: B(.4), ease: 'elastic.out(1.4,.3)' }, B(b)));
+/* ── 4 · relax (bars 6–7, beats 20–28): the stroke wipes the knot into “คลาย” ── */
+tl.addLabel('scene:relax', B(20));
+OM.sfx('whoosh', B(20) + .25, { gain: .6 });
+tl.fromTo('#stroke', { scaleX: 0 }, { scaleX: 1, duration: B(1.5), ease: 'expo.out' }, B(20));
+tl.fromTo('#knot2', { clipPath: 'inset(0% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 100%)', duration: B(1.5), ease: 'expo.out' }, B(20));
+tl.fromTo('#loose', { clipPath: 'inset(0% 100% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: B(1.5), ease: 'expo.out' }, B(20));
+tl.fromTo('#loose .g', { x: (i, el, a) => (i - (a.length - 1) / 2) * -30 }, { x: (i, el, a) => (i - (a.length - 1) / 2) * 34, duration: B(7), ease: 'power2.out' }, B(20.5));
+tl.fromTo('#loose', { scale: 1.08 }, { scale: 1, duration: B(7), ease: 'power2.out' }, B(20));
+tl.fromTo('#stroke', { y: 0 }, { y: 40, duration: B(7), ease: 'none' }, B(20));
+tl.fromTo('.relaxSub', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: B(1.5) }, OM.sfx('pop', B(24), { gain: .5, note: 3 }));
+
+tl.fromTo('#relaxL', { scale: 1.3 }, { scale: 1, duration: B(8), ease: 'power2.out' }, B(20));
+tl.fromTo('#loose .g', { y: 0 }, { y: (i) => (i % 2 ? -18 : 18), duration: B(1), ease: 'sine.inOut', repeat: 5, yoyo: true }, B(22));
+tl.fromTo('#rleaf1', { x: 0, y: 0, rotation: -20, opacity: .95 }, { x: 1500, y: -500, rotation: 60, opacity: .95, duration: B(8), ease: 'none' }, B(20.5));
+tl.fromTo('#rleaf2', { x: 0, y: 0, rotation: 140, opacity: .9 }, { x: -1500, y: 600, rotation: 40, opacity: .9, duration: B(7), ease: 'none' }, B(21));
+OM.sfx('slide', B(22), { gain: .35, pan: -.3 });
+OM.sfx('slide', B(26), { gain: .35, pan: .3 });
+/* ── 5 · montage (bars 8–10, beats 28–40): the stroke becomes the band; label words slam onto it ── */
+tl.addLabel('scene:montage', B(28));
+hide('#relaxL', B(28));
+show('#montage', B(28));
+const shots = gsap.utils.toArray('#montage .shot');
+const beats = [2, 2, 1, 1, 1, 1, .5, .5, .5, .5, 2];
+const fields = ['#f8f5e3', '#f8f5e3', '#f8f5e3', '#353615', '#353615', '#f8f5e3', '#f8f5e3', '#1d2c8c', '#f8f5e3', '#353615', '#f8f5e3'];
+const bandOn = [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1];
+let t = B(28);
+shots.forEach((el, i) => {
+  show(el, t);
+  if (i) hide(shots[i - 1], t);
+  tl.set('#mfield', { backgroundColor: fields[i] }, t);
+  tl.set('#band', { autoAlpha: bandOn[i] }, t);
+  tl.fromTo(el.querySelector('.big'), { scale: 1.35 }, { scale: 1, duration: Math.min(B(beats[i]), B(1)), ease: 'expo.out' }, t);
+  tl.fromTo(el, { y: 0 }, { y: -18, duration: B(beats[i]), ease: 'none' }, t);
+  const snip = el.querySelector('.snip');
+  if (snip) tl.fromTo(snip, { y: 260, opacity: 0 }, { y: 0, opacity: 1, duration: B(.75), ease: 'expo.out' }, t + B(.25));
+  const medal = el.querySelector('.medal');
+  if (medal) tl.fromTo(medal, { scale: .4, rotation: -30, opacity: 0 }, { scale: 1, rotation: 0, opacity: 1, duration: B(1), ease: 'back.out(1.6)' }, t + B(.25));
+  OM.sfx(beats[i] < 1 ? 'tick' : 'hit', t, { gain: beats[i] < 1 ? .55 : .45, pan: (i % 2 ? .25 : -.25), pitch: 1 + i * .03 });
+  t += B(beats[i]);
+});
+tl.fromTo('#band', { rotation: -4, y: 0 }, { rotation: -2, y: 20, duration: B(12), ease: 'none' }, B(28));
+hide(shots[shots.length - 1], B(40));
+hide('#montage', B(40));
+
+/* ── 6 · bottle (bars 11–12, beats 40–48): the real bottle lands behind the stroke ── */
+tl.addLabel('scene:bottle', B(40));
+show('#bottleL', B(40));
+tl.fromTo('#stroke2', { scaleX: 0, transformOrigin: '0% 50%' }, { scaleX: 1, duration: B(1), ease: 'expo.out' }, B(40));
+tl.fromTo('#bottle', { y: 1300, rotation: 6 }, { y: 0, rotation: 0, duration: B(1.25), ease: 'expo.out' }, B(40));
+OM.sfx('thud', B(40) + .18, { gain: .7 });
+tl.fromTo('#bottle', { scale: 1 }, { scale: 1.05, duration: B(8), ease: 'none' }, B(40));
+tl.fromTo('.use1', { opacity: 0, y: -40 }, { opacity: 1, y: 0, duration: B(1) }, B(41));
+tl.fromTo('.use2', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: B(1) }, B(43));
+OM.sfx('pop', B(41), { gain: .45, note: 1 });
+OM.sfx('pop', B(43), { gain: .45, note: 5 });
+tl.fromTo('#leafA', { x: 300, y: 80 }, { x: -260, y: -40, duration: B(8), ease: 'none' }, B(40));
+tl.fromTo('.leafB', { x: -60 }, { x: 80, duration: B(8), ease: 'none' }, B(40));
+tl.fromTo('#bottleL', { scale: 1 }, { scale: 1.55, duration: B(.6), ease: 'expo.out', transformOrigin: '540px 1120px' }, B(44));
+tl.fromTo('#bottleL', { rotation: 0 }, { rotation: -2, duration: B(4), ease: 'none' }, B(44));
+OM.sfx('whip', B(44), { gain: .5 });
+hide('#bottleL', B(48));
+
+/* ── 7 · logo (bars 13–15 + hold): olive flood, the same bottle carried, the wordmark ── */
+tl.addLabel('scene:logo', B(48));
+show('#endL', B(48));
+tl.fromTo('#flood', { clipPath: 'circle(0% at 50% 60%)' }, { clipPath: 'circle(130% at 50% 60%)', duration: B(1.5), ease: 'expo.out' }, B(48));
+tl.fromTo('#ebottle', { y: 40, scale: 1.12 }, { y: 0, scale: 1, duration: B(2), ease: 'expo.out' }, B(48));
+tl.fromTo('#ebottle', { scale: 1 }, { scale: 1.05, duration: B(10), ease: 'none' }, B(50));
+tl.fromTo('#sheen', { x: -700 }, { x: 1500, duration: B(3), ease: 'power2.inOut' }, B(56));
+OM.sfx('sparkle', B(57), { gain: .4 });
+tl.fromTo('.wm', { opacity: 0, y: 60, letterSpacing: '40px' }, { opacity: 1, y: 0, letterSpacing: '4px', duration: B(2) }, B(49));
+tl.fromTo('.wmEn', { opacity: 0 }, { opacity: 1, duration: B(2) }, B(50));
+tl.fromTo('.etag', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: B(1.5) }, B(52));
+tl.fromTo('.eclaim', { opacity: 0 }, { opacity: 1, duration: B(1.5) }, B(53));
+tl.fromTo('.echips span', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: B(1), stagger: B(.5) }, B(54));
+OM.sfx('chime', B(49), { gain: .5 });
+tl.fromTo('#endL', { scale: 1 }, { scale: 1.07, duration: B(60) - B(49) + V.endHold, ease: 'none' }, B(49));
+tl.fromTo('#eleaf', { x: 0, y: 0, rotation: 0 }, { x: 1500, y: -700, rotation: 90, duration: B(12), ease: 'none' }, B(48));
+tl.to({}, { duration: B(60) - B(55) + V.endHold }, B(55));
+
+window.__timelines['film'] = tl;
 </script>
 </body>
 </html>
