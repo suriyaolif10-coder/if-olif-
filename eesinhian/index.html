@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>อีซิ่นเหี้ยน</title>
+<style>
+  @font-face { font-family: "LomaBold"; src: url("fonts/Loma-Bold.otf") format("opentype"); font-weight: 700; }
+  :root { --bg: #05060a; --panel: #10131b; --line: #232838; --text: #d9dde6; --muted: #8a92a6; --accent: #a8413d; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font-family: "LomaBold", system-ui, sans-serif; }
+  body { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 12px 16px; }
+  #stage { position: relative; height: calc(100vh - 190px); aspect-ratio: 9 / 16; max-width: 100%; background: #000; border: 1px solid var(--line); }
+  #stage canvas { width: 100%; height: 100%; display: block; }
+  .bar { width: min(100%, 720px); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+  button { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font: inherit; font-size: 14px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.on { background: var(--accent); border-color: var(--accent); }
+  input[type=range] { flex: 1; min-width: 160px; accent-color: var(--accent); }
+  #time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 14px; min-width: 110px; text-align: center; }
+  .scenes button { padding: 6px 9px; font-size: 13px; }
+  #note { color: var(--muted); font-size: 12px; text-align: center; max-width: 720px; }
+  body.export { padding: 0; } body.export .bar, body.export #note { display: none; }
+  body.export #stage { height: 1920px; width: 1080px; border: 0; }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="cv" width="1080" height="1920"></canvas></div>
+<div class="bar">
+  <button id="play">▶ เล่น</button>
+  <button id="restart">⟲ เริ่มใหม่</button>
+  <button id="mute">🔊 เสียง</button>
+  <input id="seek" type="range" min="0" max="1000" value="0" aria-label="Timeline">
+  <span id="time">0:00 / 1:30</span>
+</div>
+<div class="bar scenes" id="scenes"></div>
+<div id="note"></div>
+<audio id="amb" src="audio/ambience.wav" preload="auto"></audio>
+<audio id="nar" preload="auto"></audio>
+<script src="story.js"></script>
+<script src="art.js"></script>
+<script>
+(async function () {
+  const P = new URLSearchParams(location.search);
+  const EXPORT = P.has("export");
+  const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+  const amb = document.getElementById("amb"), nar = document.getElementById("nar");
+  if (EXPORT) document.body.classList.add("export");
+  await document.fonts.load('bold 60px "LomaBold"'); await document.fonts.ready;
+
+  // timeline scale: base 90 s, stretched to the real narration length if one exists
+  let scale = parseFloat(P.get("scale") || "1");
+  const note = document.getElementById("note");
+  if (!EXPORT) {
+    const src = P.get("narration") || "audio/narration.mp3";
+    try {
+      const ok = (await fetch(src, { method: "HEAD" })).ok;
+      if (ok) {
+        nar.src = src;
+        await new Promise((r) => { nar.onloadedmetadata = r; nar.onerror = r; });
+        if (nar.duration > 5) scale = nar.duration / STORY.BASE_DURATION;
+        note.textContent = `ใช้เสียงบรรยายจริง: ${src} (${nar.duration.toFixed(1)} วิ) — ฉากและซับยืดตามความยาวเสียง`;
+      }
+    } catch (e) {}
+    if (!nar.src) note.textContent = "ยังไม่มีไฟล์เสียงบรรยาย — ซับใช้เวลาจาก story.js (ชั่วคราว). วางไฟล์ไว้ที่ audio/narration.mp3 เพื่อซิงก์อัตโนมัติ";
+  }
+  const DUR = STORY.BASE_DURATION * scale;
+
+  // export hook: render an exact frame at real time t
+  window.renderAt = (t) => { ART.drawFrame(ctx, t / scale); return true; };
+  window.DURATION = DUR;
+  if (EXPORT) { window.renderAt(0); window.READY = true; return; }
+
+  let playing = false, t0 = 0, base = 0, muted = false;
+  const now = () => playing ? base + (performance.now() - t0) / 1000 : base;
+  const seek = document.getElementById("seek"), time = document.getElementById("time"), playB = document.getElementById("play");
+  const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+  function syncAudio(t) {
+    for (const a of [amb, nar]) if (a.src) { if (Math.abs(a.currentTime - t) > .15) a.currentTime = Math.min(t, (a.duration || 1e9) - .01); }
+    amb.volume = nar.src ? .35 : 1;
+  }
+  function play() { if (now() >= DUR) base = 0; t0 = performance.now(); playing = true; syncAudio(base); amb.play().catch(() => {}); if (nar.src) nar.play().catch(() => {}); playB.textContent = "⏸ หยุด"; }
+  function pause() { base = now(); playing = false; amb.pause(); nar.pause(); playB.textContent = "▶ เล่น"; }
+  function goto(t) { base = Math.max(0, Math.min(DUR, t)); t0 = performance.now(); syncAudio(base); if (!playing) draw(); }
+  playB.onclick = () => (playing ? pause() : play());
+  document.getElementById("restart").onclick = () => { goto(0); if (!playing) play(); };
+  const muteB = document.getElementById("mute");
+  muteB.onclick = () => { muted = !muted; amb.muted = nar.muted = muted; muteB.textContent = muted ? "🔇 ปิดเสียง" : "🔊 เสียง"; };
+  seek.oninput = () => goto(seek.value / 1000 * DUR);
+  const sb = document.getElementById("scenes");
+  STORY.scenes.forEach((s) => { const b = document.createElement("button"); b.textContent = `${s.id}. ${s.name}`; b.onclick = () => goto(s.start * scale + .01); sb.appendChild(b); });
+  window.addEventListener("keydown", (e) => { if (e.code === "Space") { e.preventDefault(); playB.click(); } });
+
+  function draw() {
+    let t = now();
+    if (playing && nar.src && !nar.paused) t = nar.currentTime; // narration is the master clock
+    else if (playing && !amb.paused && amb.readyState > 2) t = amb.currentTime;
+    if (t >= DUR) { t = DUR - 1e-3; if (playing) pause(); base = DUR; }
+    ART.drawFrame(ctx, t / scale);
+    seek.value = Math.round(t / DUR * 1000); time.textContent = `${fmt(t)} / ${fmt(DUR)}`;
+    const cur = STORY.scenes.findIndex((s) => t / scale >= s.start && t / scale < s.end);
+    [...sb.children].forEach((b, i) => b.classList.toggle("on", i === cur));
+  }
+  (function loop() { draw(); requestAnimationFrame(loop); })();
+})();
+</script>
+</body>
+</html>
