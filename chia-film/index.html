@@ -1,98 +1,282 @@
 <!doctype html>
-<html lang="zh-CN" data-composition-variables='[
-  {"id":"kicker","type":"string","label":"眉题","default":"HUASHU-MOTION"},
-  {"id":"title","type":"string","label":"标题","default":"一句话，变成会动的画面"},
-  {"id":"subtitle","type":"string","label":"副标题","default":"对着画面指一下，就能改"},
-  {"id":"stat","type":"number","label":"数字","default":100,"min":0,"max":9999,"step":1},
-  {"id":"statLabel","type":"string","label":"数字说明","default":"% 由代码生成，随时可改"},
-  {"id":"accent","type":"color","label":"强调色","default":"#d9480f"},
-  {"id":"paper","type":"color","label":"底色","default":"#f3eee4"},
-  {"id":"ink","type":"color","label":"文字色","default":"#1d1b18"},
-  {"id":"endHold","type":"number","label":"结尾停留（秒）","default":1.6,"min":0,"max":10,"step":0.1,"group":"节奏"}
+<html lang="th" data-composition-variables='[
+  {"id":"brand","type":"string","label":"แบรนด์","default":"ไร่พระจันทร์"},
+  {"id":"line","type":"string","label":"LINE","default":"LINE @moonfarms"},
+  {"id":"fda","type":"string","label":"เลข อย.","default":"อย. 66-2-01162-6-0056"},
+  {"id":"green","type":"color","label":"เขียว","default":"#5f8f4e","group":"สี"},
+  {"id":"brown","type":"color","label":"น้ำตาล","default":"#8a786d","group":"สี"},
+  {"id":"orange","type":"color","label":"ส้ม","default":"#f5a51b","group":"สี"},
+  {"id":"paper","type":"color","label":"พื้น","default":"#f6f4f0","group":"สี"},
+  {"id":"endHold","type":"number","label":"ค้างท้าย (วินาที)","default":1.2,"min":0.3,"max":5,"step":0.1,"group":"จังหวะ"}
 ]'>
 <head>
 <meta charset="utf-8">
-<title>huashu-motion · blank</title>
+<title>เมล็ดเจีย · ไร่พระจันทร์</title>
 <script src="vendor/gsap.min.js"></script>
-<style id="om-fonts">
-@font-face { font-family: "Noto Sans SC"; src: url("assets/fonts/NotoSansSC-500.woff") format("woff"); font-weight: 500; font-style: normal; }
-@font-face { font-family: "Noto Sans SC"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; font-style: normal; }
-</style>
+<script src="vendor/om.js"></script>
+<script src="assets/shapes.js"></script>
 <style>
-  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
-  #film { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--paper); color: var(--ink); font-family: "Noto Sans SC", sans-serif; font-weight: 500; }
-  .grain { position: absolute; inset: 0; opacity: .5; background:
-      radial-gradient(1200px 700px at 20% 10%, #ffffff80, transparent 60%),
-      radial-gradient(900px 600px at 90% 100%, #00000010, transparent 60%); }
-  .kicker { position: absolute; left: 160px; top: 300px; font-size: 26px; letter-spacing: 10px; color: var(--accent); }
-  .title { position: absolute; margin: 0; left: 150px; top: 350px; width: 1620px; font-size: 128px; line-height: 1.12; letter-spacing: -4px; font-weight: 900; }
-  .title .ch { display: inline-block; }
-  .title .mask { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 10px; }
-  .rule { position: absolute; left: 160px; top: 528px; width: 1100px; height: 10px; background: var(--accent); transform-origin: 0 50%; }
-  .subtitle { position: absolute; left: 160px; top: 580px; font-size: 44px; opacity: .72; }
-  .stat { position: absolute; left: 160px; top: 300px; display: flex; align-items: baseline; gap: 36px; }
-  .stat .num { font-size: 360px; line-height: 1; letter-spacing: -14px; font-weight: 900; color: var(--accent); font-variant-numeric: tabular-nums; }
-  .stat .lbl { font-size: 64px; }
-  .end span { display: block; }
-  .end { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 56px; letter-spacing: 4px; }
-  .end b { color: var(--accent); font-weight: 500; }
+@font-face{font-family:Prompt;src:url(assets/fonts/Prompt-Light.ttf);font-weight:300}
+@font-face{font-family:Prompt;src:url(assets/fonts/Prompt-Medium.ttf);font-weight:500}
+@font-face{font-family:Prompt;src:url(assets/fonts/Prompt-SemiBold.ttf);font-weight:600}
+@font-face{font-family:Prompt;src:url(assets/fonts/Prompt-Bold.ttf);font-weight:700}
+@font-face{font-family:Prompt;src:url(assets/fonts/Prompt-ExtraBold.ttf);font-weight:800}
+:root{--ink:#3a332e}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+#film{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--paper);font-family:Prompt,sans-serif;color:var(--ink)}
+.layer{position:absolute;inset:0}
+.ctr{position:absolute;left:0;right:0;text-align:center;white-space:nowrap}
+#seeds{position:absolute;inset:0}
+.logoS{position:absolute;left:390px;top:110px;width:300px}
+/* hook */
+.k1{top:300px;font:500 52px Prompt;color:var(--green);letter-spacing:4px}
+.h1{top:850px;font:700 96px Prompt}
+.h1s{top:990px;font:500 50px Prompt;color:#fff}
+.h1s span{background:var(--green);border-radius:40px;padding:6px 36px}
+/* zero */
+.k2{top:150px;font:700 110px Prompt;color:var(--ink)}
+.chips{position:absolute;left:0;right:0;top:1060px;display:flex;flex-direction:column;align-items:center;gap:22px}
+.chip{font:600 62px Prompt;color:var(--ink);background:#fff;border-radius:60px;padding:8px 46px;box-shadow:0 10px 30px #0001;display:flex;align-items:center;gap:22px}
+.chip i{font-style:normal;color:#fff;background:var(--orange);width:62px;height:62px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:44px}
+/* jars */
+.jar{position:absolute;filter:drop-shadow(0 30px 30px #0003)}
+#jarB{left:235px;top:480px;height:1000px;transform-origin:0 0}
+#jarW{left:60px;top:560px;height:860px}
+.p1{top:170px;font:700 92px/1.15 Prompt}
+.p1 b{color:var(--green)}
+.p2{top:1500px;font:500 54px Prompt;color:var(--brown)}
+.p3{top:1590px;font:300 46px Prompt}
+/* standards */
+.std{position:absolute;left:0;right:0;top:960px;display:flex;flex-direction:column;align-items:center;gap:20px}
+.std .chip{font-size:52px}
+.std .chip i{background:var(--green)}
+.halal{height:70px;border-radius:8px}
+.kS{top:220px;font:500 50px Prompt;color:var(--green);letter-spacing:4px}
+/* how to */
+.one{top:160px;font:600 70px Prompt;color:var(--green)}
+.spoon{position:absolute;left:730px;top:560px;font:700 120px Prompt}
+.water{top:1020px;font:600 80px Prompt}
+.water b{color:#3a9bd5}
+.card{position:absolute;border-radius:28px;overflow:hidden;box-shadow:0 30px 70px #0003;border:12px solid #fff}
+.card img{width:100%;height:100%;object-fit:cover;display:block}
+#pud{left:140px;top:1150px;width:800px;height:620px}
+/* end */
+.eLogo{position:absolute;left:190px;top:170px;width:700px}
+.eT{top:420px;font:700 84px/1.2 Prompt}
+.eT small{display:block;font:500 46px Prompt;color:var(--brown);margin-top:8px}
+.eLine{top:690px}
+.eLine span{display:inline-block;background:#06c755;color:#fff;font:700 56px Prompt;border-radius:50px;padding:6px 44px}
 </style>
 </head>
 <body>
-<!--
-  huashu-motion contract (all optional, all plain HTML + GSAP):
-  1. Editable values are composition variables on <html>. The studio inspector edits their defaults.
-  2. data-om-id names things people can point at; comments arrive with the id under the pointer.
-  3. Timeline labels "scene:<id>" become the studio's scene strip.
-  No data-duration on the root: the film is as long as the timeline, so timing variables (endHold) can change it.
--->
-<div id="film" data-composition-id="film" data-width="1920" data-height="1080">
-  <div class="grain"></div>
+<div id="film" data-composition-id="film" data-width="1080" data-height="1920" data-om-signature="top-right">
+  <audio id="om-sound" src="assets/sound.wav" data-start="0" data-duration="32" data-track-index="8" data-volume="1"></audio>
+  <canvas id="seeds" width="1080" height="1920" data-om-id="seeds"></canvas>
 
-  <section id="s-title">
-    <div class="kicker" data-om-id="kicker" data-var-text="kicker">HUASHU-MOTION</div>
-    <h1 class="title" data-om-id="title" data-om-var="title"></h1>
-    <div class="rule" data-om-id="rule"></div>
-    <div class="subtitle" data-om-id="subtitle" data-var-text="subtitle">对着画面指一下，就能改</div>
+  <section id="hookL" class="layer" data-om-id="hook">
+    <img class="logoS" src="assets/logo.png" data-om-id="logo-small">
+    <div class="ctr k1" data-om-id="hook-kicker">ส่วนประกอบ</div>
+    <div class="ctr h1" data-om-id="hook-title">เมล็ดเจีย 100%</div>
+    <div class="ctr h1s" data-om-id="hook-badge"><span>100% Natural</span></div>
+    <img class="jar" id="hJar" src="assets/jar-white-400.png" style="left:340px;top:1130px;height:660px" data-om-id="hook-jar">
   </section>
 
-  <section id="s-stat" class="stat" data-om-id="stat">
-    <span class="num" id="num">0</span>
-    <span class="lbl" data-var-text="statLabel">% 由代码生成，随时可改</span>
+  <section id="zeroL" class="layer" data-om-id="zero" style="visibility:hidden">
+    <div class="ctr k2" data-om-id="zero-title">ไม่ใส่</div>
+    <div class="chips">
+      <div class="chip"><i>✕</i>แป้ง</div>
+      <div class="chip"><i>✕</i>น้ำตาล</div>
+      <div class="chip"><i>✕</i>วัตถุกันเสีย</div>
+      <div class="chip"><i>✕</i>แต่งสี</div>
+      <div class="chip"><i>✕</i>แต่งกลิ่น</div>
+    </div>
   </section>
 
-  <section id="s-end" class="end" data-om-id="end"><span>made with <b>huashu-motion</b></span></section>
+  <section id="jarsL" class="layer" data-om-id="jars" style="visibility:hidden">
+    <div class="ctr p1" data-om-id="jars-title"><b>WHITE</b> &amp; BLACK<br>CHIA SEEDS</div>
+    <img class="jar" id="jarW" src="assets/jar-white-400.png" data-om-id="jar-white">
+    <img class="jar" id="jarB" src="assets/jar-black-400.png" data-om-id="jar-black">
+    <div class="ctr p2" data-om-id="jars-sub">เมล็ดเจียขาว · เมล็ดเจียดำ</div>
+    <div class="ctr p3" data-om-id="jars-size">น้ำหนักสุทธิ 400 กรัม · ทานได้ 80 ครั้ง</div>
+  </section>
+
+  <section id="stdL" class="layer" data-om-id="standards" style="visibility:hidden">
+    <div class="ctr kS" data-om-id="std-kicker">มาตรฐานรับรอง</div>
+    <div class="std">
+      <div class="chip" data-var-text="fda">อย. 66-2-01162-6-0056</div>
+      <div class="chip"><img class="halal" src="assets/halal-mark.png">ฮาลาล</div>
+      <div class="chip"><i>✓</i>GHP · HACCP</div>
+      <div class="chip"><i>✓</i>MiT · Made in Thailand</div>
+      <div class="chip"><i>✓</i>ตรวจแล็บ ไม่พบ E. coli</div>
+    </div>
+  </section>
+
+  <section id="howL" class="layer" data-om-id="howto" style="visibility:hidden">
+    <div class="ctr one" data-om-id="how-kicker">วิธีทาน</div>
+    <div class="spoon" data-om-id="how-spoon">ช้อน</div>
+    <div class="ctr water" data-om-id="how-water">+ <b>น้ำเปล่า</b> รอให้พองตัว</div>
+    <div class="card" id="pud" data-om-id="pudding"><img src="assets/pudding.jpg"></div>
+  </section>
+
+  <section id="endL" class="layer" data-om-id="end" style="visibility:hidden">
+    <img class="eLogo" src="assets/logo.png" data-om-id="end-logo">
+    <div class="ctr eT" data-om-id="end-title">เมล็ดเจียขาว · ดำ<small>100% Natural · มี อย. · ฮาลาล</small></div>
+    <div class="ctr eLine" data-om-id="end-line"><span data-var-text="line">LINE @moonfarms</span></div>
+    <img class="jar" id="eW" src="assets/jar-white-400.png" style="left:70px;top:900px;height:860px" data-om-id="end-jar-white">
+    <img class="jar" id="eB" src="assets/jar-black-400.png" style="left:545px;top:900px;height:860px" data-om-id="end-jar-black">
+  </section>
 </div>
 
+<script type="text/vnd.abc" id="om-score">
+X:1
+T:เมล็ดเจีย · ไร่พระจันทร์ (acoustic pop, F major)
+M:4/4
+L:1/8
+Q:1/4=120
+K:F
+V:UKE inst=uke gain=0.5
+!mp! !mark:hook! [FAc]2 z2 [FAc]2 z2 | [EGc]2 z2 [EGc]2 z2 | !mf! !mark:free! [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] | [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] | !mark:stop! z8 | !f! !mark:jar! [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] | [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] | !mark:standards! [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] | [FAc] [FAc] [FAc] [FAc] [FAc] [FAc] [FAc] [FAc] | [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] | !mf! !mark:howto! [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] | [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] | !mf! !mark:end! [FAc] [FAc] [FAc] [FAc] [FAc] [FAc] [FAc] [FAc] | [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] | [FAcf]2 z6 |
+V:GLK inst=glock gain=0.4
+!mp! c2 A c f2 e c | c2 G c e2 d c | !mf! z8 | z8 | z2 c' z f z c z | !f! c2 G c e2 d c | d2 A d f2 e d | z8 | z8 | z8 | !mf! z8 | z8 | !mf! c2 A c f2 e c | c2 G c e2 d c | f'2 z6 |
+V:PZ inst=pizz gain=0.45
+!mp! z8 | z8 | !mf! DF DF DF DF | DF DF DF DF | z8 | !f! EG EG EG EG | DF DF DF DF | DF DF DF DF | FA FA FA FA | EG EG EG EG | !mf! DF DF DF DF | DF DF DF DF | !mf! z8 | z8 | [F,C]2 z6 |
+V:BAS inst=bass gain=0.7
+!mp! z8 | z8 | !mf! D,,2 z D,, D,,2 z D,, | B,,,2 z B,,, B,,,2 z B,,, | z8 | !f! C,,2 z C,, C,,2 z C,, | D,,2 z D,, D,,2 z D,, | B,,,2 z B,,, B,,,2 z B,,, | F,,2 z F,, F,,2 z F,, | C,,2 z C,, C,,2 z C,, | !mf! D,,2 z D,, D,,2 z D,, | B,,,2 z B,,, B,,,2 z B,,, | !mf! F,,2 z F,, F,,2 z F,, | C,,2 z C,, C,,2 z C,, | F,,2 z6 |
+V:DR inst=drums kit=pop gain=0.75
+!mp! C,,2 z2 [C,,^D,,]2 z2 | C,,2 z2 [C,,^D,,]2 z2 | !mf! C,,2 [C,,D,,]2 C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 C,,2 D,,/D,,/D,,/D,,/ | !rise(! z8 | !f! !rise)! !hit! [C,,^C,]2 [C,,D,,]2 C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 C,,2 [C,,D,,]2 | !hit! [C,,^C,]2 [C,,D,,]2 C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 C,,2 A,,/A,,/D,,/D,,/ | !mf! C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | !mf! !hit! [C,,^C,]2 [C,,D,,]2 C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 C,,2 [C,,D,,]2 | [C,,^C,]2 z6 |
+V:SH inst=drums kit=pop gain=0.35
+!mp! z8 | z8 | !mf! z ^A z ^A z ^A z ^A | z ^A z ^A z ^A z ^A | z8 | !f! ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ | !mf! z ^A z ^A z ^A z ^A | z ^A z ^A z ^A z ^A | !mf! z ^A z ^A z ^A z ^A | z ^A z ^A z ^A z ^A | z8 |
+</script>
 <script>
-  const V = OM.vars();
-  const esc = (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c] || c;
-  const title = document.querySelector('.title');
-  // Each character sits in its own mask so it can rise into place; spaces keep their width.
-  title.innerHTML = [...V.title].map((c) => c === ' ' ? ' ' : `<span class="mask"><span class="ch">${esc(c)}</span></span>`).join('');
+const V = OM.vars();
+OM.music({ bpm: 120 });
+const B = (n) => OM.beat(n);
+const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+const show = (el, t) => tl.set(el, { visibility: 'visible' }, t);
+const hide = (el, t) => tl.set(el, { visibility: 'hidden' }, t);
 
-  const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+/* ── seeds: 1500 particles move between shapes; a pure function of time ── */
+const S = window.SHAPES, A = window.SEEDATTR, N = A.r.length;
+const KEYS = [ // [time, shape, alpha]
+  [-0.5, 'rain', 1], [0.8, 'p100', 1], [3.7, 'p100', 1], [4.7, 'p0', 1], [7.8, 'p0', 1],
+  [9.4, 'jar', 1], [9.9, 'jar', 1], [10.4, 'jar', 0], [13.0, 'rain', 0], [13.4, 'rain', 1],
+  [14.6, 'ay', 1], [19.7, 'ay', 1], [20.6, 'one', 1], [22.0, 'one', 1], [22.8, 'scatter', 0],
+  [23.6, 'rain', 0], [23.8, 'rain', 1], [25.4, 'pile', 1], [40, 'pile', 1]];
+const sprites = [];
+(function makeSprites() {
+  const R = OM.random(4);
+  for (let k = 0; k < 16; k++) {
+    const c = document.createElement('canvas'); c.width = 40; c.height = 28; const x = c.getContext('2d');
+    const white = k >= 10, v = R();
+    const base = white ? [236 - v * 34, 230 - v * 34, 218 - v * 34] : [52 + v * 70, 46 + v * 62, 42 + v * 54];
+    const g = x.createRadialGradient(14, 10, 2, 20, 14, 22);
+    g.addColorStop(0, `rgb(${base.map((q) => Math.min(255, q + 45) | 0)})`); g.addColorStop(1, `rgb(${base.map((q) => q * .68 | 0)})`);
+    x.fillStyle = g; x.beginPath(); x.ellipse(20, 14, 18, 12, 0, 0, 7); x.fill();
+    if (!white) { x.fillStyle = 'rgba(230,220,200,.35)'; x.beginPath(); x.ellipse(24, 13, 6, 4, 0, 0, 7); x.fill(); }
+    sprites.push(c);
+  }
+})();
+const ctx = document.getElementById('seeds').getContext('2d');
+const ease = (p) => (p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+function draw(t) {
+  ctx.clearRect(0, 0, 1080, 1920);
+  let k = 0; while (k < KEYS.length - 2 && KEYS[k + 1][0] <= t) k++;
+  const [t0, s0, a0] = KEYS[k], [t1, s1, a1] = KEYS[k + 1], D = t1 - t0;
+  const P0 = S[s0], P1 = S[s1];
+  for (let i = 0; i < N; i++) {
+    const d = A.d[i] * .35 * D;
+    let p = Math.min(1, Math.max(0, (t - t0 - d) / (D * .65))); const e = ease(p);
+    let x = P0[i][0] + (P1[i][0] - P0[i][0]) * e, y = P0[i][1] + (P1[i][1] - P0[i][1]) * e;
+    if (s0 !== s1) { const arc = Math.sin(Math.PI * e) * (60 + A.d[i] * 120); x += arc * Math.cos(A.ph[i]); y += arc * Math.sin(A.ph[i]); }
+    x += Math.sin(t * 2.1 + A.ph[i]) * 1.6; y += Math.cos(t * 1.7 + A.ph[i]) * 1.6;
+    const al = a0 + (a1 - a0) * e; if (al <= .01) continue;
+    const r = A.r[i], spr = sprites[(A.white[i] ? 10 + (i % 6) : i % 10)];
+    ctx.globalAlpha = al; ctx.save(); ctx.translate(x, y); ctx.rotate(A.rot[i] + t * .3 * (A.d[i] - .5) + (s0 !== s1 ? e * 3 * (A.d[i] - .5) : 0));
+    ctx.drawImage(spr, -r * 1.1, -r * .75, r * 2.2, r * 1.5); ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+}
 
-  tl.addLabel('scene:title', 0)
-    .fromTo('.kicker', { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: .6 }, .15)
-    .fromTo('.title .ch', { yPercent: 110 }, { yPercent: 0, duration: .9, stagger: .045, ease: 'expo.out' }, .25)
-    .fromTo('.rule', { scaleX: 0 }, { scaleX: 1, duration: .9, ease: 'expo.inOut' }, .9)
-    .fromTo('.subtitle', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .7 }, 1.25)
-    .to('#s-title', { opacity: 0, y: -40, duration: .5, ease: 'power2.in' }, 3.1);
+/* 1 · hook (0–4 s): seeds rain into “100%” */
+tl.addLabel('scene:hook', 0);
+tl.fromTo('.k1', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: B(1.5) }, B(.5));
+tl.fromTo('.logoS', { opacity: 0 }, { opacity: 1, duration: B(1.5) }, 0);
+tl.fromTo('.h1', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: B(1.5) }, B(2));
+tl.fromTo('.h1s', { opacity: 0, scale: .7 }, { opacity: 1, scale: 1, duration: B(1), ease: 'back.out(2)' }, B(4));
+OM.sfx('sparkle', .6, { gain: .35 }); OM.sfx('pop', B(4.2), { gain: .4, note: 5 });
+tl.fromTo('#hJar', { y: 900, rotation: 8 }, { y: 0, rotation: 0, duration: B(2), ease: 'power4.out' }, B(3));
+OM.sfx('thud', B(3.4), { gain: .4 });
+tl.fromTo('#hJar', { rotation: 0 }, { rotation: -3, duration: B(3), ease: 'sine.inOut' }, B(5));
+tl.to('#hookL', { opacity: 0, duration: B(.75), ease: 'power2.in' }, B(7));
+hide('#hookL', B(8));
 
-  const counter = { v: 0 };
-  tl.addLabel('scene:stat', 3.4)
-    .fromTo('#s-stat', { opacity: 0 }, { opacity: 1, duration: .3 }, 3.4)
-    .fromTo('.stat .lbl', { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: .6 }, 3.7)
-    .fromTo(counter, { v: 0 }, { v: V.stat, duration: 1.3, ease: 'expo.out',
-        onUpdate: () => { document.getElementById('num').textContent = Math.round(counter.v); } }, 3.4)
-    .to('#s-stat', { opacity: 0, scale: .96, duration: .45, ease: 'power2.in' }, 5.8);
+/* 2 · zero (4–9 s): “0” and what is not inside, one chip per beat */
+tl.addLabel('scene:free', B(8));
+show('#zeroL', B(8.5));
+tl.fromTo('.k2', { opacity: 0, y: -40 }, { opacity: 1, y: 0, duration: B(1) }, B(9));
+gsap.utils.toArray('#zeroL .chip').forEach((c, i) => {
+  const at = B(10 + i);
+  tl.fromTo(c, { opacity: 0, x: i % 2 ? 300 : -300 }, { opacity: 1, x: 0, duration: B(.75), ease: 'back.out(1.4)' }, at);
+  OM.sfx('pop', at + .1, { gain: .4, note: i + 1, pan: i % 2 ? .3 : -.3 });
+});
+tl.to('#zeroL', { opacity: 0, duration: B(.75), ease: 'power2.in' }, B(15.5));
+hide('#zeroL', B(16.5));
 
-  tl.addLabel('scene:end', 6.3)
-    .fromTo('.end span', { opacity: 0, y: 24, scale: .96 }, { opacity: 1, y: 0, scale: 1, duration: 1.1, ease: 'expo.out' }, 6.3)
-    .to({}, { duration: V.endHold }); // the closing hold; the film ends when the timeline does
+/* 3 · stop + jar (8–14 s): the seeds gather into the jar's silhouette, the real jar appears */
+tl.addLabel('scene:stop', B(16));
+tl.addLabel('scene:jar', B(20));
+show('#jarsL', B(19.2));
+tl.set('#jarW', { opacity: 0 }, 0);
+tl.fromTo('#jarB', { opacity: 0 }, { opacity: 1, duration: B(1.2), ease: 'power2.inOut' }, B(19.2));
+tl.fromTo('#jarB', { x: 0, y: 0, scale: 1 }, { x: 260, y: 80, scale: .86, duration: B(2), ease: 'power3.inOut' }, B(21));
+tl.fromTo('#jarW', { opacity: 0, x: -500 }, { opacity: 1, x: 0, duration: B(2), ease: 'power3.out' }, B(21.5));
+OM.sfx('whoosh', B(21.5), { gain: .4, pan: -.3 }); OM.sfx('thud', B(22.6), { gain: .5 });
+tl.fromTo('.p1', { opacity: 0, y: -40 }, { opacity: 1, y: 0, duration: B(1.5) }, B(22));
+tl.fromTo('.p2', { opacity: 0 }, { opacity: 1, duration: B(1) }, B(23.5));
+tl.fromTo('.p3', { opacity: 0 }, { opacity: 1, duration: B(1) }, B(24.5));
+tl.fromTo(['#jarW', '#jarB'], { rotation: 0 }, { rotation: (i) => (i ? 2 : -2), duration: B(4), ease: 'sine.inOut' }, B(23));
+tl.to('#jarsL', { opacity: 0, duration: B(.75), ease: 'power2.in' }, B(27.25));
+hide('#jarsL', B(28));
 
-  window.__timelines['film'] = tl;
+/* 4 · standards (14–20 s): seeds write “อย.”, the proofs land one per beat */
+tl.addLabel('scene:standards', B(28));
+show('#stdL', B(28));
+tl.fromTo('.kS', { opacity: 0, letterSpacing: '20px' }, { opacity: 1, letterSpacing: '4px', duration: B(2) }, B(28.5));
+gsap.utils.toArray('#stdL .chip').forEach((c, i) => {
+  const at = B(30.5 + i * 1.5);
+  tl.fromTo(c, { opacity: 0, y: 80, scale: .9 }, { opacity: 1, y: 0, scale: 1, duration: B(.8), ease: 'back.out(1.5)' }, at);
+  OM.sfx('stamp', at + .15, { gain: .35, pan: (i - 2) * .15 });
+});
+tl.to('#stdL', { opacity: 0, duration: B(.75), ease: 'power2.in' }, B(39.25));
+hide('#stdL', B(40));
+
+/* 5 · how to (20–24 s): “1 ช้อน + น้ำเปล่า”, then the pudding */
+tl.addLabel('scene:howto', B(40));
+show('#howL', B(40.5));
+tl.fromTo('.one', { opacity: 0 }, { opacity: 1, duration: B(1) }, B(40.5));
+tl.fromTo('.spoon', { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: B(1) }, B(41.5));
+tl.fromTo('.water', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: B(1) }, B(42.5));
+OM.sfx('pop', B(41.6), { gain: .4, note: 3 }); OM.sfx('pop', B(42.6), { gain: .4, note: 5 });
+tl.fromTo('#pud', { y: 900, rotation: 6 }, { y: 0, rotation: -2, duration: B(2) }, B(44));
+OM.sfx('whoosh', B(44.2), { gain: .35 });
+tl.to('#howL', { opacity: 0, duration: B(.75), ease: 'power2.in' }, B(47.25));
+hide('#howL', B(48));
+
+/* 6 · end (24–30 s): the seeds fall into a bed, the two jars stand on it */
+tl.addLabel('scene:end', B(48));
+show('#endL', B(48));
+tl.fromTo('.eLogo', { opacity: 0, scale: .8 }, { opacity: 1, scale: 1, duration: B(1.5), ease: 'back.out(1.6)' }, B(48.5));
+tl.fromTo('#eW', { y: -1200 }, { y: 0, duration: B(1.5), ease: 'power4.out' }, B(50));
+tl.fromTo('#eB', { y: -1200 }, { y: 0, duration: B(1.5), ease: 'power4.out' }, B(50.5));
+OM.sfx('thud', B(50.3), { gain: .5, pan: -.3 }); OM.sfx('thud', B(50.8), { gain: .5, pan: .3 });
+tl.fromTo('.eT', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: B(1.5) }, B(52));
+tl.fromTo('.eLine span', { opacity: 0, scale: .7 }, { opacity: 1, scale: 1, duration: B(1), ease: 'back.out(2)' }, B(54));
+OM.sfx('chime', B(54.2), { gain: .4 });
+tl.fromTo('#endL', { scale: 1 }, { scale: 1.04, duration: B(12), ease: 'none' }, B(52));
+tl.to({}, { duration: B(60) - B(56) + V.endHold }, B(56));
+
+OM.clock(tl, draw, tl.duration());
+window.__timelines['film'] = tl;
 </script>
 </body>
 </html>
