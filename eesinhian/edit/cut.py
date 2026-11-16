@@ -2,13 +2,14 @@
 """Cut the user's 9-scene video (1280x1152, 9 x 10 s) to 9:16 with narration,
 dialogue and Thai subtitles.
 
-    python3 cut.py VIDEO NARRATOR.mp3 YOUNGMAN.mp3 ELDER.mp3 OUT.mp4
+    python3 cut.py VIDEO NARRATOR.mp3 YOUNGMAN.mp3 ELDER.mp3 OUT.mp4 [--keep-original-sound]
 """
 import os, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FONTS = os.path.join(HERE, "..", "fonts")
 video, nar, man, eld, out = sys.argv[1:6]
+KEEP_BED = "--keep-original-sound" in sys.argv  # default: original clip sound removed
 SRC = {"nar": nar, "man": man, "eld": eld}
 
 # (source, clip start, clip end, place at) - clip times measured from pauses in each file
@@ -96,11 +97,14 @@ for i, (src, a, b, at) in enumerate(PIECES):
               f"afade=t=in:d=0.03,afade=t=out:st={max(0, b - a - 0.06):.2f}:d=0.06,adelay={d}|{d}[p{i}]")
     labels.append(f"[p{i}]")
 fc.append("".join(labels) + f"amix=inputs={len(labels)}:normalize=0,apad,atrim=0:90,volume=1.15[vo]")
-fc.append("[vo]asplit=2[vo1][vo2]")
-# original clip sound kept underneath, ducked while someone speaks
-fc.append("[0:a]aformat=sample_rates=48000:channel_layouts=stereo,volume=0.7[bed]")
-fc.append("[bed][vo2]sidechaincompress=threshold=0.03:ratio=6:attack=20:release=400[duck]")
-fc.append("[duck][vo1]amix=inputs=2:normalize=0,alimiter=limit=0.93[aout]")
+if KEEP_BED:
+    fc.append("[vo]asplit=2[vo1][vo2]")
+    # original clip sound kept underneath, ducked while someone speaks
+    fc.append("[0:a]aformat=sample_rates=48000:channel_layouts=stereo,volume=0.7[bed]")
+    fc.append("[bed][vo2]sidechaincompress=threshold=0.03:ratio=6:attack=20:release=400[duck]")
+    fc.append("[duck][vo1]amix=inputs=2:normalize=0,alimiter=limit=0.93[aout]")
+else:
+    fc.append("[vo]alimiter=limit=0.93[aout]")
 
 cmd = ["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex", ";".join(fc), "-map", "[v]", "-map", "[aout]",
        "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p", "-r", "30",
