@@ -8,7 +8,16 @@ import os, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FONTS = os.path.join(HERE, "..", "fonts")
-video, nar, man, eld, out = sys.argv[1:6]
+import json
+if "--narration" in sys.argv:
+    # python3 cut.py VIDEO --narration VOICE.mp3 --subs subs.json OUT.mp4
+    a = sys.argv
+    video, voice, subs_file, out = a[1], a[a.index("--narration") + 1], a[a.index("--subs") + 1], a[-1]
+    nar = man = eld = voice
+    SINGLE = True
+else:
+    video, nar, man, eld, out = sys.argv[1:6]
+    SINGLE = False
 KEEP_BED = "--keep-original-sound" in sys.argv  # default: original clip sound removed
 SRC = {"nar": nar, "man": man, "eld": eld}
 
@@ -47,6 +56,10 @@ SUBS = [
     (82.90, 86.70, r"อย่าคิดว่า...\N{r}เธอกำลังรอใคร{w}"),
 ]
 
+if SINGLE:
+    PIECES = [("nar", 0.0, 90.0, 0.0)]
+    SUBS = [tuple(x) for x in json.load(open(subs_file, encoding="utf-8"))]
+
 def ts(s):
     return f"{int(s // 3600)}:{int(s % 3600 // 60):02d}:{s % 60:05.2f}"
 
@@ -74,7 +87,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         t = t.replace("{r}", RED).replace("{w}", WHITE)
         f.write(f"Dialogue: 0,{ts(s)},{ts(e)},Sub,,0,0,0,,{{\\fad(120,120)}}{t}\n")
 
-inputs = ["-i", video, "-i", nar, "-i", man, "-i", eld]
+inputs = ["-i", video, "-i", nar] if SINGLE else ["-i", video, "-i", nar, "-i", man, "-i", eld]
 idx = {"nar": 1, "man": 2, "eld": 3}
 fc = []
 # picture: each 10 s clip has its own black padding baked in -> crop it per scene,
