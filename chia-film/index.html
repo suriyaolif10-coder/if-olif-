@@ -7,7 +7,7 @@
   {"id":"brown","type":"color","label":"น้ำตาล","default":"#8a786d","group":"สี"},
   {"id":"orange","type":"color","label":"ส้ม","default":"#f5a51b","group":"สี"},
   {"id":"paper","type":"color","label":"พื้น","default":"#f6f4f0","group":"สี"},
-  {"id":"endHold","type":"number","label":"ค้างท้าย (วินาที)","default":1.2,"min":0.3,"max":5,"step":0.1,"group":"จังหวะ"}
+  {"id":"endHold","type":"number","label":"ค้างท้าย (วินาที)","default":0.8,"min":0.3,"max":5,"step":0.1,"group":"จังหวะ"}
 ]'>
 <head>
 <meta charset="utf-8">
@@ -55,6 +55,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
 /* how to */
 .one{top:160px;font:600 70px Prompt;color:var(--green)}
 .spoon{position:absolute;left:730px;top:560px;font:700 120px Prompt}
+.menu{top:1000px;font:600 72px Prompt;color:var(--green)}
 .water{top:1020px;font:600 80px Prompt}
 .water b{color:#3a9bd5}
 .card{position:absolute;border-radius:28px;overflow:hidden;box-shadow:0 30px 70px #0003;border:12px solid #fff}
@@ -70,7 +71,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
 </head>
 <body>
 <div id="film" data-composition-id="film" data-width="1080" data-height="1920" data-om-signature="top-right">
-  <audio id="om-sound" src="assets/sound.wav" data-start="0" data-duration="32" data-track-index="8" data-volume="1"></audio>
+  <audio id="om-sound" src="assets/sound.wav" data-start="0" data-duration="40.8" data-track-index="8" data-volume="1"></audio>
   <canvas id="seeds" width="1080" height="1920" data-om-id="seeds"></canvas>
 
   <section id="hookL" class="layer" data-om-id="hook">
@@ -116,6 +117,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
     <div class="spoon" data-om-id="how-spoon">ช้อน</div>
     <div class="ctr water" data-om-id="how-water">+ <b>น้ำเปล่า</b> รอให้พองตัว</div>
     <div class="card" id="pud" data-om-id="pudding"><img src="assets/pudding.jpg"></div>
+    <div class="ctr menu" data-om-id="how-menu">แช่น้ำดื่ม · ใส่สมูทตี้</div>
   </section>
 
   <section id="endL" class="layer" data-om-id="end" style="visibility:hidden">
@@ -129,39 +131,42 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
 
 <script type="text/vnd.abc" id="om-score">
 X:1
-T:เมล็ดเจีย · ไร่พระจันทร์ (acoustic pop, F major)
-M:4/4
+T:เมล็ดเจีย · ไร่พระจันทร์ (acoustic pop under narration, F major)
+M:2/4
 L:1/8
 Q:1/4=120
 K:F
-V:UKE inst=uke gain=0.5
-!mp! !mark:hook! [FAc]2 z2 [FAc]2 z2 | [EGc]2 z2 [EGc]2 z2 | !mf! !mark:free! [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] | [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] | !mark:stop! z8 | !f! !mark:jar! [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] | [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] | !mark:standards! [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] | [FAc] [FAc] [FAc] [FAc] [FAc] [FAc] [FAc] [FAc] | [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] | !mf! !mark:howto! [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] [DFA] | [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] [DFB] | !mf! !mark:end! [FAc] [FAc] [FAc] [FAc] [FAc] [FAc] [FAc] [FAc] | [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] [EGc] | [FAcf]2 z6 |
-V:GLK inst=glock gain=0.4
-!mp! c2 A c f2 e c | c2 G c e2 d c | !mf! z8 | z8 | z2 c' z f z c z | !f! c2 G c e2 d c | d2 A d f2 e d | z8 | z8 | z8 | !mf! z8 | z8 | !mf! c2 A c f2 e c | c2 G c e2 d c | f'2 z6 |
-V:PZ inst=pizz gain=0.45
-!mp! z8 | z8 | !mf! DF DF DF DF | DF DF DF DF | z8 | !f! EG EG EG EG | DF DF DF DF | DF DF DF DF | FA FA FA FA | EG EG EG EG | !mf! DF DF DF DF | DF DF DF DF | !mf! z8 | z8 | [F,C]2 z6 |
-V:BAS inst=bass gain=0.7
-!mp! z8 | z8 | !mf! D,,2 z D,, D,,2 z D,, | B,,,2 z B,,, B,,,2 z B,,, | z8 | !f! C,,2 z C,, C,,2 z C,, | D,,2 z D,, D,,2 z D,, | B,,,2 z B,,, B,,,2 z B,,, | F,,2 z F,, F,,2 z F,, | C,,2 z C,, C,,2 z C,, | !mf! D,,2 z D,, D,,2 z D,, | B,,,2 z B,,, B,,,2 z B,,, | !mf! F,,2 z F,, F,,2 z F,, | C,,2 z C,, C,,2 z C,, | F,,2 z6 |
-V:DR inst=drums kit=pop gain=0.75
-!mp! C,,2 z2 [C,,^D,,]2 z2 | C,,2 z2 [C,,^D,,]2 z2 | !mf! C,,2 [C,,D,,]2 C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 C,,2 D,,/D,,/D,,/D,,/ | !rise(! z8 | !f! !rise)! !hit! [C,,^C,]2 [C,,D,,]2 C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 C,,2 [C,,D,,]2 | !hit! [C,,^C,]2 [C,,D,,]2 C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 C,,2 A,,/A,,/D,,/D,,/ | !mf! C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | !mf! !hit! [C,,^C,]2 [C,,D,,]2 C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 C,,2 [C,,D,,]2 | [C,,^C,]2 z6 |
-V:SH inst=drums kit=pop gain=0.35
-!mp! z8 | z8 | !mf! z ^A z ^A z ^A z ^A | z ^A z ^A z ^A z ^A | z8 | !f! ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ ^A/^A/^A/^A/ | !mf! z ^A z ^A z ^A z ^A | z ^A z ^A z ^A z ^A | !mf! z ^A z ^A z ^A z ^A | z ^A z ^A z ^A z ^A | z8 |
+V:UKE inst=uke gain=0.45
+!mark:hook! !mp! [FAc]2 [FAc]2 | [FAc]2 [FAc]2 | [EGc]2 [EGc]2 | [EGc]2 [EGc]2 | [DFA]2 [DFA]2 | !mark:free! !mf! [DFA] [DFA] [DFA] [DFA] | [DFB] [DFB] [DFB] [DFB] | [DFB] [DFB] [DFB] [DFB] | [FAc] [FAc] [FAc] [FAc] | [FAc] [FAc] [FAc] [FAc] | !mark:stop! z4 | !mark:jar! !f! [EGc] [EGc] [EGc] [EGc] | [DFA] [DFA] [DFA] [DFA] | [DFA] [DFA] [DFA] [DFA] | [DFB] [DFB] [DFB] [DFB] | [DFB] [DFB] [DFB] [DFB] | [FAc] [FAc] [FAc] [FAc] | !mark:standards! !mf! [FAc] [FAc] [FAc] [FAc] | [EGc] [EGc] [EGc] [EGc] | [EGc] [EGc] [EGc] [EGc] | [DFA] [DFA] [DFA] [DFA] | [DFA] [DFA] [DFA] [DFA] | [DFB] [DFB] [DFB] [DFB] | [DFB] [DFB] [DFB] [DFB] | [FAc] [FAc] [FAc] [FAc] | [FAc] [FAc] [FAc] [FAc] | [EGc] [EGc] [EGc] [EGc] | !mark:howto! !mp! [EGc] [EGc] [EGc] [EGc] | [DFA] [DFA] [DFA] [DFA] | [DFA] [DFA] [DFA] [DFA] | [DFB] [DFB] [DFB] [DFB] | [DFB] [DFB] [DFB] [DFB] | [FAc] [FAc] [FAc] [FAc] | [FAc] [FAc] [FAc] [FAc] | [EGc] [EGc] [EGc] [EGc] | [EGc] [EGc] [EGc] [EGc] | !mark:end! !mf! [DFA]2 [DFA]2 | [DFA]2 [DFA]2 | [DFB]2 [DFB]2 | [DFB]2 [DFB]2 | [FAcf]2 z2 |
+V:GLK inst=glock gain=0.35
+c2 A c | f2 e c | c2 G c | e2 d c | d2 A d | z4 | z4 | z4 | z4 | z4 | c' z f c | e2 d c | d2 A d | f2 e d | d2 B d | f2 g f | c2 A c | z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 | d2 A d | f2 e d | d2 B d | f2 g f | f'2 z2 |
+V:PZ inst=pizz gain=0.4
+z4 | z4 | z4 | z4 | z4 | DF DF  | DF DF  | DF DF  | FA FA  | FA FA  | z4 | EG EG  | DF DF  | DF DF  | DF DF  | DF DF  | FA FA  | FA FA  | EG EG  | EG EG  | DF DF  | DF DF  | DF DF  | DF DF  | FA FA  | FA FA  | EG EG  | EG EG  | DF DF  | DF DF  | DF DF  | DF DF  | FA FA  | FA FA  | EG EG  | EG EG  | z4 | z4 | z4 | z4 | [F,C]2 z2 |
+V:BAS inst=bass gain=0.6
+F,,2 z F,, | F,,2 z F,, | C,,2 z C,, | C,,2 z C,, | D,,2 z D,, | D,,2 z D,, | B,,,2 z B,,, | B,,,2 z B,,, | F,,2 z F,, | F,,2 z F,, | z4 | C,,2 z C,, | D,,2 z D,, | D,,2 z D,, | B,,,2 z B,,, | B,,,2 z B,,, | F,,2 z F,, | F,,2 z F,, | C,,2 z C,, | C,,2 z C,, | D,,2 z D,, | D,,2 z D,, | B,,,2 z B,,, | B,,,2 z B,,, | F,,2 z F,, | F,,2 z F,, | C,,2 z C,, | C,,2 z C,, | D,,2 z D,, | D,,2 z D,, | B,,,2 z B,,, | B,,,2 z B,,, | F,,2 z F,, | F,,2 z F,, | C,,2 z C,, | C,,2 z C,, | D,,2 z D,, | D,,2 z D,, | B,,,2 z B,,, | B,,,2 z B,,, | F,,2 z2 |
+V:DR inst=drums kit=pop gain=0.65
+C,,2 [C,,^D,,]2 | C,,2 [C,,^D,,]2 | C,,2 [C,,^D,,]2 | C,,2 [C,,^D,,]2 | C,,2 [C,,^D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | !rise(! z4 | !rise)! !hit! [C,,^C,]2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | [C,,^C,]2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,D,,]2 | C,,2 [C,,^D,,]2 | C,,2 [C,,^D,,]2 | C,,2 [C,,^D,,]2 | C,,2 [C,,^D,,]2 | [C,,^C,]2 z2 |
+V:SH inst=drums kit=pop gain=0.3
+z4 | z4 | z4 | z4 | z4 | z ^A z ^A | z ^A z ^A | z ^A z ^A | z ^A z ^A | z ^A z ^A | z4 | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | ^A/^A/^A/^A/ ^A/^A/^A/^A/ | z ^A z ^A | z ^A z ^A | z ^A z ^A | z ^A z ^A | z ^A z ^A | z ^A z ^A | z ^A z ^A | z ^A z ^A | z ^A z ^A | z4 | z4 | z4 | z4 | z4 |
 </script>
 <script>
 const V = OM.vars();
-OM.music({ bpm: 120 });
-const B = (n) => OM.beat(n);
+OM.music({ bpm: 120 });  // scene labels sit on the narration; the score is written to these lengths
+const OLD = [0, 4, 8, 10, 14, 20, 24, 30], NEW = [0, 5, 10, 11, 17, 27, 36, 40];
+const MAP = (x) => { for (let i = 0; i < OLD.length - 1; i++) if (x <= OLD[i + 1]) return NEW[i] + (x - OLD[i]) * (NEW[i + 1] - NEW[i]) / (OLD[i + 1] - OLD[i]); return NEW[NEW.length - 1] + (x - OLD[OLD.length - 1]); };
+const B = (n) => MAP(n * 60 / 120);
 const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
 const show = (el, t) => tl.set(el, { visibility: 'visible' }, t);
 const hide = (el, t) => tl.set(el, { visibility: 'hidden' }, t);
 
 /* ── seeds: 1500 particles move between shapes; a pure function of time ── */
+const KEYMAP = (k) => k.map(([t, sh, a]) => [t < 0 ? t : MAP(t), sh, a]);
 const S = window.SHAPES, A = window.SEEDATTR, N = A.r.length;
 const KEYS = [ // [time, shape, alpha]
   [-0.5, 'rain', 1], [0.8, 'p100', 1], [3.7, 'p100', 1], [4.7, 'p0', 1], [7.8, 'p0', 1],
   [9.4, 'jar', 1], [9.9, 'jar', 1], [10.4, 'jar', 0], [13.0, 'rain', 0], [13.4, 'rain', 1],
   [14.6, 'ay', 1], [19.7, 'ay', 1], [20.6, 'one', 1], [22.0, 'one', 1], [22.8, 'scatter', 0],
-  [23.6, 'rain', 0], [23.8, 'rain', 1], [25.4, 'pile', 1], [40, 'pile', 1]];
+  [23.6, 'rain', 0], [23.8, 'rain', 1], [25.4, 'pile', 1], [60, 'pile', 1]].map(([t, sh, a]) => [t < 0 ? t : MAP(t), sh, a]);
 const sprites = [];
 (function makeSprites() {
   const R = OM.random(4);
@@ -201,9 +206,9 @@ function draw(t) {
 tl.addLabel('scene:hook', 0);
 tl.fromTo('.k1', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: B(1.5) }, B(.5));
 tl.fromTo('.logoS', { opacity: 0 }, { opacity: 1, duration: B(1.5) }, 0);
-tl.fromTo('.h1', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: B(1.5) }, B(2));
-tl.fromTo('.h1s', { opacity: 0, scale: .7 }, { opacity: 1, scale: 1, duration: B(1), ease: 'back.out(2)' }, B(4));
-OM.sfx('sparkle', .6, { gain: .35 }); OM.sfx('pop', B(4.2), { gain: .4, note: 5 });
+tl.fromTo('.h1', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: .7 }, 2.0);
+tl.fromTo('.h1s', { opacity: 0, scale: .7 }, { opacity: 1, scale: 1, duration: .5, ease: 'back.out(2)' }, 3.8);
+OM.sfx('sparkle', .6, { gain: .35 }); OM.sfx('pop', 3.95, { gain: .4, note: 5 });
 tl.fromTo('#hJar', { y: 900, rotation: 8 }, { y: 0, rotation: 0, duration: B(2), ease: 'power4.out' }, B(3));
 OM.sfx('thud', B(3.4), { gain: .4 });
 tl.fromTo('#hJar', { rotation: 0 }, { rotation: -3, duration: B(3), ease: 'sine.inOut' }, B(5));
@@ -215,7 +220,7 @@ tl.addLabel('scene:free', B(8));
 show('#zeroL', B(8.5));
 tl.fromTo('.k2', { opacity: 0, y: -40 }, { opacity: 1, y: 0, duration: B(1) }, B(9));
 gsap.utils.toArray('#zeroL .chip').forEach((c, i) => {
-  const at = B(10 + i);
+  const at = [5.15, 6.0, 7.25, 9.0, 9.75][i];
   tl.fromTo(c, { opacity: 0, x: i % 2 ? 300 : -300 }, { opacity: 1, x: 0, duration: B(.75), ease: 'back.out(1.4)' }, at);
   OM.sfx('pop', at + .1, { gain: .4, note: i + 1, pan: i % 2 ? .3 : -.3 });
 });
@@ -243,7 +248,7 @@ tl.addLabel('scene:standards', B(28));
 show('#stdL', B(28));
 tl.fromTo('.kS', { opacity: 0, letterSpacing: '20px' }, { opacity: 1, letterSpacing: '4px', duration: B(2) }, B(28.5));
 gsap.utils.toArray('#stdL .chip').forEach((c, i) => {
-  const at = B(30.5 + i * 1.5);
+  const at = [17.4, 19.35, 20.9, 22.4, 25.15][i];
   tl.fromTo(c, { opacity: 0, y: 80, scale: .9 }, { opacity: 1, y: 0, scale: 1, duration: B(.8), ease: 'back.out(1.5)' }, at);
   OM.sfx('stamp', at + .15, { gain: .35, pan: (i - 2) * .15 });
 });
@@ -254,11 +259,13 @@ hide('#stdL', B(40));
 tl.addLabel('scene:howto', B(40));
 show('#howL', B(40.5));
 tl.fromTo('.one', { opacity: 0 }, { opacity: 1, duration: B(1) }, B(40.5));
-tl.fromTo('.spoon', { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: B(1) }, B(41.5));
-tl.fromTo('.water', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: B(1) }, B(42.5));
-OM.sfx('pop', B(41.6), { gain: .4, note: 3 }); OM.sfx('pop', B(42.6), { gain: .4, note: 5 });
-tl.fromTo('#pud', { y: 900, rotation: 6 }, { y: 0, rotation: -2, duration: B(2) }, B(44));
-OM.sfx('whoosh', B(44.2), { gain: .35 });
+tl.fromTo('.spoon', { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: .5 }, 28.1);
+tl.fromTo('.water', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: .5 }, 29.5);
+OM.sfx('pop', 28.2, { gain: .35, note: 3 }); OM.sfx('pop', 29.6, { gain: .35, note: 5 });
+tl.fromTo('#pud', { y: 900, rotation: 6 }, { y: 0, rotation: -2, duration: 1 }, 32.6);
+OM.sfx('whoosh', 32.7, { gain: .35 });
+tl.fromTo('.menu', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: .5 }, 34.4);
+tl.fromTo(['.water', '.spoon'], { opacity: 1 }, { opacity: 0, duration: .4, immediateRender: false }, 32.4);
 tl.to('#howL', { opacity: 0, duration: B(.75), ease: 'power2.in' }, B(47.25));
 hide('#howL', B(48));
 
@@ -270,9 +277,9 @@ tl.fromTo('#eW', { y: -1200 }, { y: 0, duration: B(1.5), ease: 'power4.out' }, B
 tl.fromTo('#eB', { y: -1200 }, { y: 0, duration: B(1.5), ease: 'power4.out' }, B(50.5));
 OM.sfx('thud', B(50.3), { gain: .5, pan: -.3 }); OM.sfx('thud', B(50.8), { gain: .5, pan: .3 });
 tl.fromTo('.eT', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: B(1.5) }, B(52));
-tl.fromTo('.eLine span', { opacity: 0, scale: .7 }, { opacity: 1, scale: 1, duration: B(1), ease: 'back.out(2)' }, B(54));
-OM.sfx('chime', B(54.2), { gain: .4 });
-tl.fromTo('#endL', { scale: 1 }, { scale: 1.04, duration: B(12), ease: 'none' }, B(52));
+tl.fromTo('.eLine span', { opacity: 0, scale: .7 }, { opacity: 1, scale: 1, duration: .5, ease: 'back.out(2)' }, 38.4);
+OM.sfx('chime', 38.5, { gain: .4 });
+tl.fromTo('#endL', { scale: 1 }, { scale: 1.04, duration: 3.4, ease: 'none' }, B(52));
 tl.to({}, { duration: B(60) - B(56) + V.endHold }, B(56));
 
 OM.clock(tl, draw, tl.duration());
