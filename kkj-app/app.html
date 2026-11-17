@@ -160,6 +160,10 @@ const LOGO = 'data:image/webp;base64,UklGRl5eAABXRUJQVlA4WAoAAAAQAAAAZwEAWgEAQUx
 const STD = 280000;
 const SHEET_ID = '11aTk309P3EOuQMM5_mjRi5TDjV8h-cRlCj7I0F95i3I';
 const XLSX_FILE_ID = '1cV0t9yFH3oNWcZb8QqmNhxIlpEDPRzRC';
+// รายงาน (กข.คจ.) แยกตามจังหวัด แปลงเป็น Google Sheets: แถว 1-3 หัวตาราง, 4-60 หมู่บ้าน, 61 รวม (สูตร SUM)
+const REPORT_ID = '1PTag5sttxbMwKNyW0I8imipH489J9D1SQbfMwQAxdS4';
+const sheetUrl = (id) => 'https://docs.google.com/spreadsheets/d/' + id + '/edit';
+const vKey = (tambon, moo, name) => key(tambon) + '|' + key(moo) + '|' + key(normName(name));
 const SHEETS = 'Google Sheets', DRIVE = 'Google Drive';
 const XLSX_CDN = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
 const POSTAL = { 'โนนสัง': '39130' };
@@ -535,17 +539,75 @@ function App() {
       award(30, 10, 'ส่งข้อมูลขึ้นชีต');
     } catch (e) { setSync({ busy: false, msg: '', err: mcpMessage(e, SHEETS) + ' (ข้อมูลในชีตอาจถูกเขียนไปบางส่วน ให้กดดึงข้อมูลเพื่อตรวจ)' }); }
   }
+  async function pushReportOne(v) {
+    try {
+      const cur = await cap.mcp.callTool(SHEETS, 'get_values', { spreadsheetId: REPORT_ID, range: 'A1:F1000' }, { cache: false });
+      const values = (cur.payload && cur.payload.values) || [];
+      const want = vKey(v.tambon, v.moo, v.name);
+      const idx = values.findIndex((r, i) => i >= 3 && /^\d+$/.test(txt(r[0])) && vKey(r[3], r[4], r[5]) === want);
+      if (idx < 0) return 'รายงาน กข.คจ.: ไม่พบหมู่บ้านนี้';
+      const r = idx + 1;
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: REPORT_ID, range: 'L' + r + ':M' + r, values: [[v.loaned, v.deposit]] }, { cache: false });
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: REPORT_ID, range: 'X' + r, values: [[v.problem]] }, { cache: false });
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: REPORT_ID, range: 'AB' + r, values: [[v.damaged]] }, { cache: false });
+      return 'รายงาน กข.คจ.: อัปเดตแถว ' + r + ' แล้ว';
+    } catch (e) { return 'รายงาน กข.คจ.: ' + mcpMessage(e, SHEETS); }
+  }
   async function pushOne(v) {
+    const a = await pushReportOne(v);
+    const b = await pushNativeOne(v);
+    return a + ' · ' + b;
+  }
+  async function pushNativeOne(v) {
     try {
       const cur = await cap.mcp.callTool(SHEETS, 'get_values', { spreadsheetId: SHEET_ID, range: 'A1:N1000' }, { cache: false });
       const values = (cur.payload && cur.payload.values) || [];
       const idx = values.findIndex((r, i) => i > 0 && key(r[2]) === key(v.tambon) && key(r[1]) === key(v.moo) && key(r[3]) === key(v.name));
-      if (idx < 0) return 'ไม่พบหมู่บ้านนี้ในชีต ใช้ปุ่ม "ส่งขึ้นชีตทั้งหมด" ในแท็บข้อมูล';
+      if (idx < 0) return 'ชีตคลินิก: ไม่พบหมู่บ้านนี้';
       const r = idx + 1;
       await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'G' + r + ':I' + r, values: [[v.deposit, v.loaned, v.risk]] }, { cache: false });
       await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'L' + r, values: [[v.statusLabel]] }, { cache: false });
-      return 'อัปเดตแถว ' + r + ' ในชีตแล้ว';
-    } catch (e) { return mcpMessage(e, SHEETS); }
+      return 'ชีตคลินิก: อัปเดตแถว ' + r + ' แล้ว';
+    } catch (e) { return 'ชีตคลินิก: ' + mcpMessage(e, SHEETS); }
+  }
+  async function pullReport() {
+    setSync({ busy: true, msg: 'กำลังดึงรายงาน กข.คจ. จาก Google Sheets...', err: '' });
+    try {
+      const r = await cap.mcp.callTool(SHEETS, 'get_values', { spreadsheetId: REPORT_ID, range: 'A1:AI1000' }, { cache: false });
+      const rows = rowsFromGrid((r.payload && r.payload.values) || []) || [];
+      if (!rows.length) throw new Error('ไม่พบแถวข้อมูลหมู่บ้านในรายงาน');
+      replaceVillages(rows, 'รายงาน กข.คจ. (Google Sheets)');
+      setSync({ busy: false, msg: 'ดึงรายงานแล้ว ' + rows.length + ' หมู่บ้าน', err: '' });
+      award(30, 10, 'ซิงค์จากรายงาน');
+    } catch (e) { setSync({ busy: false, msg: '', err: e.code ? mcpMessage(e, SHEETS) : e.message }); }
+  }
+  async function pushReport() {
+    setModal(null);
+    setSync({ busy: true, msg: 'กำลังส่งตัวเลขขึ้นรายงาน กข.คจ....', err: '' });
+    try {
+      const cur = await cap.mcp.callTool(SHEETS, 'get_values', { spreadsheetId: REPORT_ID, range: 'A1:AI1000' }, { cache: false });
+      const values = (cur.payload && cur.payload.values) || [];
+      const dataIdx = values.map((r, i) => (i >= 3 && /^\d+$/.test(txt(r[0])) ? i : -1)).filter((i) => i >= 0);
+      if (!dataIdx.length) throw new Error('ไม่พบแถวหมู่บ้านในรายงาน');
+      const first = dataIdx[0], last = dataIdx[dataIdx.length - 1];
+      const byKey = new Map(villages.map((v) => [v.district + '|' + vKey(v.tambon, v.moo, v.name), v]));
+      const LM = [], X = [], AB = []; let matched = 0;
+      for (let i = first; i <= last; i++) {
+        const r = values[i] || [];
+        const v = dataIdx.includes(i) ? byKey.get(txt(r[2]).replace(/^(อ\.|อำเภอ)\s*/, '') + '|' + vKey(r[3], r[4], r[5])) : null;
+        if (v) matched++;
+        LM.push(v ? [v.loaned, v.deposit] : [num(r[11]), num(r[12])]);
+        X.push([v ? v.problem : num(r[23])]); AB.push([v ? v.damaged : num(r[27])]);
+      }
+      const a = first + 1, b = last + 1;
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: REPORT_ID, range: 'L' + a + ':M' + b, values: LM }, { cache: false });
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: REPORT_ID, range: 'X' + a + ':X' + b, values: X }, { cache: false });
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: REPORT_ID, range: 'AB' + a + ':AB' + b, values: AB }, { cache: false });
+      const districts = new Set(dataIdx.map((i) => txt(values[i][2])));
+      const missing = villages.filter((v) => districts.has(v.district)).length - matched;
+      setSync({ busy: false, msg: 'ส่งขึ้นรายงานแล้ว ' + matched + ' หมู่บ้าน' + (missing > 0 ? ' · ' + missing + ' หมู่บ้านในแอปไม่มีในรายงาน จึงไม่ได้เพิ่ม' : ''), err: '' });
+      award(30, 10, 'ส่งตัวเลขขึ้นรายงาน');
+    } catch (e) { setSync({ busy: false, msg: '', err: (e.code ? mcpMessage(e, SHEETS) : e.message) + ' (ถ้าเขียนไปบางส่วน ให้กดดึงรายงานเพื่อตรวจ)' }); }
   }
   async function readOldXlsx() {
     setSync({ busy: true, msg: 'กำลังอ่านไฟล์ Excel เดิมจาก Google Drive...', err: '' });
@@ -595,7 +657,7 @@ function App() {
   const onFile = (e) => { const f = e.target.files && e.target.files[0]; if (f) importFile(f); e.target.value = ''; };
 
   const lv = levelOf(game.xp), into = game.xp % 400;
-  const ctx = { villages, meta, game, path, go, openVillage, openList, enterWard, checkVillage, updateVillage, pushOne, setModal, say, award, pickFile, mcpOk, sync, pullSheet, readOldXlsx, exportExcel, exportCSV, setTab, setVillages, setMeta, setGame, pushAll: pushSheet };
+  const ctx = { villages, meta, game, path, go, openVillage, openList, enterWard, checkVillage, updateVillage, pushOne, setModal, say, award, pickFile, mcpOk, sync, pullSheet, readOldXlsx, exportExcel, exportCSV, setTab, setVillages, setMeta, setGame, pushAll: pushSheet, pullReport, pushReport };
 
   return html`<${React.Fragment}>
     ${splash ? html`<${Splash} onDone=${() => setSplash(false)} />` : null}
@@ -648,8 +710,8 @@ function ModalHost({ modal, ctx, close }) {
     </${Modal}>`;
   }
   if (modal.type === 'confirmPush') {
-    return html`<${Modal} title="ส่งขึ้น Google Sheets ทั้งหมด?" onClose=${close} footer=${html`<button class="btn btn-ghost flex-1" type="button" onClick=${close}>ยกเลิก</button><button class="btn btn-gold flex-1" type="button" onClick=${modal.run}>ยืนยัน เขียนทับ</button>`}>
-      <p>แอปจะเขียนข้อมูล อ.โนนสัง ทุกหมู่บ้านทับคอลัมน์ A–I และ L–N ในชีต "คลินิกแก้หนี้ NBL 280K" สูตรในคอลัมน์ J–K ยังอยู่เหมือนเดิม</p>
+    return html`<${Modal} title=${modal.title || 'ส่งขึ้น Google Sheets ทั้งหมด?'} onClose=${close} footer=${html`<button class="btn btn-ghost flex-1" type="button" onClick=${close}>ยกเลิก</button><button class="btn btn-gold flex-1" type="button" onClick=${modal.run}>ยืนยัน เขียนทับ</button>`}>
+      <p>${modal.body || 'แอปจะเขียนข้อมูล อ.โนนสัง ทุกหมู่บ้านทับคอลัมน์ A–I และ L–N ในชีต "คลินิกแก้หนี้ NBL 280K" สูตรในคอลัมน์ J–K ยังอยู่เหมือนเดิม'}</p>
       <p class="muted small">ถ้ามีคนแก้ชีตหลังจากที่ดึงข้อมูลล่าสุด การแก้นั้นจะถูกทับ แนะนำให้กด "ดึงจากชีต" ก่อน</p>
     </${Modal}>`;
   }
@@ -736,7 +798,7 @@ function Village(ctx) {
   const save = async () => {
     const patch = { deposit: num(form.deposit), loaned: num(form.loaned), problem: num(form.problem), damaged: num(form.damaged) };
     updateVillage(v.id, patch); setEdit(false); say('บันทึกในเครื่องแล้ว');
-    if (mcpOk && v.district === 'โนนสัง') { setPushing(true); setPushMsg('กำลังอัปเดต Google Sheets...'); const m = await pushOne(finish(Object.assign({}, v, patch))); setPushMsg(m); setPushing(false); }
+    if (mcpOk) { setPushing(true); setPushMsg('กำลังอัปเดต Google Sheets...'); const m = await pushOne(finish(Object.assign({}, v, patch))); setPushMsg(m); setPushing(false); }
   };
   const copy = (t, el) => { try { navigator.clipboard.writeText(t).then(() => say('คัดลอกแล้ว'), () => say('คัดลอกไม่ได้ กดค้างที่ตัวเลขเพื่อคัดลอก')); } catch (e) { say('คัดลอกไม่ได้ กดค้างที่ตัวเลขเพื่อคัดลอก'); } };
   const pct = (x) => Math.max(0, Math.min(100, x)) + '%';
@@ -764,7 +826,7 @@ function Village(ctx) {
       ${edit ? html`<div class="grid grid-cols-2 gap-2">
           ${[['deposit', 'เงินในบัญชี'], ['loaned', 'เงินลูกหนี้'], ['problem', 'เงินมีปัญหา'], ['damaged', 'เงินเสียหาย']].map(([k, l]) => html`<div class="field" key=${k}><label for=${'f-' + k}>${l}</label><input id=${'f-' + k} inputmode="decimal" value=${form[k]} onInput=${(e) => setForm(Object.assign({}, form, { [k]: e.target.value }))} /></div>`)}
           <div class="small muted" style=${{ gridColumn: '1 / -1' }}>รวมสุทธิใหม่ = <b class="num" style=${{ color: 'var(--fg)' }}>${baht(num(form.deposit) + num(form.loaned) - num(form.problem) - num(form.damaged))}</b> บาท</div>
-          <button class="btn btn-ghost" type="button" onClick=${() => setEdit(false)}>ยกเลิก</button><button class="btn btn-gold" type="button" onClick=${save}>บันทึก${mcpOk && v.district === 'โนนสัง' ? ' + ส่งขึ้นชีต' : ''}</button>
+          <button class="btn btn-ghost" type="button" onClick=${() => setEdit(false)}>ยกเลิก</button><button class="btn btn-gold" type="button" onClick=${save}>บันทึก${mcpOk ? ' + ส่งขึ้นชีต' : ''}</button>
         </div>` : html`<button class="btn btn-ghost" type="button" onClick=${startEdit}>✏️ แก้ตัวเลขของหมู่บ้านนี้</button>`}
       ${pushMsg ? html`<div class="small" style=${{ color: pushing ? 'var(--muted)' : 'var(--ok)' }}>${pushMsg}</div>` : null}
     </section>
@@ -870,14 +932,21 @@ function DataTab(ctx) {
 
     <section class="card grid gap-3">
       <div class="font-semibold">🔄 Google Sheets ซิงค์ 2 ทาง</div>
-      <p class="small muted">ชีต "คลินิกแก้หนี้ NBL 280K - โนนสัง" · ใช้บัญชี Google ของคนที่เปิดแอป ต้องมีสิทธิ์แก้ชีตนี้</p>
+      <p class="small muted">ใช้บัญชี Google ของคนที่เปิดแอป ต้องมีสิทธิ์แก้ชีต · แก้ตัวเลขในหน้าหมู่บ้านแล้วกดบันทึก แอปจะเขียนลงทั้ง 2 ชีตให้</p>
       ${mcpOk === false ? html`<p class="small" style=${{ color: 'var(--warn)' }}>หน้านี้เชื่อม Google ไม่ได้ (เปิดนอก claude.ai หรือยังไม่ได้เชื่อม Connector) ใช้การนำเข้าไฟล์แทนได้</p>` : null}
+      <div class="small font-semibold">1. รายงาน (กข.คจ.) แยกตามจังหวัด <a href=${sheetUrl(REPORT_ID)} target="_blank" rel="noopener" style=${{ color: 'var(--navy-hi)' }}>เปิดชีต ↗</a></div>
+      <p class="small muted">แอปเขียนเฉพาะช่อง L ลูกหนี้ · M บัญชี · X เงินมีปัญหา · AB เงินเสียหาย แถวรวมด้านล่างคำนวณเอง</p>
+      <div class="grid grid-cols-2 gap-2">
+        <button class="btn btn-navy" type="button" disabled=${!mcpOk || sync.busy} onClick=${ctx.pullReport}>⬇️ ดึงจากรายงาน</button>
+        <button class="btn btn-ghost" type="button" disabled=${!mcpOk || sync.busy} onClick=${() => setModal({ type: 'confirmPush', title: 'ส่งตัวเลขขึ้นรายงาน กข.คจ.?', body: 'แอปจะเขียนลูกหนี้ บัญชี เงินมีปัญหา และเงินเสียหาย ของทุกหมู่บ้านที่มีในรายงาน ทับช่อง L, M, X, AB ข้อมูลช่องอื่นไม่ถูกแตะ', run: ctx.pushReport })}>⬆️ ส่งขึ้นรายงาน</button>
+      </div>
+      <div class="small font-semibold">2. ชีตคลินิกแก้หนี้ NBL 280K <a href=${sheetUrl(SHEET_ID)} target="_blank" rel="noopener" style=${{ color: 'var(--navy-hi)' }}>เปิดชีต ↗</a></div>
       <div class="grid grid-cols-2 gap-2">
         <button class="btn btn-navy" type="button" disabled=${!mcpOk || sync.busy} onClick=${pullSheet}>⬇️ ดึงจากชีต</button>
         <button class="btn btn-ghost" type="button" disabled=${!mcpOk || sync.busy} onClick=${() => setModal({ type: 'confirmPush', run: ctx.pushAll })}>⬆️ ส่งขึ้นชีตทั้งหมด</button>
       </div>
-      <button class="btn btn-ghost" type="button" disabled=${!mcpOk || sync.busy} onClick=${readOldXlsx}>📂 อ่านไฟล์ Excel เดิมจาก Drive</button>
-      <p class="small muted">แก้ตัวเลขในหน้าหมู่บ้านแล้วกดบันทึก แอปจะอัปเดตแถวนั้นในชีตให้ทันที ส่วนคนที่แก้ในชีต ให้กด "ดึงจากชีต" เพื่อเอาค่าล่าสุดมา</p>
+      <button class="btn btn-ghost" type="button" disabled=${!mcpOk || sync.busy} onClick=${readOldXlsx}>📂 อ่านไฟล์ Excel ต้นฉบับ (.xlsx อ่านอย่างเดียว)</button>
+      <p class="small muted">คนที่แก้ตัวเลขในชีตโดยตรง ให้กดปุ่ม ดึง เพื่อเอาค่าล่าสุดเข้าแอป</p>
       ${sync.busy ? html`<div class="flex items-center gap-2 small"><div class="spin" style=${{ width: 20, height: 20, borderWidth: 3 }}></div>${sync.msg}</div>` : null}
       ${!sync.busy && sync.msg ? html`<div class="small" style=${{ color: 'var(--good)' }}>✓ ${sync.msg}</div>` : null}
       ${sync.err ? html`<div class="small" style=${{ color: 'var(--bad)' }}>${sync.err}</div>` : null}
