@@ -1,0 +1,611 @@
+<title>เข็มทิศแก้หนี้ กข.คจ.</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap">
+<style>
+/* Layout: one-column game HUD on a navy night ground; sticky HUD + crumb bar, then the current level's cards. */
+:root {
+  --bg: #151b26;
+  --panel: #0f131b;
+  --panel-2: #1b2331;
+  --line: #2c3647;
+  --fg: #eaf0f8;
+  --muted: #98a3b6;
+  --navy: #1E3A5F;
+  --navy-2: #2c5384;
+  --navy-hi: #8fb6ea;
+  --yellow: #f6c51b;
+  --yellow-ink: #1a1405;
+  --teal: #2b6b78;
+  --teal-line: #4fb3b0;
+  --plum: #3f3d67;
+  --plum-line: #8a7fd0;
+  --good: #46cf8e;
+  --risk: #f09140;
+  --bad: #ef6f6f;
+  --font: "Kanit", "Noto Sans Thai", "Leelawadee UI", sans-serif;
+  --r-lg: 26px; --r-md: 18px; --r-sm: 12px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-weight: 400; font-size: 16px; line-height: 1.55; }
+button, input, label { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--navy-hi); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+.app { max-width: 920px; margin: 0 auto; padding-bottom: 48px; }
+.app.phone { max-width: 460px; }
+.gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* HUD */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.top { background: var(--bg); border-bottom: 1px solid var(--line); display: grid; gap: 12px; padding-block: 14px; }
+.hud { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; }
+.ava { position: relative; width: 64px; height: 64px; border-radius: 18px; background: var(--panel); display: grid; place-items: center; }
+.ava .lv { position: absolute; right: -10px; bottom: -8px; background: var(--navy); border: 2px solid var(--navy-2); color: var(--fg); font-weight: 600; font-size: 13px; padding: 0 7px; border-radius: 999px; }
+.hud h1 { margin: 0; font-size: 1.3rem; font-weight: 700; color: var(--navy-hi); line-height: 1.25; }
+.xp { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--muted); font-weight: 500; font-size: .92rem; }
+.xp .bar { width: 120px; height: 6px; border-radius: 3px; background: var(--panel-2); overflow: hidden; }
+.xp .bar i { display: block; height: 100%; background: var(--navy-2); transition: width .5s; }
+.coin { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffe17a, #d9a40d); vertical-align: -2px; margin-left: 2px; }
+.tag { color: var(--muted); font-size: .78rem; letter-spacing: .06em; font-weight: 500; }
+.btn { border: 0; border-radius: var(--r-md); padding: 12px 18px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-align: center; }
+.btn.navy { background: var(--navy); color: var(--fg); border: 1px solid var(--navy-2); }
+.btn.yellow { background: var(--yellow); color: var(--yellow-ink); }
+.btn.black { background: #07090d; color: var(--fg); border: 1px solid #07090d; }
+.btn.ghost { background: transparent; border: 1.5px solid var(--line); color: var(--fg); }
+.btn:disabled { opacity: .5; cursor: default; }
+.filebar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; }
+.filebtn { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: var(--navy); border: 1px solid var(--navy-2); border-radius: var(--r-md); padding: 12px 18px; cursor: pointer; font-weight: 600; font-size: 1.05rem; min-width: 0; }
+.filebtn small { font-size: .78rem; font-weight: 500; background: rgba(255,255,255,.08); border-radius: 999px; padding: 2px 10px; color: var(--muted); }
+.hidden-input { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.crumbs { display: flex; gap: 8px; align-items: center; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.crumbs::-webkit-scrollbar { display: none; }
+.chip { flex: none; border: 1.5px solid var(--line); background: transparent; border-radius: 999px; padding: 6px 14px; font-weight: 500; white-space: nowrap; }
+.chip.on { background: var(--navy); border-color: var(--navy-2); }
+.chip.sq { border-radius: 14px; width: 46px; padding: 6px 0; }
+.crumbs .sep { color: var(--muted); flex: none; }
+.search { display: flex; align-items: center; gap: 10px; border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 10px 16px; }
+.search input { background: transparent; border: 0; outline: 0; width: 100%; min-width: 0; }
+.search input::placeholder { color: var(--muted); }
+
+/* Main */
+main { display: grid; gap: 18px; padding-block: 20px; }
+.hero { background: linear-gradient(160deg, var(--navy-2), var(--navy) 70%); border-radius: var(--r-lg); padding: 26px; display: grid; gap: 18px; position: relative; }
+.hero .eyebrow { font-size: .8rem; font-weight: 600; letter-spacing: .14em; color: #c9d7ec; text-transform: uppercase; max-width: calc(100% - 80px); }
+.hero h2 { margin: 0; font-size: clamp(1.9rem, 6vw, 2.5rem); font-weight: 700; line-height: 1.1; }
+.hero p { margin: 0; color: #cfdaea; }
+.hero .badge { position: absolute; top: 22px; right: 22px; }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tile { border-radius: var(--r-md); padding: 16px 12px; display: grid; gap: 2px; justify-items: center; text-align: center; border: 1.5px solid rgba(255,255,255,.06); background: rgba(10,16,28,.35); }
+.tile .k { font-size: .85rem; color: #c4cfdf; font-weight: 500; }
+.tile .v { font-size: 2rem; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.tile .s { font-size: .8rem; color: #c4cfdf; }
+.tile.teal { background: var(--teal); border-color: var(--teal-line); }
+.tile.plum { background: var(--plum); border-color: var(--plum-line); }
+.row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.panel { background: var(--panel); border: 1.5px solid var(--line); border-radius: var(--r-lg); padding: 22px; display: grid; gap: 14px; min-width: 0; }
+.panel h3 { margin: 0; font-size: 1.05rem; font-weight: 600; }
+.panel-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.unit { display: grid; gap: 16px; }
+.unit .who { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; }
+.unit .ring { width: 72px; height: 72px; border-radius: 50%; border: 3px solid var(--panel-2); display: grid; place-items: center; background: var(--panel); }
+.unit .name { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.unit .name b { font-size: 1.35rem; font-weight: 600; color: var(--navy-hi); }
+.unit .sub { color: var(--muted); font-size: .92rem; }
+.pill { font-size: .78rem; font-weight: 600; padding: 2px 10px; border-radius: 999px; background: var(--navy); border: 1px solid var(--navy-2); white-space: nowrap; }
+.pill.good { background: transparent; color: var(--good); border-color: var(--good); }
+.pill.ok { background: transparent; color: var(--navy-hi); border-color: var(--navy-hi); }
+.pill.bad { background: transparent; color: var(--bad); border-color: var(--bad); }
+.money { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.money div { border-radius: var(--r-sm); border: 1.5px solid var(--line); padding: 12px 14px; display: grid; gap: 2px; min-width: 0; }
+.money .k { font-size: .76rem; color: var(--muted); font-weight: 600; letter-spacing: .06em; }
+.money .v { font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.money .risk { background: #2a2018; border-color: #4a3524; } .money .risk .v { color: var(--risk); }
+.money .net { background: #142a22; border-color: #24473a; } .money .net .v { color: var(--good); }
+.vgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.vcard { text-align: left; background: var(--panel); border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 16px; display: grid; gap: 10px; min-width: 0; position: relative; }
+.vcard:hover { border-color: var(--navy-2); }
+.vcard .t { display: flex; justify-content: space-between; gap: 8px; align-items: start; }
+.vcard .t b { font-weight: 600; font-size: 1.05rem; }
+.vcard .m { display: flex; justify-content: space-between; color: var(--muted); font-size: .88rem; font-variant-numeric: tabular-nums; gap: 8px; }
+.vcard .m b { color: var(--fg); font-weight: 500; }
+.vcard .m b.risk { color: var(--risk); }
+.gauge { height: 8px; border-radius: 4px; background: var(--panel-2); overflow: hidden; display: flex; }
+.gauge i { display: block; height: 100%; }
+.stamp { position: absolute; right: 12px; bottom: 12px; color: var(--good); border: 2px solid var(--good); border-radius: 8px; padding: 0 8px; font-size: .78rem; font-weight: 600; transform: rotate(-8deg); }
+.how { display: grid; gap: 8px; color: #cfd8e6; font-size: .95rem; }
+.how p { margin: 0; }
+.how b { color: var(--fg); }
+.exam { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 18px; }
+@media (max-width: 720px) { .exam { grid-template-columns: minmax(0, 1fr); } }
+dl.kv { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 14px; }
+dl.kv dt { color: var(--muted); }
+dl.kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.meter { display: grid; gap: 4px; }
+.meter .h { display: flex; justify-content: space-between; gap: 10px; font-size: .92rem; }
+.meter .h b { font-variant-numeric: tabular-nums; font-weight: 500; }
+.dx { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.rx { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: rx; }
+.rx li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; }
+.rx li::before { counter-increment: rx; content: counter(rx); width: 28px; height: 28px; border-radius: 50%; background: var(--navy); border: 1px solid var(--navy-2); display: grid; place-items: center; font-size: .85rem; font-weight: 600; }
+.copy { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.copy .ph { font-variant-numeric: tabular-nums; user-select: all; background: var(--panel-2); border-radius: 8px; padding: 4px 10px; }
+.empty { color: var(--muted); text-align: center; padding: 24px; }
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--yellow); color: var(--yellow-ink); font-weight: 600; border-radius: 999px; padding: 10px 20px; z-index: 20; box-shadow: 0 8px 24px rgba(0,0,0,.4); max-width: calc(100% - 32px); text-align: center; }
+.note { color: var(--muted); font-size: .85rem; }
+@media (max-width: 560px) {
+  .hud { gap: 10px; }
+  .hud .add { padding: 8px 12px; font-size: .9rem; border-radius: 14px; }
+  .hud h1 { font-size: 1.1rem; }
+  .xp .bar { width: 70px; }
+  .ava { width: 56px; height: 56px; }
+  .tiles { gap: 8px; } .tile .v { font-size: 1.6rem; }
+  .money { grid-template-columns: minmax(0, 1fr); }
+  .row2 { grid-template-columns: minmax(0, 1fr); }
+  .hero { padding: 20px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pop { animation: pop .35s ease-out; }
+  @keyframes pop { from { transform: translateX(-50%) scale(.8); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+  .stamp.new { animation: stamp .35s ease-out; }
+  @keyframes stamp { from { transform: rotate(-8deg) scale(2); opacity: 0; } to { transform: rotate(-8deg) scale(1); opacity: 1; } }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<div class="app" id="app">
+  <div class="top gutter">
+    <div class="hud">
+      <div class="ava" id="ava"><span class="lv" id="lv">Lv1</span></div>
+      <div style="min-width:0;display:grid;gap:2px">
+        <h1>เข็มทิศแก้หนี้ กข.คจ.</h1>
+        <div class="xp"><span class="bar"><i id="xpbar" style="width:0"></i></span><span class="num" id="xptext">0/400 XP</span><span class="num" id="coins">· 0 <i class="coin"></i></span><span class="num" id="vcount">· 0 ม.</span></div>
+        <div class="tag" id="srcline">หมอแก้หนี้ by Olifsuriya · กข.คจ. · ข้อมูลชีต</div>
+      </div>
+      <label class="btn navy add" for="addInput">+ เพิ่มอำเภอ</label>
+    </div>
+    <div class="filebar">
+      <label class="filebtn" for="fileInput" id="pickLabel"><span aria-hidden="true">📥</span>เลือกไฟล์ Excel/CSV <small>รองรับ (กข.คจ.) แยกตามจังหวัด</small></label>
+      <button class="btn yellow" type="button" id="phoneBtn" aria-pressed="false">📱 มือถือ</button>
+    </div>
+    <input class="hidden-input" type="file" id="fileInput" accept=".xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+    <input class="hidden-input" type="file" id="addInput" accept=".xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+    <nav class="crumbs" id="crumbs" aria-label="ตำแหน่งที่ดูอยู่"></nav>
+    <div class="search" id="searchBox" hidden><span aria-hidden="true">🔍</span><input id="q" type="search" placeholder="ค้นหา จังหวัด อำเภอ ตำบล หมู่บ้าน ประธาน" aria-label="ค้นหา"></div>
+  </div>
+  <main class="gutter" id="main" aria-live="polite"></main>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script type="text/plain" id="seed">
+1|บ้านค้อ|6|บ้านท่าศิลา|นายจรัญ ฤาชา|0807534921|2|292500|54|280000|12500|0|0|||บ้านท่าศิลา|20|1000
+2|หนองเรือ|10|บ้านโนนสะอาด|นางสาวพรสวรรค์ บาลี|0625256380|1|280934.41|26|248500|32434.41|0|0|||บ้านโนนสะอาด|20|1000
+3|บ้านถิ่น|9|บ้านหนองสวรรค์|นายสุพจน์ พิมพ์คต|0930836897|1|280518.52|2|280000|518.52|0|0|||บ้านหนองสวรรค์|20|1000
+4|บ้านค้อ|2|บ้านโคกป่ากุง|นายธวัชชัย พุดเพาะ|0951693488|2|280042.43|42|230962|49080.43|0|0|||บ้านโคกป่ากุง|30|3000
+5|โนนเมือง|7|บ้านภูศรีทอง|นายสมพงศ์ สารีคาน|0956761195|3|280000|40|120000|160000|0|0|||บ้านภูศรีทอง|32|3200
+6|นิคมพัฒนา|10|บ้านดงบาก|นายธนทัต ผางเวศ|0927282475|2|280500|20|280000|500|0|0|||บ้านดงบาก|20|1000
+7|หนองเรือ|11|บ้านหนองเรือ|นายลุน รัตนะวงศ์|0655505977|2|280025.24|8|262500|17525.24|0|0|||บ้านหนองเรือ|20|1000
+8|นิคมพัฒนา|4|บ้านโคกสง่า|นายประครอง สอนคำมี|0828403362|2|287827.72|28|272000|15827.72|0|0|||บ้านโคกสง่า|20|1000
+9|บ้านถิ่น|8|บ้านนิคมโคกม่วง|นายไสว ไพราม|0808347811|2|280732.79|20|251300|29432.79|0|0||||0|0
+10|ปางกู่|9|บ้านนิคมศรีวิไล|นายวิสุทธิ์ สีทาแก|0930836473|2|282004.64|29|280000|2004.64|0|0||||0|0
+11|โคกม่วง|6|บ้านหนองปิง|นายธนา โพธิ์วงศ์|0833562836|1|284608|52|186600|98008|0|0|||บ้านหนองปิง|20|1000
+12|โนนสัง|11|บ้านโคกกลางสามัคคี|นายสุริยา แก้วกันยา|0926410561|3|287710.74|0|283500|4210.74|0|0|||โคกกลางสามัคคี|246|1019300
+13|หนองเรือ|3|บ้านหนองลุมพุก|นายวีระพงษ์ หาญบัญญัติ|0870324055|3|340119|0|280000|60119|0|0|||บ้านหนองลุมพุก|35|10080
+14|หนองเรือ|7|บ้านหนองกุงคำไฮ|นางรัศมี โสมมีชัย|0919868887|3|281467.84|84|281000|467.84|0|0|||บ้านหนองกุงคำไฮ|20|1000
+15|โนนเมือง|6|บ้านห้วยมะหรี่|นายบุญมี สมดี|0823039499|3|280465.57|27|280000|465.57|0|0|||บ้านห้วยมะหรี่|20|1000
+16|บ้านถิ่น|3|บ้านหิ่นสิ่ว|นายพวง ช่างจักร|0937801704|2|282917.64|37|280000|2917.64|0|0||||0|0
+17|นิคมพัฒนา|7|บ้านนิคมทองหลาง|นายวิระ สิงห์น้อย|0615741409|3|288435.66|28|280000|8435.66|0|0|||นิคมทองหลาง|36|231900
+18|นิคมพัฒนา|11|บ้านโคกเจริญ|นายกิตติชัย ภูเงิน|0625573055|2|285935.87|2|280000|5935.87|0|0|||โคกเจริญ|82|469990
+19|โคกใหญ่|6|บ้านหนองเเสบง|นายประภาส สายศรี|0610798350|3|280481.83|6|280000|481.83|0|0|||หนองสะแบง|730|4818075
+20|ปางกู่|4|บ้านหนองแวงโป่งสัง|นายชินพัฒน์ ช่างทองคำ|0879498329|2|282126.14|38|282000|126.14|0|0|||หนองแวงโป่งสัง|154|142540
+21|ปางกู่|5|บ้านโสกปลาขาว|นางสาววิภาดา อิ่มนาง|0386400848|2|280338.79|0|280000|338.79|0|0|||บ้านโสกปากขาว|20|1000
+22|ปางกู่|6|บ้านหนองหญ้าปล้อง|นางทองใบ สุพรรณ|0862422016|2|280936.05|0|280000|936.05|0|0|||หนองหญ้าปล้อง|87|146000
+23|บ้านถิ่น|7|บ้านโนนคูณ|นายธนพล สาผุยทำ|0913748362|2|280000|32|220000|0|7|60000|ขาดวินัยในการใช้ทรัพย์สิน|ไปพบเพื่อทวงถาม||0|0
+24|นิคมพัฒนา|1|บ้านนิคมพัฒนา|นายสมบัติ ที่ดินดำ|0802501924|1|280000|22|226677|53323|0|0|||บ้านนิคมพัฒนา|20|1000
+25|โนนสัง|4|บ้านโนนภูทอง|นางหนูพัตร บุญธะนะ|0851027971|3|281633.51|0|263900|17733.51|0|0|||โนนภูทอง|80|1080000
+26|โนนสัง|5|บ้านโคกกลาง|นายอานนท์ ขนันทอง|0857605949|3|280846.66|40|280400|446.66|0|0|||บ้านโคกกลาง|20|1000
+27|ปางกู่|2|บ้านโสกแดง|นายพีระศักดิ์ ยอดตา|0895085497|2|280949.23|54|280000|949.23|0|0||||0|0
+28|โคกใหญ่|5|บ้านโคกน้อย|นายสังคม หมื่นทอง|0848872602|2|280365.33|0|280000|365.33|0|0|||โนนปอแดง|117|565500
+29|โนนเมือง|5|บ้านห้วยบง|นายชัยวัฒน์ วงไชยา|0957800860|1|280420|31|280000|420|0|0|||ห้วยบง|331|1411130
+30|โคกม่วง|8|บ้านวังมน|นายพิกุล ไพรหน่าย|0856454196|1|280000|13|107574|172426|0|0||||0|0
+31|โคกใหญ่|4|บ้านโนนปอแดง|นายรุ่งเรืองชัย เย็นวัฒนา|0850013769|2|280390|42|204900|75490|0|0|||โนนปอแดง|117|565500
+32|นิคมพัฒนา|9|บ้านโสกม่วง|นายประยูร รามหริ่ง|0981423765|2|280867.93|0|236000|44867.93|0|0|||บ้านโสกม่วง|20|1000
+33|โคกใหญ่|7|บ้านโนนยาว|นายประทีป วงศ์แก้ว|0652670531|2|280365.33|40|280000|365.33|0|0|||โนนยาว|84|111100
+34|บ้านถิ่น|5|บ้านโสกก้านเหลือง|นายทองขาน อาจหาญ|0935965299|3|293797.33|29|290000|3797.33|0|0||||0|0
+35|โคกใหญ่|3|บ้านหนองตานา|นายสงวน ชาชุม|0933367445|2|280781.83|0|280000|781.83|0|0|||หนองตานา|248|1866520
+36|กุดดู่|10|บ้านหัวขัวสันติสุข|นายปัญญาวุธ ผาสีกา|0855383127|3|280347.43|37|280000|347.43|0|0|||หัวขัวสันติสุข|40|43000
+37|กุดดู่|4|บ้านกุดคอเมย|นายพินิจ ขานตา|0807537706|2|288951.40|42|280000|8951.40|0|0|||บ้านกุดคอเมย|20|1000
+38|บ้านค้อ|4|บ้านกุดฉิม|นายมณเทียร ภูหวดน้อย|0862375148|1|280288.55|22|280008|280.55|0|0||||0|0
+39|กุดดู่|7|บ้านหัวขัว|นายเจริญ ละลี|0828497011|2|280114.83|0|280000|114.83|0|0|||หัวขัว|40|35000
+40|บ้านถิ่น|4|บ้านหนองเล้าข้าว|นายกิตติพัฒน์ พิมพ์โคตร|0639692474|1|280105.25|5|100000|105.25|45|180000|ขาดวินัยในการใช้ทรัพย์สิน|เรียกพบคณะกรรมการเพื่อขอชำระเงินยืม/พักหนี้สื่อรับสภาพหนี้||0|0
+41|กุดดู่|5|บ้านหนองโดน|นายประสิทธิ์ ฐานะ|0653068521|2|290619.53|40|280000|10619.53|0|0|||หนองโดน|111|291000
+42|กุดดู่|8|บ้านโสกช้าง|นายชาญ โคตรเพชร|0811835638|2|288951.40|37|280000|8951.40|0|0|||โสกช้าง|85|103100
+43|หนองเรือ|6|บ้านหนองกุงจารย์ผาง|นายคำเดื่อง สายสิงห์|0971368710|1|280187|30|109500|124687|5|46000|ขาดวินัยในการใช้ทรัพย์สิน|ไปพบเพื่อทวงถาม||0|0
+44|หนองเรือ|8|บ้านนาล้อม|นางสาวพิมพ์ใจ แผงเพชร|0937081867|3|280387|48|280000|387|0|0|||บ้านนาล้อม|30|3000
+45|หนองเรือ|9|บ้านหนองโน|นายเรียบ สมสันต์|0614086230|3|280026.26|8|280000|26.26|0|0|||หนองโน|86|1085600
+46|โคกม่วง|7|บ้านบุ่งบก|นายสันติ เนื่องคำอินทร์|0927698532|1|280014|30|231800|48214|0|0|||บ้านโคกม่วง|20|1000
+47|โคกม่วง|4|บ้านแมด|นายกิตติศักดิ์ ด้วงคำจันทร์|0933416351|3|286613.77|0|215500|71113.77|0|0|||แมด|25|5000
+48|โคกม่วง|5|บ้านตาดไฮ|นายสมพงษ์ พรมไตร|0872145183|3|286613.77|41|215500|71113.77|0|0|||บ้านตาดไฮ|25|7500
+49|นิคมพัฒนา|6|บ้านหนองนาเลิง|นายวีระ สิงห์น้อย|0850129642|2|291010.38|15|280000|11010.38|0|0|||บ้านหนองนาเลิง|20|1000
+50|บ้านค้อ|7|บ้านหนองนกเขียน|นายศรทอง ชุมแวงวาปี|0617084509|2|282446.77|43|280000|2446.77|0|0|||บ้านหนองนกเขียน|20|1000
+51|บ้านค้อ|8|บ้านกุดแห่|นางสมพิศ สายตรี|0986604298|2|281002.11|40|280000|1002.11|0|0||||0|0
+52|หนองเรือ|4|บ้านท่าลาด|นายอภิโชค ไชยรส|0872318439|2|280000|61|143842|136158|0|0|||บ้าท่าลาด|150|3500000
+53|บ้านค้อ|3|บ้านหนองงูเหลือม|นางหนูทิพย์ คลังกลาง|0810505284|2|280000|20|245432|34568|0|0||||0|0
+54|หนองเรือ|2|บ้านโคกป่ากุง|นายกิตติศักดิ์ ทิพย์เนตร|0969658636|3|284424.40|5|280000|4424.40|0|0|||บ้านโคกป่ากุง|30|3000
+55|โคกม่วง|9|บ้านชัยมงคล|นายคมพยัคฆ์ ดวงคำ|0982405242|1|280032|0|119050|15632|1|145350|อื่น ๆ|ประชุมคณะกรรมการ/ตั้งคณะกรรมการตรวจสอบข้อเท็จจริง เพื่อหาแนวทางเร่งรัด|บ้านโคกม่วง|20|1000
+56|โคกม่วง|2|บ้านโคกศรีเรือง|นายวิมล นามขำ|0622382493|3|281502|31|278734|2768|0|0|||บ้านโคกศรีเมือง|20|1000
+57|โคกม่วง|1|บ้านโคกม่วง|นายมนตรี นครชัย|0956571562|1|287012|51|286000|1012|0|0|||บ้านโคกม่วง|20|1000
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(function () {
+  const STD = 280000;
+  const KEY_GAME = 'kkj-compass-game-v1', KEY_DATA = 'kkj-compass-data-v1', KEY_UI = 'kkj-compass-ui-v1';
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => Math.round(+n || 0).toLocaleString('th-TH');
+  const store = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+  function h(tag, attrs, ...kids) {
+    const e = document.createElement(tag);
+    if (attrs) for (const [k, v] of Object.entries(attrs)) {
+      if (v == null || v === false) continue;
+      if (k === 'class') e.className = v; else if (k === 'style') e.style.cssText = v;
+      else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v);
+    }
+    for (const c of kids.flat()) if (c != null && c !== false) e.append(c.nodeType ? c : document.createTextNode(String(c)));
+    return e;
+  }
+
+  // ---------- mascot: หมอแก้หนี้ ----------
+  const MASCOT = 'data:image/webp;base64,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';
+  function doctor(size) {
+    const i = new Image(size, size); i.src = MASCOT; i.alt = ''; i.setAttribute('aria-hidden', 'true');
+    i.style.cssText = 'width:' + size + 'px;height:' + size + 'px;border-radius:50%;display:block;background:#f4f1e8;box-shadow:0 0 0 2px #2c5384';
+    return i;
+  }
+  $('ava').prepend(doctor(52));
+
+  // ---------- data ----------
+  const num = (v) => { if (typeof v === 'number') return v; const x = parseFloat(String(v == null ? '' : v).replace(/[,\s฿]/g, '')); return Number.isFinite(x) ? x : 0; };
+  const txt = (v) => String(v == null ? '' : v).trim();
+  function finish(r) {
+    r.risk = r.pamt + r.damt;
+    r.net = r.loaned + r.deposit;            // หมุนเวียน = บัญชี + ลูกหนี้
+    r.sutthi = r.net - r.risk;               // สุทธิ = บัญชี + ลูกหนี้ − เสี่ยง
+    r.status = Math.abs(r.net - STD) < 0.005 ? 'พอดี' : r.net > STD ? 'ดีเยี่ยม' : 'ป่วย·ขาด';
+    r.key = [r.prov, r.amp, r.tam, r.moo, r.village].join('|');
+    return r;
+  }
+  function seedRows() {
+    return $('seed').textContent.trim().split('\n').map((l) => {
+      const f = l.split('|');
+      return finish({ prov: 'หนองบัวลำภู', amp: 'โนนสัง', tam: f[1], moo: f[2], village: f[3], chair: f[4], phone: f[5], level: f[6], fund: num(f[7]), hh: num(f[8]), loaned: num(f[9]), deposit: num(f[10]),
+        phh: num(f[11]), pamt: num(f[12]), pcause: f[13], paction: f[14], dhh: 0, damt: 0, dcause: '', daction: '', group: f[15], savers: num(f[16]), savings: num(f[17]) });
+    });
+  }
+  function rowsFromGrid(grid) {
+    const out = [];
+    for (const c of grid) {
+      if (!c || !/^\d+$/.test(txt(c[0])) || !txt(c[1]) || !txt(c[5])) continue;
+      let phone = txt(c[7]); if (/^\d{9}$/.test(phone)) phone = '0' + phone;
+      out.push(finish({ prov: txt(c[1]).replace(/^จ(ังหวัด|\.)\s*/, ''), amp: txt(c[2]).replace(/^อ(ำเภอ|\.)\s*/, ''), tam: txt(c[3]).replace(/^ต(ำบล|\.)\s*/, ''), moo: txt(c[4]),
+        village: txt(c[5]).replace(/^บ้าน\s+/, 'บ้าน'), chair: txt(c[6]), phone, level: txt(c[8]).replace('ระดับ', '').trim(),
+        fund: num(c[9]), hh: num(c[10]), loaned: num(c[11]), deposit: num(c[12]),
+        phh: num(c[22]), pamt: num(c[23]), pcause: txt(c[24]), paction: txt(c[25]), dhh: num(c[26]), damt: num(c[27]), dcause: txt(c[28]), daction: txt(c[29]),
+        group: txt(c[30]), savers: num(c[31]), savings: num(c[32]) }));
+    }
+    return out;
+  }
+  function parseCSV(text) {
+    const rows = []; let row = [], cur = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (q) { if (ch === '"' && text[i + 1] === '"') { cur += '"'; i++; } else if (ch === '"') q = false; else cur += ch; }
+      else if (ch === '"') q = true; else if (ch === ',') { row.push(cur); cur = ''; }
+      else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; }
+      else cur += ch;
+    }
+    if (cur || row.length) { row.push(cur); rows.push(row); }
+    return rows;
+  }
+
+  const saved = store.get(KEY_DATA);
+  let DATA = saved && Array.isArray(saved.rows) && saved.rows.length ? saved.rows.map(finish) : seedRows();
+  let SOURCE = saved && saved.source ? saved.source : 'ข้อมูลชีต ปีงบ 2569';
+
+  // ---------- game ----------
+  const game = Object.assign({ xp: 0, coins: 0, seen: [], wards: [] }, store.get(KEY_GAME) || {});
+  const seen = new Set(game.seen), wards = new Set(game.wards);
+  function saveGame() { game.seen = [...seen]; game.wards = [...wards]; store.set(KEY_GAME, game); }
+  function award(xp, coins, msg) { game.xp += xp; game.coins += coins; saveGame(); hud(); toast(msg + ' · +' + xp + ' XP' + (coins ? ' +' + coins + ' เหรียญ' : '')); }
+  let tt;
+  function toast(m) { const t = $('toast'); t.textContent = m; t.hidden = false; t.classList.remove('pop'); void t.offsetWidth; t.classList.add('pop'); clearTimeout(tt); tt = setTimeout(() => { t.hidden = true; }, 2200); }
+  function hud() {
+    const lv = 1 + Math.floor(game.xp / 400), into = game.xp % 400;
+    $('lv').textContent = 'Lv' + lv;
+    $('xpbar').style.width = (into / 400 * 100) + '%';
+    $('xptext').textContent = into + '/400 XP';
+    $('coins').replaceChildren('· ' + fmt(game.coins) + ' ', h('i', { class: 'coin', 'aria-label': 'เหรียญ' }));
+    $('vcount').textContent = '· ' + DATA.length + ' ม.';
+    $('srcline').textContent = 'หมอแก้หนี้ by Olifsuriya · กข.คจ. · ' + SOURCE + ' · ตรวจแล้ว ' + DATA.filter((r) => seen.has(r.key)).length + '/' + DATA.length;
+  }
+
+  // ---------- aggregates ----------
+  const uniq = (a) => [...new Set(a)];
+  function agg(rows) {
+    const s = (k) => rows.reduce((a, r) => a + r[k], 0);
+    return { n: rows.length, net: s('net'), risk: s('risk'), sutthi: s('sutthi'), ex: rows.filter((r) => r.status === 'ดีเยี่ยม').length, ok: rows.filter((r) => r.status === 'พอดี').length, sick: rows.filter((r) => r.status === 'ป่วย·ขาด').length, savings: s('savings') };
+  }
+  const inProv = (p) => DATA.filter((r) => r.prov === p);
+  const inAmp = (p, a) => DATA.filter((r) => r.prov === p && r.amp === a);
+  const inTam = (p, a, t) => DATA.filter((r) => r.prov === p && r.amp === a && r.tam === t);
+  const statusClass = (s) => s === 'ดีเยี่ยม' ? 'good' : s === 'พอดี' ? 'ok' : 'bad';
+
+  // ---------- navigation ----------
+  const ui = Object.assign({ phone: false }, store.get(KEY_UI) || {});
+  let stack = [{ v: 'home' }];
+  const cur = () => stack[stack.length - 1];
+  function go(view) { stack.push(view); $('q').value = ''; render(); window.scrollTo({ top: 0 }); }
+  function back() { if (stack.length > 1) stack.pop(); $('q').value = ''; render(); window.scrollTo({ top: 0 }); }
+  function jump(view) { // rebuild a sensible stack for crumbs
+    const s = [{ v: 'home' }];
+    if (view.v !== 'home') s.push({ v: 'provs' });
+    if (view.p && view.v !== 'provs') s.push({ v: 'prov', p: view.p });
+    if (view.a && !['prov'].includes(view.v)) s.push({ v: 'amp', p: view.p, a: view.a });
+    if (view.t && view.v !== 'amp') s.push({ v: 'tam', p: view.p, a: view.a, t: view.t });
+    if (view.v === 'vil' || view.v === 'list') s.push(view);
+    stack = s; $('q').value = ''; render(); window.scrollTo({ top: 0 });
+  }
+
+  function crumbs() {
+    const c = cur(), nav = $('crumbs'); nav.replaceChildren();
+    nav.append(h('button', { class: 'chip sq', type: 'button', 'aria-label': 'ย้อนกลับ', disabled: stack.length === 1, onclick: back }, '‹'));
+    const items = [{ label: 'หน้าแรก', view: { v: 'home' } }];
+    if (c.v !== 'home') {
+      const provs = uniq(DATA.map((r) => r.prov));
+      if (!c.p) items.push({ label: provs.length + ' จังหวัด › ' + uniq(DATA.map((r) => r.prov + r.amp)).length + ' อำเภอ', view: { v: 'provs' } });
+      if (c.p) items.push({ label: 'จ.' + c.p, view: { v: 'prov', p: c.p } });
+      if (c.a) items.push({ label: 'อ.' + c.a + ' · ' + inAmp(c.p, c.a).length + ' ม.', view: { v: 'amp', p: c.p, a: c.a } });
+      if (c.a && !c.t && c.v === 'amp') items.push({ label: 'ตำบล ' + uniq(inAmp(c.p, c.a).map((r) => r.tam)).length, view: null });
+      if (c.t) items.push({ label: 'ต.' + c.t, view: { v: 'tam', p: c.p, a: c.a, t: c.t } });
+      if (c.v === 'vil') items.push({ label: c.r.village, view: null });
+      if (c.v === 'list') items.push({ label: 'หมู่บ้านทั้งหมด', view: null });
+    }
+    items.forEach((it, i) => {
+      if (i) nav.append(h('span', { class: 'sep', 'aria-hidden': 'true' }, '›'));
+      const last = i === items.length - 1;
+      nav.append(h('button', { class: 'chip' + (last && c.v !== 'home' ? ' on' : ''), type: 'button', 'aria-current': last ? 'page' : null, onclick: it.view && !last ? () => jump(it.view) : null }, it.label));
+    });
+    $('searchBox').hidden = c.v === 'vil';
+  }
+
+  // ---------- pieces ----------
+  const money = (a, label) => h('div', { class: 'money' },
+    h('div', null, h('span', { class: 'k' }, 'หมุนเวียน · ' + label), h('span', { class: 'v' }, fmt(a.net) + ' ฿')),
+    h('div', { class: 'risk' }, h('span', { class: 'k' }, 'เสี่ยงรวม'), h('span', { class: 'v' }, fmt(a.risk) + ' ฿')),
+    h('div', { class: 'net' }, h('span', { class: 'k' }, 'สุทธิ · ' + label), h('span', { class: 'v' }, fmt(a.sutthi) + ' ฿')));
+  const gauge = (a) => h('div', { class: 'gauge', role: 'img', 'aria-label': 'ดีเยี่ยม ' + a.ex + ' พอดี ' + a.ok + ' ป่วยหรือขาด ' + a.sick },
+    h('i', { style: 'width:' + (a.ex / a.n * 100) + '%;background:var(--good)' }), h('i', { style: 'width:' + (a.ok / a.n * 100) + '%;background:var(--navy-hi)' }), h('i', { style: 'width:' + (a.sick / a.n * 100) + '%;background:var(--bad)' }));
+  const q = () => $('q').value.trim();
+  const match = (s) => !q() || s.includes(q());
+
+  function unitCard({ title, badge, sub, rows, label, primary, secondary, backBtn }) {
+    const a = agg(rows);
+    return h('section', { class: 'panel unit' },
+      h('div', { class: 'who' }, h('div', { class: 'ring' }, doctor(52)),
+        h('div', { style: 'min-width:0;display:grid;gap:4px' }, h('div', { class: 'name' }, h('b', null, title), badge ? h('span', { class: 'pill' }, badge) : null), h('span', { class: 'sub' }, sub))),
+      money(a, label), gauge(a),
+      h('div', { class: 'note num' }, 'ดีเยี่ยม ' + a.ex + ' · พอดี ' + a.ok + ' · ป่วย·ขาด ' + a.sick + (a.sick ? ' ต้องดูแล' : '')),
+      h('div', { class: 'row2' }, primary, secondary), backBtn || null);
+  }
+
+  function villageCard(r) {
+    const done = seen.has(r.key);
+    return h('button', { class: 'vcard', type: 'button', onclick: () => go({ v: 'vil', p: r.prov, a: r.amp, t: r.tam, r }) },
+      h('div', { class: 't' }, h('span', null, h('b', null, r.village), h('div', { class: 'note' }, 'หมู่ ' + r.moo + ' · ต.' + r.tam)), h('span', { class: 'pill ' + statusClass(r.status) }, r.status)),
+      h('div', { class: 'm' }, h('span', null, 'หมุนเวียน'), h('b', null, fmt(r.net) + ' ฿')),
+      h('div', { class: 'm' }, h('span', null, 'เสี่ยง'), h('b', { class: r.risk ? 'risk' : null }, fmt(r.risk) + ' ฿')),
+      h('div', { class: 'm' }, h('span', null, 'สุทธิ'), h('b', null, fmt(r.sutthi) + ' ฿')),
+      done ? h('span', { class: 'stamp' }, 'ตรวจแล้ว') : null);
+  }
+
+  // ---------- views ----------
+  function viewHome() {
+    const a = agg(DATA), provs = uniq(DATA.map((r) => r.prov)), amps = uniq(DATA.map((r) => r.prov + '|' + r.amp));
+    const out = [];
+    if (q()) return [searchResults()];
+    out.push(h('section', { class: 'hero' },
+      h('div', { class: 'eyebrow' }, 'NBL 280K · หมอแก้หนี้ by Olifsuriya · ' + provs.length + ' จังหวัด ' + amps.length + ' อำเภอ · กข.คจ. กรมท่า'),
+      h('div', { class: 'badge ring', style: 'width:64px;height:64px;border-radius:50%;background:var(--panel);display:grid;place-items:center;border:3px solid var(--navy-2)' }, doctor(46)),
+      h('h2', null, 'คลินิกหนี้ 280K'),
+      h('p', null, 'จ.' + provs.join(', จ.') + ' · กข.คจ. 280,000 · ' + a.n + ' หมู่บ้าน · ' + SOURCE),
+      h('div', { class: 'tiles' },
+        h('div', { class: 'tile' }, h('span', { class: 'k' }, 'ทั้งหมด'), h('span', { class: 'v' }, a.n), h('span', { class: 's' }, 'หมู่')),
+        h('div', { class: 'tile teal' }, h('span', { class: 'k' }, 'เงินครบ ≥280K'), h('span', { class: 'v' }, a.ex + a.ok), h('span', { class: 's' }, '= ดีเยี่ยม ' + a.ex + ' + พอดี ' + a.ok)),
+        h('div', { class: 'tile plum' }, h('span', { class: 'k' }, 'ป่วย · ขาด'), h('span', { class: 'v' }, a.sick), h('span', { class: 's' }, 'ต้องดูแล'))),
+      h('div', { class: 'row2' },
+        h('button', { class: 'btn black', type: 'button', onclick: () => go(provs.length === 1 ? { v: 'prov', p: provs[0] } : { v: 'provs' }) }, provs.length === 1 ? 'ดู ' + amps.length + ' อำเภอ ›' : 'ดู ' + provs.length + ' จังหวัด ›'),
+        h('label', { class: 'btn yellow', for: 'fileInput' }, '📥 นำเข้าไฟล์จริง'))));
+    const sick = DATA.filter((r) => r.status === 'ป่วย·ขาด').sort((x, y) => x.net - y.net);
+    if (sick.length) out.push(h('section', { class: 'panel' },
+      h('div', { class: 'panel-head' }, h('h3', null, '🚑 คนไข้ต้องดูแลด่วน · เงินไม่ครบ 280K'), h('span', { class: 'pill bad' }, sick.length + ' หมู่')),
+      h('div', { class: 'vgrid' }, sick.map(villageCard))));
+    out.push(h('section', { class: 'panel how' },
+      h('h3', null, '📥 วิธีนำเข้าไฟล์จริง NBL 280K · ชีต (กข.คจ.) แยกตามจังหวัด'),
+      h('p', null, '· ไฟล์จริงมีหัวซับซ้อน: แถว 0 หัวเรื่องรวม, แถว 1 หัวหลัก (จังหวัด, อำเภอ...), แถว 2 หัวรอง (ระดับ, ครัวเรือน, บาท) แอปจะข้ามหัวเองและอ่านเฉพาะแถวที่ขึ้นต้นด้วยลำดับที่'),
+      h('p', null, '· คอลัมน์ที่ใช้: 0 ลำดับ, ', h('b', null, '1 จังหวัด, 2 อำเภอ, 3 ตำบล, 4 หมู่ที่, 5 ชื่อหมู่บ้าน'), ', 6 ประธาน, 7 เบอร์, 8 ระดับ, ', h('b', null, '9 หมุนเวียนโครงการ, 11 เงินยืม = ลูกหนี้, 12 เงินฝาก = บัญชี'), ', 22 ครัวเรือนมีปัญหา, ', h('b', null, '23 เงินมีปัญหา, 27 เงินเสียหาย')),
+      h('p', null, '· สูตร: ', h('b', null, 'เสี่ยง = เงินมีปัญหา (23) + เงินเสียหาย (27)'), ' · หมุนเวียน = บัญชี + ลูกหนี้ · ', h('b', null, 'สุทธิ = บัญชี + ลูกหนี้ − เสี่ยง')),
+      h('p', null, '· สถานะ: บัญชี + ลูกหนี้ มากกว่า 280,000 = ดีเยี่ยม · เท่ากับ 280,000 = พอดี · น้อยกว่า = ป่วย·ขาด'),
+      h('p', null, '· ', h('b', null, 'เลือกไฟล์ Excel/CSV'), ' แทนที่ข้อมูลทั้งหมด · ', h('b', null, '+ เพิ่มอำเภอ'), ' รวมไฟล์ใหม่เข้ากับของเดิม (อำเภอเดิมจะถูกแทนด้วยไฟล์ใหม่)'),
+      h('p', null, '· ถ้าอ่านไฟล์ .xlsx ไม่ได้ ให้เปิดใน Excel แล้วบันทึกเป็น CSV UTF-8 แล้วนำเข้าใหม่'),
+      h('p', null, '· ข้อมูลที่นำเข้าเก็บไว้ในเครื่องนี้เท่านั้น ไม่ส่งออกไปที่ไหน'),
+      SOURCE !== 'ข้อมูลชีต ปีงบ 2569' ? h('button', { class: 'btn ghost', type: 'button', onclick: resetData }, 'กลับไปใช้ข้อมูลชีตเดิม') : null));
+    return out;
+  }
+
+  function searchResults() {
+    const hits = DATA.filter((r) => match([r.prov, r.amp, r.tam, r.village, r.chair].join(' ')));
+    return h('section', { class: 'panel' }, h('div', { class: 'panel-head' }, h('h3', null, 'ผลค้นหา "' + q() + '"'), h('span', { class: 'pill' }, hits.length + ' หมู่')),
+      hits.length ? h('div', { class: 'vgrid' }, hits.slice(0, 60).map(villageCard)) : h('p', { class: 'empty' }, 'ไม่พบ ลองพิมพ์ชื่อหมู่บ้าน ตำบล หรือชื่อประธาน'));
+  }
+
+  function viewProvs() {
+    const provs = uniq(DATA.map((r) => r.prov)).filter(match);
+    return [h('section', { class: 'panel' }, h('h3', null, '🗺️ จังหวัด · เลือกจังหวัดเพื่อดูอำเภอ'),
+      h('div', { class: 'chips' }, provs.map((p) => h('button', { class: 'chip', type: 'button', onclick: () => go({ v: 'prov', p }) }, 'จ.' + p + ' · ' + inProv(p).length + ' ม.'))))];
+  }
+
+  function viewProv(c) {
+    const provs = uniq(DATA.map((r) => r.prov));
+    const amps = uniq(inProv(c.p).map((r) => r.amp));
+    const out = [h('section', { class: 'panel' },
+      h('div', { class: 'panel-head' }, h('h3', null, '🗺️ จังหวัด · เลือกจังหวัดเพื่อดูอำเภอ · กข.คจ.'), h('span', { class: 'pill' }, provs.length + ' จังหวัด · ' + uniq(DATA.map((r) => r.prov + r.amp)).length + ' อำเภอ')),
+      h('div', { class: 'chips' }, h('button', { class: 'chip', type: 'button', onclick: () => jump({ v: 'provs' }) }, 'ทั้งหมด · ' + DATA.length + ' ม.'),
+        provs.map((p) => h('button', { class: 'chip' + (p === c.p ? ' on' : ''), type: 'button', onclick: () => jump({ v: 'prov', p }) }, 'จ.' + p + ' · ' + inProv(p).length + ' ม.'))))];
+    amps.filter((a) => match('อำเภอ' + a + ' ' + a)).forEach((a) => {
+      const rows = inAmp(c.p, a), tams = uniq(rows.map((r) => r.tam));
+      out.push(unitCard({ title: 'อำเภอ ' + a, badge: 'จ.' + c.p, sub: 'อ.' + a + ' จ.' + c.p + ' · ' + rows.length + ' หมู่บ้าน · หมอแก้หนี้ by Olifsuriya · กข.คจ.', rows, label: 'อ.' + a,
+        primary: h('button', { class: 'btn navy', type: 'button', onclick: () => go({ v: 'amp', p: c.p, a }) }, 'ดูตำบลใน อ.' + a + ' › ' + tams.length + ' ตำบล'),
+        secondary: h('button', { class: 'btn ghost', type: 'button', onclick: () => go({ v: 'list', p: c.p, a, f: 'all' }) }, 'ดู ' + rows.length + ' หมู่บ้าน ›'),
+        backBtn: h('button', { class: 'btn ghost', type: 'button', onclick: back }, '‹ กลับดู ' + amps.length + ' อำเภอใน จ.' + c.p) }));
+    });
+    return out;
+  }
+
+  function viewAmp(c) {
+    const tams = uniq(inAmp(c.p, c.a).map((r) => r.tam)).map((t) => ({ t, rows: inTam(c.p, c.a, t) }))
+      .sort((x, y) => agg(y.rows).sick - agg(x.rows).sick || y.rows.length - x.rows.length);
+    const out = [h('section', { class: 'panel' }, h('div', { class: 'panel-head' }, h('h3', null, '🏥 อ.' + c.a + ' · เลือกตำบลเพื่อเข้าวอร์ด'), h('span', { class: 'pill' }, tams.length + ' ตำบล · ' + inAmp(c.p, c.a).length + ' ม.')), money(agg(inAmp(c.p, c.a)), 'อ.' + c.a))];
+    tams.filter(({ t }) => match('ตำบล' + t + ' ' + t)).forEach(({ t, rows }) => {
+      out.push(unitCard({ title: 'ตำบล ' + t, badge: 'อ.' + c.a, sub: 'วอร์ดตำบล' + t + ' · ' + rows.length + ' หมู่บ้าน', rows, label: 'ต.' + t,
+        primary: h('button', { class: 'btn navy', type: 'button', onclick: () => { go({ v: 'tam', p: c.p, a: c.a, t }); } }, 'เข้าวอร์ด ต.' + t + ' ›'),
+        secondary: h('button', { class: 'btn ghost', type: 'button', onclick: () => go({ v: 'list', p: c.p, a: c.a, t, f: 'all' }) }, 'ดู ' + rows.length + ' หมู่บ้าน ›') }));
+    });
+    return out;
+  }
+
+  function viewTam(c) {
+    const wk = c.p + '|' + c.a + '|' + c.t;
+    if (!wards.has(wk)) { wards.add(wk); setTimeout(() => award(10, 0, 'เปิดวอร์ดใหม่ ต.' + c.t), 50); }
+    const rows = inTam(c.p, c.a, c.t).filter((r) => match(r.village + ' ' + r.chair)).sort((x, y) => x.net - y.net);
+    const a = agg(inTam(c.p, c.a, c.t));
+    return [unitCard({ title: 'ตำบล ' + c.t, badge: 'อ.' + c.a, sub: 'วอร์ดตำบล' + c.t + ' · ' + a.n + ' หมู่บ้าน · เรียงจากเงินน้อยไปมาก', rows: inTam(c.p, c.a, c.t), label: 'ต.' + c.t,
+      primary: h('button', { class: 'btn navy', type: 'button', onclick: () => { const nx = nextPatient(inTam(c.p, c.a, c.t)); if (nx) go({ v: 'vil', p: c.p, a: c.a, t: c.t, r: nx }); else toast('ตรวจครบทั้งวอร์ดแล้ว'); } }, '🩺 ตรวจคนไข้รายถัดไป'),
+      secondary: h('button', { class: 'btn ghost', type: 'button', onclick: back }, '‹ กลับไปอำเภอ' + c.a) }),
+    h('div', { class: 'vgrid' }, rows.map(villageCard))];
+  }
+
+  function viewList(c) {
+    const base = c.t ? inTam(c.p, c.a, c.t) : inAmp(c.p, c.a);
+    const f = c.f || 'all';
+    const rows = base.filter((r) => (f === 'all' || r.status === f) && match(r.village + ' ' + r.tam + ' ' + r.chair)).sort((x, y) => x.net - y.net);
+    const a = agg(base);
+    return [h('section', { class: 'panel' },
+      h('div', { class: 'panel-head' }, h('h3', null, '📋 หมู่บ้านใน ' + (c.t ? 'ต.' + c.t : 'อ.' + c.a)), h('span', { class: 'pill' }, rows.length + ' / ' + base.length + ' ม.')),
+      h('div', { class: 'chips' }, [['all', 'ทั้งหมด · ' + a.n], ['ดีเยี่ยม', 'ดีเยี่ยม · ' + a.ex], ['พอดี', 'พอดี · ' + a.ok], ['ป่วย·ขาด', 'ป่วย·ขาด · ' + a.sick]].map(([k, l]) =>
+        h('button', { class: 'chip' + (f === k ? ' on' : ''), type: 'button', 'aria-pressed': String(f === k), onclick: () => { c.f = k; render(); } }, l)))),
+    rows.length ? h('div', { class: 'vgrid' }, rows.map(villageCard)) : h('p', { class: 'empty' }, 'ไม่มีหมู่บ้านในกลุ่มนี้')];
+  }
+
+  function nextPatient(rows, exceptKey) {
+    return rows.filter((r) => !seen.has(r.key) && r.key !== exceptKey).sort((x, y) => x.net - y.net)[0];
+  }
+
+  function viewVil(c) {
+    const r = DATA.find((x) => x.key === c.r.key) || c.r;
+    const done = seen.has(r.key);
+    const dx = [], rx = [];
+    if (r.status === 'ป่วย·ขาด') { dx.push('เงินในระบบ (บัญชี + ลูกหนี้) ' + fmt(r.net) + ' บาท ขาดจากมาตรฐาน 280,000 อยู่ ' + fmt(STD - r.net) + ' บาท'); rx.push('ตรวจสอบยอดเงินกับสมุดบัญชีและทะเบียนลูกหนี้ ให้ครบ 280,000'); }
+    if (r.pamt > 0) { dx.push('เงินมีปัญหา ' + fmt(r.pamt) + ' บาท (' + r.phh + ' ครัวเรือน)' + (r.pcause ? ' สาเหตุ: ' + r.pcause : '')); rx.push('ประชุมคณะกรรมการ ติดตามทวงถาม ทำหนังสือรับสภาพหนี้กับครัวเรือนที่ค้างชำระ'); if (r.paction) rx.push('ติดตามผลที่รายงานไว้: ' + r.paction); }
+    if (r.damt > 0) { dx.push('เงินเสียหาย ' + fmt(r.damt) + ' บาท' + (r.dcause ? ' สาเหตุ: ' + r.dcause : '')); rx.push('ตั้งคณะกรรมการตรวจสอบข้อเท็จจริง และรายงานอำเภอ'); }
+    const idle = r.net ? r.deposit / r.net * 100 : 0;
+    if (idle >= 40) { dx.push('เงินค้างในบัญชี ' + Math.round(idle) + '% ของเงินทุน ครัวเรือนยืมน้อย'); rx.push('ประชาสัมพันธ์และคัดเลือกครัวเรือนยากจนยื่นยืมเงินประกอบอาชีพตามระเบียบ'); }
+    if (!r.savers) { dx.push('ไม่มีข้อมูลกลุ่มออมทรัพย์เพื่อการผลิต'); rx.push('ส่งเสริมให้ตั้งหรือฟื้นฟูกลุ่มออมทรัพย์เพื่อการผลิต'); }
+    if (!dx.length) { dx.push('ไม่พบอาการผิดปกติ เงินครบตามมาตรฐาน'); rx.push('ติดตามตามรอบปกติ และยกเป็นหมู่บ้านตัวอย่าง'); }
+    const nx = nextPatient(inTam(r.prov, r.amp, r.tam), r.key);
+    const meter = (label, v, pct, color) => h('div', { class: 'meter' }, h('div', { class: 'h' }, h('span', null, label), h('b', null, v)), h('div', { class: 'gauge' }, h('i', { style: 'width:' + Math.max(0, Math.min(100, pct)) + '%;background:' + color })));
+    const phoneEl = h('span', { class: 'ph' }, r.phone || '—');
+    return [h('section', { class: 'exam' },
+      h('div', { class: 'panel', style: 'position:relative' },
+        h('div', { class: 'who', style: 'display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center' }, h('div', { class: 'ring', style: 'width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:var(--panel-2)' }, doctor(54)),
+          h('div', { style: 'min-width:0' }, h('div', { style: 'font-size:1.3rem;font-weight:600;color:var(--navy-hi)' }, r.village), h('div', { class: 'note' }, 'หมู่ ' + r.moo + ' · ต.' + r.tam + ' · อ.' + r.amp + ' · จ.' + r.prov))),
+        h('span', { class: 'pill ' + statusClass(r.status), style: 'justify-self:start;font-size:.9rem' }, 'อาการ: ' + r.status),
+        h('dl', { class: 'kv' },
+          h('dt', null, 'ผู้ดูแล (ประธาน)'), h('dd', null, r.chair || '—'),
+          h('dt', null, 'โทร'), h('dd', null, phoneEl),
+          h('dt', null, 'ระดับศักยภาพ'), h('dd', null, r.level || '—'),
+          h('dt', null, 'ครัวเรือนที่ยืม'), h('dd', null, fmt(r.hh)),
+          h('dt', null, 'กลุ่มออมทรัพย์'), h('dd', null, r.group ? r.group + ' · ' + fmt(r.savers) + ' คน' : '—'),
+          h('dt', null, 'เงินออมสะสม'), h('dd', null, fmt(r.savings) + ' ฿')),
+        r.phone ? h('div', { class: 'copy' }, h('button', { class: 'btn ghost', type: 'button', style: 'padding:6px 14px', onclick: (e) => {
+          const b = e.currentTarget; const fb = () => { const rg = document.createRange(); rg.selectNodeContents(phoneEl); const s = getSelection(); s.removeAllRanges(); s.addRange(rg); b.textContent = 'เลือกเบอร์ไว้แล้ว'; };
+          try { navigator.clipboard.writeText(r.phone).then(() => { b.textContent = 'คัดลอกเบอร์แล้ว'; }, fb); } catch (err) { fb(); } } }, 'คัดลอกเบอร์')) : null,
+        done ? h('span', { class: 'stamp' + (c.justDone ? ' new' : ''), style: 'top:16px;bottom:auto' }, 'ตรวจแล้ว') : null),
+      h('div', { style: 'display:grid;gap:18px;min-width:0' },
+        h('div', { class: 'panel' }, h('h3', null, '📟 จอสัญญาณชีพ'),
+          money({ net: r.net, risk: r.risk, sutthi: r.sutthi }, 'หมู่ ' + r.moo),
+          meter('เงินครบมาตรฐาน 280K', fmt(r.net) + ' / 280,000', r.net / STD * 100, r.status === 'ป่วย·ขาด' ? 'var(--bad)' : 'var(--good)'),
+          meter('ลูกหนี้ (ครัวเรือนยืม)', fmt(r.loaned) + ' ฿', r.net ? r.loaned / r.net * 100 : 0, 'var(--navy-hi)'),
+          meter('บัญชี (ฝากธนาคาร)', fmt(r.deposit) + ' ฿', r.net ? r.deposit / r.net * 100 : 0, 'var(--yellow)'),
+          meter('เสี่ยง (มีปัญหา + เสียหาย)', fmt(r.risk) + ' ฿', r.net ? r.risk / r.net * 100 : 0, 'var(--risk)')),
+        h('div', { class: 'panel' }, h('h3', null, '🩺 ผลวินิจฉัย'), h('ul', { class: 'dx' }, dx.map((d) => h('li', null, d)))),
+        h('div', { class: 'panel' }, h('h3', null, '💊 ใบสั่งการรักษา'), h('ol', { class: 'rx' }, rx.map((d) => h('li', null, d))),
+          h('div', { class: 'row2' },
+            h('button', { class: 'btn yellow', type: 'button', disabled: done, onclick: () => { seen.add(r.key); const sick = r.status === 'ป่วย·ขาด'; award(sick ? 80 : 40, sick ? 100 : 50, sick ? 'รักษาเคสหนักสำเร็จ' : 'บันทึกการตรวจแล้ว'); c.justDone = true; render(); } }, done ? '✓ ตรวจแล้ว' : '✓ บันทึกการตรวจ'),
+            h('button', { class: 'btn navy', type: 'button', disabled: !nx, onclick: () => { if (!done) { seen.add(r.key); award(r.status === 'ป่วย·ขาด' ? 80 : 40, r.status === 'ป่วย·ขาด' ? 100 : 50, 'บันทึกการตรวจแล้ว'); } stack[stack.length - 1] = { v: 'vil', p: r.prov, a: r.amp, t: r.tam, r: nx }; render(); window.scrollTo({ top: 0 }); } }, nx ? 'คนไข้ถัดไป: ' + nx.village + ' ›' : 'ตรวจครบทั้งวอร์ด')))))];
+  }
+
+  function render() {
+    const c = cur();
+    crumbs(); hud();
+    const views = { home: viewHome, provs: viewProvs, prov: viewProv, amp: viewAmp, tam: viewTam, vil: viewVil, list: viewList };
+    $('main').replaceChildren(...[].concat(views[c.v](c)));
+    c.justDone = false;
+  }
+
+  // ---------- import ----------
+  function readFile(file, merge) {
+    const name = file.name || 'ไฟล์';
+    const done = (rows) => {
+      if (!rows.length) { toast('ไม่พบแถวข้อมูลหมู่บ้าน ตรวจว่าเป็นไฟล์ (กข.คจ.) แยกตามจังหวัด'); return; }
+      if (merge) {
+        const areas = new Set(rows.map((r) => r.prov + '|' + r.amp));
+        DATA = DATA.filter((r) => !areas.has(r.prov + '|' + r.amp)).concat(rows);
+        SOURCE = 'ชีตหลายไฟล์ล่าสุด ' + name;
+      } else { DATA = rows; SOURCE = 'ไฟล์ ' + name; }
+      store.set(KEY_DATA, { rows: DATA, source: SOURCE });
+      stack = [{ v: 'home' }];
+      award(20, 0, 'นำเข้า ' + rows.length + ' หมู่บ้านจาก ' + name);
+      render();
+    };
+    const isCSV = /\.csv$/i.test(name) || file.type === 'text/csv';
+    const fr = new FileReader();
+    fr.onerror = () => toast('อ่านไฟล์ไม่สำเร็จ ลองเลือกไฟล์ใหม่');
+    if (isCSV) {
+      fr.onload = () => { try { done(rowsFromGrid(parseCSV(String(fr.result).replace(/^﻿/, '')))); } catch (e) { toast('อ่าน CSV ไม่ได้: ' + e.message); } };
+      fr.readAsText(file, 'utf-8');
+    } else {
+      if (!window.XLSX) { toast('โหลดตัวอ่าน Excel ไม่ได้ ให้บันทึกไฟล์เป็น CSV UTF-8 แล้วนำเข้าใหม่'); return; }
+      fr.onload = () => {
+        try {
+          const wb = XLSX.read(new Uint8Array(fr.result), { type: 'array' });
+          let rows = [];
+          wb.SheetNames.forEach((sn) => { rows = rows.concat(rowsFromGrid(XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, raw: true, defval: '' }))); });
+          done(rows);
+        } catch (e) { toast('อ่าน Excel ไม่ได้ ให้บันทึกเป็น CSV UTF-8 แล้วนำเข้าใหม่'); }
+      };
+      fr.readAsArrayBuffer(file);
+    }
+  }
+  function resetData() { DATA = seedRows(); SOURCE = 'ข้อมูลชีต ปีงบ 2569'; try { localStorage.removeItem(KEY_DATA); } catch (e) {} stack = [{ v: 'home' }]; render(); toast('กลับไปใช้ข้อมูลชีตเดิมแล้ว'); }
+  $('fileInput').addEventListener('change', (e) => { const f = e.target.files && e.target.files[0]; if (f) readFile(f, false); e.target.value = ''; });
+  $('addInput').addEventListener('change', (e) => { const f = e.target.files && e.target.files[0]; if (f) readFile(f, true); e.target.value = ''; });
+
+  // ---------- misc ----------
+  function applyPhone() { $('app').classList.toggle('phone', !!ui.phone); $('phoneBtn').setAttribute('aria-pressed', String(!!ui.phone)); $('phoneBtn').textContent = ui.phone ? '🖥️ จอใหญ่' : '📱 มือถือ'; }
+  $('phoneBtn').addEventListener('click', () => { ui.phone = !ui.phone; store.set(KEY_UI, ui); applyPhone(); });
+  let qt; $('q').addEventListener('input', () => { clearTimeout(qt); qt = setTimeout(render, 150); });
+  applyPhone();
+  render();
+})();
+</script>

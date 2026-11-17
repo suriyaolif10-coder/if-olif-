@@ -1,0 +1,518 @@
+<title>คลินิกแก้หนี้ by Olifsuriya</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a clinic intake chart — diagnosis strip on top, then the treatment plan (debt table → strategy → payoff curve), then care notes. */
+:root {
+  --bg: #f5f8f7;
+  --surface: #ffffff;
+  --ink: #12302c;
+  --muted: #557069;
+  --line: #d6e2de;
+  --accent: #0f7a66;
+  --accent-ink: #ffffff;
+  --accent-soft: #e0f1ec;
+  --good: #1b8a4b;
+  --warn: #b7741a;
+  --bad: #c2412d;
+  --chart-a: #0f7a66;
+  --chart-b: #b7741a;
+  --font-display: "Anuphan", "IBM Plex Sans Thai", "Noto Sans Thai", sans-serif;
+  --font-body: "IBM Plex Sans Thai", "Noto Sans Thai", "Leelawadee UI", sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1816; --surface: #13221f; --ink: #e3efec; --muted: #93aca6; --line: #263a36;
+    --accent: #3cc2a4; --accent-ink: #062520; --accent-soft: #173a33;
+    --good: #4cc47e; --warn: #e3a54a; --bad: #ef7a64; --chart-a: #3cc2a4; --chart-b: #e3a54a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1816; --surface: #13221f; --ink: #e3efec; --muted: #93aca6; --line: #263a36;
+  --accent: #3cc2a4; --accent-ink: #062520; --accent-soft: #173a33;
+  --good: #4cc47e; --warn: #e3a54a; --bad: #ef7a64; --chart-a: #3cc2a4; --chart-b: #e3a54a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(2rem, 5vw, 3.1rem); font-weight: 700; }
+h2 { font-size: 1.55rem; font-weight: 600; }
+h3 { font-size: 1.1rem; font-weight: 600; }
+p { margin: 0; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.eyebrow { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+/* Header */
+header { display: grid; gap: 14px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--accent); font-family: var(--font-display); font-weight: 600; }
+.brand svg { flex: none; }
+.lede { color: var(--muted); max-width: 62ch; font-size: 1.05rem; }
+.lede strong { color: var(--ink); }
+
+section { display: grid; gap: 18px; }
+.sec-head { display: grid; gap: 4px; }
+.sec-head p { color: var(--muted); max-width: 65ch; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; min-width: 0; }
+
+/* Diagnosis */
+.diag { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 20px; }
+@media (max-width: 760px) { .diag { grid-template-columns: 1fr; } }
+.field { display: grid; gap: 6px; }
+.field label { font-size: .9rem; font-weight: 500; }
+input[type="number"], input[type="text"] {
+  width: 100%; font: inherit; color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; min-width: 0;
+}
+input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+input.num { font-size: .95rem; }
+.dsr-gauge { display: grid; gap: 14px; }
+.dsr-value { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.dsr-value .big { font-family: var(--font-num); font-size: 2.8rem; font-weight: 500; line-height: 1; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: .88rem; font-weight: 600; border: 1px solid currentColor; }
+.pill.good { color: var(--good); } .pill.warn { color: var(--warn); } .pill.bad { color: var(--bad); }
+.bar { position: relative; height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--good) 0 33%, var(--warn) 33% 50%, var(--bad) 50% 100%); opacity: .9; }
+.bar-marker { position: absolute; top: -5px; width: 4px; height: 22px; border-radius: 2px; background: var(--ink); transform: translateX(-2px); transition: left .3s ease; }
+.bar-scale { display: flex; justify-content: space-between; font-size: .78rem; color: var(--muted); }
+.advice { color: var(--ink); }
+
+/* Debts table */
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 640px; }
+th { text-align: left; font-size: .8rem; color: var(--muted); font-weight: 600; padding: 0 8px 8px; letter-spacing: .03em; }
+td { padding: 6px 8px; border-top: 1px solid var(--line); vertical-align: middle; }
+td.rate-cell { white-space: nowrap; }
+.flag { font-size: .75rem; color: var(--bad); display: block; line-height: 1.3; }
+.icon-btn { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 8px; width: 34px; height: 34px; cursor: pointer; font-size: 1.1rem; }
+.icon-btn:hover { color: var(--bad); border-color: var(--bad); }
+.row-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-top: 12px; }
+.btn { font: inherit; font-weight: 600; border-radius: 10px; padding: 9px 16px; cursor: pointer; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); }
+.btn.ghost { background: transparent; color: var(--accent); }
+.note { font-size: .85rem; color: var(--muted); }
+
+/* Plan */
+.budget-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; }
+.budget-row .field { flex: 1 1 220px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; padding: 3px; background: var(--bg); }
+.seg button { font: inherit; border: 0; background: transparent; color: var(--muted); padding: 7px 14px; border-radius: 8px; cursor: pointer; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 640px) { .compare { grid-template-columns: 1fr; } }
+.strat { border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 10px; background: var(--surface); }
+.strat.active { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.strat .head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.tag { font-size: .75rem; font-weight: 600; padding: 2px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
+.stat .k { font-size: .8rem; color: var(--muted); }
+.stat .v { font-family: var(--font-num); font-size: 1.15rem; }
+.order { margin: 0; padding-left: 1.3em; color: var(--muted); font-size: .92rem; }
+.order li::marker { color: var(--accent); font-family: var(--font-num); }
+.warning-box { border: 1px solid var(--bad); color: var(--bad); border-radius: 12px; padding: 14px 16px; }
+
+.chart-wrap { position: relative; }
+#chart { width: 100%; height: 260px; display: block; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: .85rem; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; background: var(--c); }
+
+/* Care notes */
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+.step { display: grid; gap: 6px; align-content: start; padding: 4px 0 4px 16px; border-left: 2px solid var(--line); }
+.step .n { font-family: var(--font-num); color: var(--accent); font-size: .9rem; }
+.step p { color: var(--muted); font-size: .95rem; }
+.script { position: relative; background: var(--accent-soft); border-radius: 12px; padding: 16px 18px; white-space: pre-wrap; font-size: .95rem; }
+.copy-row { display: flex; gap: 10px; align-items: center; }
+.caps { width: 100%; border-collapse: collapse; min-width: 0; }
+.caps td { padding: 8px 0; }
+.caps td:last-child { text-align: right; font-family: var(--font-num); }
+.help-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+a { color: var(--accent); }
+footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; display: grid; gap: 6px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 7v14M7 14h14" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+      คลินิกแก้หนี้ by Olifsuriya
+    </div>
+    <h1>ตรวจสุขภาพหนี้ แล้ววางแผนปลดหนี้ให้จบเป็นเดือนที่แน่นอน</h1>
+    <p class="lede">กรอกรายได้และหนี้แต่ละก้อน ระบบจะวัด <strong>DSR</strong> (สัดส่วนภาระหนี้ต่อรายได้) เทียบสองวิธีปลดหนี้ และบอกว่าคุณจะหมดหนี้เมื่อไร ตัวเลขที่เห็นตอนนี้เป็นตัวอย่าง แก้ได้ทุกช่อง ข้อมูลเก็บไว้ในเบราว์เซอร์ของคุณเท่านั้น</p>
+  </header>
+
+  <!-- 1. Diagnosis -->
+  <section aria-labelledby="diag-h">
+    <div class="sec-head">
+      <span class="eyebrow">ขั้นที่ 1 · วินิจฉัย</span>
+      <h2 id="diag-h">อาการหนี้ของคุณ</h2>
+    </div>
+    <div class="diag">
+      <div class="panel" style="display:grid;gap:14px;align-content:start">
+        <div class="field">
+          <label for="income">รายได้สุทธิต่อเดือน (บาท)</label>
+          <input id="income" class="num" type="number" min="0" step="500" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="expense">ค่าใช้จ่ายจำเป็นต่อเดือน ไม่รวมหนี้ (บาท)</label>
+          <input id="expense" class="num" type="number" min="0" step="500" inputmode="numeric">
+        </div>
+        <p class="note">ค่าใช้จ่ายจำเป็น เช่น ค่าเช่า อาหาร เดินทาง ค่าน้ำไฟ</p>
+      </div>
+      <div class="panel dsr-gauge" aria-live="polite">
+        <span class="eyebrow">DSR · ค่างวดหนี้รวม ÷ รายได้</span>
+        <div class="dsr-value"><span class="big" id="dsr">–</span><span id="dsr-pill" class="pill good">–</span></div>
+        <div>
+          <div class="bar"><div class="bar-marker" id="dsr-marker" style="left:0%"></div></div>
+          <div class="bar-scale"><span>0%</span><span>33%</span><span>50%</span><span>100%</span></div>
+        </div>
+        <p class="advice" id="dsr-advice"></p>
+        <p class="note" id="leftover"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Debts -->
+  <section aria-labelledby="debts-h">
+    <div class="sec-head">
+      <span class="eyebrow">ขั้นที่ 2 · ประวัติหนี้</span>
+      <h2 id="debts-h">รายการหนี้ทั้งหมด</h2>
+      <p>ใส่ยอดคงเหลือ ดอกเบี้ยต่อปี และค่างวดขั้นต่ำที่ต้องจ่ายจริงต่อเดือน</p>
+    </div>
+    <div class="panel">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>ชื่อหนี้</th><th>ยอดคงเหลือ (บาท)</th><th>ดอกเบี้ย %/ปี</th><th>ขั้นต่ำ/เดือน (บาท)</th><th><span class="sr-only" style="position:absolute;left:-9999px">ลบ</span></th></tr></thead>
+          <tbody id="debt-rows"></tbody>
+          <tfoot><tr><td style="font-weight:600">รวม</td><td class="num" id="sum-bal"></td><td class="num" id="avg-rate"></td><td class="num" id="sum-min"></td><td></td></tr></tfoot>
+        </table>
+      </div>
+      <div class="row-actions">
+        <button class="btn ghost" id="add-debt" type="button">+ เพิ่มหนี้อีกก้อน</button>
+        <button class="btn ghost" id="reset" type="button" style="border-color:var(--line);color:var(--muted)">กลับไปใช้ตัวอย่าง</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Plan -->
+  <section aria-labelledby="plan-h">
+    <div class="sec-head">
+      <span class="eyebrow">ขั้นที่ 3 · แผนรักษา</span>
+      <h2 id="plan-h">เลือกวิธีปลดหนี้</h2>
+      <p>ตั้งงบที่จ่ายหนี้ได้ต่อเดือน จ่ายขั้นต่ำทุกก้อนก่อน เงินที่เหลือโปะก้อนเป้าหมาย พอก้อนไหนหมด ค่างวดของก้อนนั้นจะไหลไปโปะก้อนถัดไป</p>
+    </div>
+    <div class="panel" style="display:grid;gap:20px">
+      <div class="budget-row">
+        <div class="field">
+          <label for="budget">งบจ่ายหนี้ต่อเดือน (บาท)</label>
+          <input id="budget" class="num" type="number" min="0" step="500" inputmode="numeric">
+        </div>
+        <div class="field" style="flex:0 1 auto">
+          <span style="font-size:.9rem;font-weight:500">แสดงกราฟของ</span>
+          <div class="seg" role="group" aria-label="เลือกวิธี">
+            <button type="button" data-s="avalanche" aria-pressed="true">หิมะถล่ม</button>
+            <button type="button" data-s="snowball" aria-pressed="false">ก้อนหิมะ</button>
+          </div>
+        </div>
+      </div>
+      <div id="plan-warning" class="warning-box" hidden></div>
+      <div class="compare">
+        <article class="strat" id="card-avalanche">
+          <div class="head"><h3>หิมะถล่ม (Avalanche)</h3><span class="tag" id="tag-avalanche" hidden>ดอกเบี้ยน้อยสุด</span></div>
+          <p class="note">โปะก้อนดอกเบี้ยสูงสุดก่อน ประหยัดดอกเบี้ยที่สุด</p>
+          <div class="stats">
+            <div class="stat"><div class="k">หมดหนี้ใน</div><div class="v" id="av-months">–</div></div>
+            <div class="stat"><div class="k">ดอกเบี้ยรวม</div><div class="v" id="av-int">–</div></div>
+            <div class="stat"><div class="k">หมดหนี้ประมาณ</div><div class="v" id="av-date">–</div></div>
+            <div class="stat"><div class="k">ก้อนแรกหมดเดือนที่</div><div class="v" id="av-first">–</div></div>
+          </div>
+          <ol class="order" id="av-order"></ol>
+        </article>
+        <article class="strat" id="card-snowball">
+          <div class="head"><h3>ก้อนหิมะ (Snowball)</h3><span class="tag" id="tag-snowball" hidden>ดอกเบี้ยน้อยสุด</span></div>
+          <p class="note">โปะก้อนยอดเล็กสุดก่อน เห็นหนี้หายเร็ว มีกำลังใจ</p>
+          <div class="stats">
+            <div class="stat"><div class="k">หมดหนี้ใน</div><div class="v" id="sb-months">–</div></div>
+            <div class="stat"><div class="k">ดอกเบี้ยรวม</div><div class="v" id="sb-int">–</div></div>
+            <div class="stat"><div class="k">หมดหนี้ประมาณ</div><div class="v" id="sb-date">–</div></div>
+            <div class="stat"><div class="k">ก้อนแรกหมดเดือนที่</div><div class="v" id="sb-first">–</div></div>
+          </div>
+          <ol class="order" id="sb-order"></ol>
+        </article>
+      </div>
+      <div class="chart-wrap">
+        <div class="legend" id="legend"></div>
+        <canvas id="chart" role="img" aria-label="กราฟยอดหนี้คงเหลือรายเดือน"></canvas>
+        <p class="note" id="minonly"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Care notes -->
+  <section aria-labelledby="care-h">
+    <div class="sec-head">
+      <span class="eyebrow">ขั้นที่ 4 · ดูแลต่อเนื่อง</span>
+      <h2 id="care-h">ใบสั่งยาของคลินิก</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><h3>หยุดก่อหนี้ใหม่</h3><p>เก็บบัตรเครดิตออกจากกระเป๋า ปิดการผ่อน 0% ในแอปช้อปปิ้ง จนกว่าแผนนี้จะจบ</p></div>
+      <div class="step"><span class="n">2</span><h3>มีเงินสำรองเล็ก ๆ</h3><p>กันไว้สัก 1 เดือนของค่าใช้จ่ายจำเป็น เพื่อไม่ต้องรูดบัตรเมื่อมีเรื่องฉุกเฉิน</p></div>
+      <div class="step"><span class="n">3</span><h3>ห้ามผิดนัดขั้นต่ำ</h3><p>จ่ายขั้นต่ำทุกก้อนตรงเวลา ตั้งหักบัญชีอัตโนมัติ ประวัติในเครดิตบูโรจะได้ไม่เสีย</p></div>
+      <div class="step"><span class="n">4</span><h3>เจรจาก่อนเป็นหนี้เสีย</h3><p>ถ้าจ่ายไม่ไหว โทรหาเจ้าหนี้ทันที ขอยืดงวด ลดดอกเบี้ย หรือรวมหนี้ ก่อนค้างเกิน 90 วัน</p></div>
+    </div>
+
+    <div class="help-grid">
+      <div class="panel" style="display:grid;gap:12px">
+        <h3>สคริปต์โทรเจรจากับเจ้าหนี้</h3>
+        <div class="script" id="script-text">สวัสดีครับ/ค่ะ ผม/ดิฉันชื่อ ______ เป็นลูกค้าบัญชี ______
+ตอนนี้มีภาระหนี้รวมประมาณ <span id="script-total">–</span> บาท และรายได้ลดลง ทำให้จ่ายค่างวดเดิมไม่ไหว
+แต่ตั้งใจจะชำระให้ครบ จึงขอปรึกษาเรื่องปรับโครงสร้างหนี้
+ขอยืดระยะเวลาผ่อน หรือลดอัตราดอกเบี้ย ให้ค่างวดเหลือประมาณ ______ บาทต่อเดือนได้ไหมครับ/คะ
+รบกวนส่งเงื่อนไขเป็นลายลักษณ์อักษรด้วยครับ/ค่ะ</div>
+        <div class="copy-row"><button class="btn" type="button" id="copy-script">คัดลอกสคริปต์</button><span class="note" id="copy-status" aria-live="polite"></span></div>
+      </div>
+      <div class="panel" style="display:grid;gap:12px;align-content:start">
+        <h3>เพดานดอกเบี้ยที่ควรรู้ (ต่อปี รวมค่าธรรมเนียม)</h3>
+        <table class="caps">
+          <tr><td>บัตรเครดิต</td><td>16%</td></tr>
+          <tr><td>สินเชื่อส่วนบุคคล</td><td>25%</td></tr>
+          <tr><td>นาโนไฟแนนซ์</td><td>33%</td></tr>
+          <tr><td>หนี้นอกระบบ (กฎหมายแพ่ง)</td><td>15%</td></tr>
+        </table>
+        <p class="note">อ้างอิงเกณฑ์ของธนาคารแห่งประเทศไทยที่ใช้อยู่ ณ เวลาที่ทำหน้านี้ ควรตรวจสอบกับเจ้าหนี้หรือ ธปท. อีกครั้ง ช่องที่สูงกว่าเพดานจะถูกทำเครื่องหมายสีแดงในตาราง</p>
+      </div>
+      <div class="panel" style="display:grid;gap:10px;align-content:start">
+        <h3>ช่องทางช่วยเหลือจริง</h3>
+        <p>ศูนย์คุ้มครองผู้ใช้บริการทางการเงิน ธปท. โทร <span class="num">1213</span></p>
+        <p>โครงการคลินิกแก้หนี้ (ทางการ) โดย บสส. สำหรับหนี้บัตรและสินเชื่อส่วนบุคคลที่เป็นหนี้เสีย: <a href="https://www.debtclinicbysam.com" target="_blank" rel="noopener">debtclinicbysam.com</a></p>
+        <p>หนี้นอกระบบ ทวงหนี้ข่มขู่ แจ้งตำรวจ หรือสายด่วน <span class="num">1599</span></p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>คลินิกแก้หนี้ by Olifsuriya</strong> เป็นเครื่องมือวางแผนการเงินส่วนตัวเพื่อการศึกษา ไม่ได้สังกัดหรือเป็นตัวแทนของ ธปท. หรือ บสส.</p>
+    <p>ผลคำนวณเป็นการประมาณแบบคิดดอกเบี้ยรายเดือนบนยอดคงเหลือ ตัวเลขจริงขึ้นกับเงื่อนไขของแต่ละสัญญา</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  const KEY = "olif-debt-clinic-v1";
+  const SAMPLE = {
+    income: 32000, expense: 17000, budget: 12000, strategy: "avalanche",
+    debts: [
+      { name: "บัตรเครดิต A", bal: 48000, rate: 16, min: 3000 },
+      { name: "บัตรกดเงินสด", bal: 35000, rate: 25, min: 1800 },
+      { name: "ผ่อนมือถือ", bal: 12000, rate: 0, min: 1500 },
+      { name: "สินเชื่อส่วนบุคคล", bal: 90000, rate: 22, min: 3500 }
+    ]
+  };
+  const CAP = 25; // flag anything above the personal-loan ceiling
+  const fmt = n => Math.round(n).toLocaleString("th-TH");
+  const thMonths = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+
+  let state;
+  try { state = JSON.parse(localStorage.getItem(KEY)) || null; } catch (e) { state = null; }
+  if (!state || !Array.isArray(state.debts)) state = JSON.parse(JSON.stringify(SAMPLE));
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+
+  const $ = id => document.getElementById(id);
+  const rows = $("debt-rows");
+
+  function renderRows() {
+    rows.innerHTML = "";
+    state.debts.forEach((d, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML =
+        `<td><input type="text" id="dn${i}" aria-label="ชื่อหนี้" value=""></td>` +
+        `<td><input class="num" type="number" id="db${i}" min="0" step="100" aria-label="ยอดคงเหลือ"></td>` +
+        `<td class="rate-cell"><input class="num" type="number" id="dr${i}" min="0" step="0.5" aria-label="ดอกเบี้ยต่อปี"><span class="flag" id="df${i}" hidden>เกินเพดาน ควรเจรจา</span></td>` +
+        `<td><input class="num" type="number" id="dm${i}" min="0" step="100" aria-label="ขั้นต่ำต่อเดือน"></td>` +
+        `<td><button class="icon-btn" type="button" aria-label="ลบหนี้ก้อนนี้" data-del="${i}">×</button></td>`;
+      rows.appendChild(tr);
+      $("dn" + i).value = d.name; $("db" + i).value = d.bal; $("dr" + i).value = d.rate; $("dm" + i).value = d.min;
+      [["dn","name",false],["db","bal",true],["dr","rate",true],["dm","min",true]].forEach(([p, k, isNum]) => {
+        $(p + i).addEventListener("input", e => { d[k] = isNum ? Math.max(0, parseFloat(e.target.value) || 0) : e.target.value; update(); });
+      });
+    });
+  }
+  rows.addEventListener("click", e => {
+    const b = e.target.closest("[data-del]");
+    if (!b) return;
+    state.debts.splice(+b.dataset.del, 1); renderRows(); update();
+  });
+  $("add-debt").addEventListener("click", () => {
+    state.debts.push({ name: "หนี้ก้อนใหม่", bal: 10000, rate: 18, min: 1000 }); renderRows(); update();
+    const last = $("dn" + (state.debts.length - 1)); if (last) last.focus();
+  });
+  $("reset").addEventListener("click", () => { state = JSON.parse(JSON.stringify(SAMPLE)); bindTop(); renderRows(); update(); });
+
+  function bindTop() {
+    ["income","expense","budget"].forEach(k => { $(k).value = state[k]; });
+  }
+  ["income","expense","budget"].forEach(k => $(k).addEventListener("input", e => { state[k] = Math.max(0, parseFloat(e.target.value) || 0); update(); }));
+  document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { state.strategy = b.dataset.s; update(); }));
+
+  // Month-by-month simulation. order: "avalanche" | "snowball" | "min"
+  function simulate(debts, budget, order) {
+    const ds = debts.filter(d => d.bal > 0).map(d => ({ ...d, b: d.bal }));
+    const series = [ds.reduce((s, d) => s + d.b, 0)];
+    let interest = 0, month = 0, firstDone = null;
+    const doneOrder = [];
+    const sortFn = order === "snowball" ? (a, b) => a.b - b.b || b.rate - a.rate : (a, b) => b.rate - a.rate || a.b - b.b;
+    while (ds.some(d => d.b > 0.5) && month < 600) {
+      month++;
+      ds.forEach(d => { if (d.b > 0) { const i = d.b * d.rate / 1200; d.b += i; interest += i; } });
+      let pool = order === "min" ? Infinity : budget;
+      ds.forEach(d => { if (d.b > 0) { const p = Math.min(d.min, d.b, pool); d.b -= p; pool -= p; } });
+      if (order !== "min") {
+        ds.filter(d => d.b > 0).sort(sortFn).forEach(d => { const p = Math.min(pool, d.b); d.b -= p; pool -= p; });
+      }
+      ds.forEach(d => { if (d.b <= 0.5 && !d.done) { d.done = true; d.b = 0; doneOrder.push(d.name); if (firstDone === null) firstDone = month; } });
+      series.push(ds.reduce((s, d) => s + d.b, 0));
+      if (month > 3 && series[month] >= series[month - 3] - 0.01) return { stuck: true, series, months: month };
+    }
+    return { stuck: month >= 600, months: month, interest, series, firstDone, doneOrder };
+  }
+
+  function monthLabel(m) {
+    const d = new Date(); d.setMonth(d.getMonth() + m);
+    return thMonths[d.getMonth()] + " " + (d.getFullYear() + 543);
+  }
+  const fmtMonths = m => { const y = Math.floor(m / 12), r = m % 12; return (y ? y + " ปี " : "") + (r ? r + " เดือน" : (y ? "" : "0 เดือน")); };
+
+  let lastResults = null;
+  function update() {
+    save();
+    const debts = state.debts;
+    const sumBal = debts.reduce((s, d) => s + d.bal, 0);
+    const sumMin = debts.reduce((s, d) => s + d.min, 0);
+    const wRate = sumBal ? debts.reduce((s, d) => s + d.bal * d.rate, 0) / sumBal : 0;
+    $("sum-bal").textContent = fmt(sumBal);
+    $("sum-min").textContent = fmt(sumMin);
+    $("avg-rate").textContent = "เฉลี่ย " + wRate.toFixed(1) + "%";
+    $("script-total").textContent = fmt(sumBal);
+    debts.forEach((d, i) => { const f = $("df" + i); if (f) f.hidden = !(d.rate > CAP); });
+
+    // DSR
+    const inc = state.income;
+    const dsr = inc > 0 ? sumMin / inc * 100 : 0;
+    $("dsr").textContent = inc > 0 ? dsr.toFixed(0) + "%" : "–";
+    $("dsr-marker").style.left = Math.min(100, dsr) + "%";
+    const pill = $("dsr-pill"), adv = $("dsr-advice");
+    if (dsr <= 33) { pill.className = "pill good"; pill.textContent = "แข็งแรง"; adv.textContent = "ภาระหนี้อยู่ในระดับที่จัดการได้ เร่งโปะก้อนดอกเบี้ยสูงเพื่อจบเร็วขึ้น"; }
+    else if (dsr <= 50) { pill.className = "pill warn"; pill.textContent = "เฝ้าระวัง"; adv.textContent = "ค่างวดกินรายได้มากเกินหนึ่งในสาม ห้ามก่อหนี้เพิ่ม และเริ่มเจรจาลดดอกเบี้ยก้อนที่แพงที่สุด"; }
+    else { pill.className = "pill bad"; pill.textContent = "อาการหนัก"; adv.textContent = "ค่างวดเกินครึ่งของรายได้ ควรติดต่อเจ้าหนี้เพื่อปรับโครงสร้างหนี้โดยเร็ว ก่อนจะกลายเป็นหนี้เสีย"; }
+    const left = inc - state.expense - sumMin;
+    $("leftover").textContent = left >= 0
+      ? `หลังหักค่าใช้จ่ายและขั้นต่ำ เหลือ ${fmt(left)} บาท/เดือน ใช้โปะหนี้หรือเก็บสำรองได้`
+      : `รายจ่ายรวมขั้นต่ำเกินรายได้ ${fmt(-left)} บาท/เดือน ต้องลดค่าใช้จ่ายหรือเจรจาลดค่างวด`;
+
+    // Strategy
+    document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.s === state.strategy)));
+    $("card-avalanche").classList.toggle("active", state.strategy === "avalanche");
+    $("card-snowball").classList.toggle("active", state.strategy === "snowball");
+
+    const warn = $("plan-warning");
+    const budget = state.budget;
+    const res = { avalanche: simulate(debts, budget, "avalanche"), snowball: simulate(debts, budget, "snowball"), min: simulate(debts, 0, "min") };
+    lastResults = res;
+    if (budget < sumMin) {
+      warn.hidden = false;
+      warn.textContent = `งบ ${fmt(budget)} บาท ต่ำกว่าขั้นต่ำรวม ${fmt(sumMin)} บาท ต้องเพิ่มงบหรือเจรจาลดค่างวดก่อน`;
+    } else if (res.avalanche.stuck) {
+      warn.hidden = false;
+      warn.textContent = "งบนี้แทบไม่พอจ่ายดอกเบี้ย ยอดหนี้ไม่ลดลง ควรเพิ่มงบหรือขอลดดอกเบี้ย";
+    } else warn.hidden = true;
+
+    [["av","avalanche"],["sb","snowball"]].forEach(([p, k]) => {
+      const r = res[k];
+      const ok = !r.stuck && debts.length && budget >= sumMin;
+      $(p + "-months").textContent = ok ? fmtMonths(r.months) : "–";
+      $(p + "-int").textContent = ok ? fmt(r.interest) + " ฿" : "–";
+      $(p + "-date").textContent = ok ? monthLabel(r.months) : "–";
+      $(p + "-first").textContent = ok && r.firstDone ? String(r.firstDone) : "–";
+      $(p + "-order").innerHTML = ok ? r.doneOrder.map(n => `<li>${n.replace(/[<>&]/g, "")}</li>`).join("") : "";
+    });
+    const okBoth = !res.avalanche.stuck && !res.snowball.stuck && budget >= sumMin && debts.length;
+    const avBetter = okBoth && res.avalanche.interest <= res.snowball.interest + 0.5;
+    $("tag-avalanche").hidden = !(okBoth && avBetter);
+    $("tag-snowball").hidden = !(okBoth && !avBetter);
+
+    const mo = res.min;
+    $("minonly").textContent = mo.stuck
+      ? "ถ้าจ่ายแค่ขั้นต่ำ ยอดหนี้จะไม่ลดลงเลย"
+      : `ถ้าจ่ายแค่ขั้นต่ำ จะใช้เวลา ${fmtMonths(mo.months)} และเสียดอกเบี้ย ${fmt(mo.interest)} บาท`;
+    drawChart();
+  }
+
+  function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  function drawChart() {
+    const r = lastResults; if (!r) return;
+    const cv = $("chart"), dpr = window.devicePixelRatio || 1;
+    const W = cv.clientWidth, H = cv.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    const main = r[state.strategy], min = r.min;
+    const colA = css("--chart-a"), colB = css("--chart-b"), muted = css("--muted"), line = css("--line");
+    $("legend").innerHTML = `<span style="--c:${colA}">${state.strategy === "avalanche" ? "หิมะถล่ม" : "ก้อนหิมะ"} ตามงบ</span><span style="--c:${colB}">จ่ายแค่ขั้นต่ำ</span>`;
+    const maxM = Math.max(1, Math.min(240, Math.max(main.series.length, min.series.length) - 1));
+    const maxV = Math.max(1, ...main.series, ...min.series.slice(0, maxM + 1));
+    const pad = { l: 64, r: 16, t: 16, b: 30 };
+    const x = m => pad.l + (W - pad.l - pad.r) * m / maxM;
+    const y = v => pad.t + (H - pad.t - pad.b) * (1 - v / maxV);
+    ctx.font = "12px 'IBM Plex Mono', monospace"; ctx.fillStyle = muted; ctx.strokeStyle = line; ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const v = maxV * i / 4, yy = y(v);
+      ctx.beginPath(); ctx.moveTo(pad.l, yy); ctx.lineTo(W - pad.r, yy); ctx.stroke();
+      ctx.textAlign = "right"; ctx.textBaseline = "middle";
+      ctx.fillText(v >= 1000 ? Math.round(v / 1000) + "k" : Math.round(v), pad.l - 8, yy);
+    }
+    const step = maxM <= 24 ? 6 : maxM <= 60 ? 12 : 24;
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    for (let m = 0; m <= maxM; m += step) ctx.fillText(m + " ด.", x(m), H - pad.b + 8);
+    function plot(series, col, fill) {
+      const pts = series.slice(0, maxM + 1);
+      if (fill) {
+        ctx.beginPath(); ctx.moveTo(x(0), y(0));
+        pts.forEach((v, m) => ctx.lineTo(x(m), y(v)));
+        ctx.lineTo(x(pts.length - 1), y(0)); ctx.closePath();
+        ctx.globalAlpha = .14; ctx.fillStyle = col; ctx.fill(); ctx.globalAlpha = 1;
+      }
+      ctx.beginPath(); pts.forEach((v, m) => m ? ctx.lineTo(x(m), y(v)) : ctx.moveTo(x(m), y(v)));
+      ctx.strokeStyle = col; ctx.lineWidth = 2.5; ctx.stroke();
+      return pts;
+    }
+    plot(min.series, colB, false);
+    if (state.budget >= state.debts.reduce((s, d) => s + d.min, 0)) {
+      const pts = plot(main.series, colA, true);
+      const em = pts.length - 1;
+      ctx.beginPath(); ctx.arc(x(em), y(pts[em]), 5, 0, Math.PI * 2); ctx.fillStyle = colA; ctx.fill();
+    }
+  }
+
+  $("copy-script").addEventListener("click", () => {
+    const text = $("script-text").innerText, st = $("copy-status");
+    const fallback = () => { const r = document.createRange(); r.selectNodeContents($("script-text")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); st.textContent = "เลือกข้อความไว้แล้ว กดคัดลอกเองได้เลย"; };
+    try { navigator.clipboard.writeText(text).then(() => { st.textContent = "คัดลอกแล้ว"; }, fallback); } catch (e) { fallback(); }
+  });
+
+  window.addEventListener("resize", drawChart);
+  if (window.matchMedia) matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", drawChart);
+  new MutationObserver(drawChart).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  bindTop(); renderRows(); update();
+  if (document.fonts) document.fonts.ready.then(drawChart);
+})();
+</script>

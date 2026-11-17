@@ -1,0 +1,1001 @@
+<title>เข็มทิศแก้หนี้ กข.คจ.</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="หมอแก้หนี้ by Olifsuriya · ตรวจสุขภาพกองทุน กข.คจ. 280K อ.โนนสัง จ.หนองบัวลำภู">
+<meta property="og:title" content="เข็มทิศแก้หนี้ กข.คจ.">
+<meta property="og:description" content="หมอแก้หนี้ by Olifsuriya · ตรวจสุขภาพกองทุน กข.คจ. 280K อ.โนนสัง จ.หนองบัวลำภู">
+<meta property="og:image" content="__OG_URL__">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0f1724">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap">
+<style>
+/* Layout: mobile game clinic. Fixed top HUD, one scrolling screen, fixed bottom tab bar; modals sit centred. */
+:root {
+  --bg: #0f1724;
+  --bg-2: #152034;
+  --card: #0b111c;
+  --card-2: #1a2539;
+  --line: #2a3850;
+  --fg: #ecf1f8;
+  --muted: #9aa8bd;
+  --navy: #1E3A5F;
+  --navy-2: #2d5689;
+  --navy-hi: #93b9ee;
+  --cream: #f6f1e4;
+  --gold: #f6c51b;
+  --gold-ink: #1d1604;
+  --good: #3fcf8e;
+  --ok: #8fc7ff;
+  --warn: #f2a541;
+  --bad: #f06a6a;
+  --font: "Kanit", "Noto Sans Thai", "Leelawadee UI", "Thonburi", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.5; }
+button, input, select, label { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--navy-hi); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+.gut { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.shell { max-width: 640px; margin: 0 auto; min-height: 100%; position: relative; }
+
+/* splash */
+.splash { position: fixed; inset: 0; z-index: 100; background: var(--cream); display: grid; place-items: center; transition: opacity .8s ease; }
+.splash.out { opacity: 0; pointer-events: none; }
+.lockup { display: grid; justify-items: center; width: min(78vw, 340px); }
+.lockup .top { color: var(--navy); font-weight: 700; font-size: clamp(2rem, 11vw, 3.1rem); line-height: 1; padding-top: .3em; white-space: nowrap; margin-bottom: calc(min(78vw, 340px) * .05 - .12em); }
+.lockup img { width: 100%; height: auto; display: block; border-radius: 50%; }
+.lockup .bot { color: var(--navy); font-weight: 700; font-size: clamp(1.6rem, 8.5vw, 2.4rem); line-height: 1.1; margin-top: calc(min(78vw, 340px) * .03); }
+.splash .loading { margin-top: 28px; color: var(--navy); font-weight: 500; display: grid; gap: 8px; justify-items: center; }
+.splash .bar { width: 180px; height: 6px; border-radius: 3px; background: rgba(30,58,95,.15); overflow: hidden; }
+.splash .bar i { display: block; height: 100%; width: 0; background: var(--navy); animation: load 9s linear forwards; }
+.splash .skip { position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(14px + env(safe-area-inset-top, 0px)); background: none; border: 1px solid rgba(30,58,95,.3); color: var(--navy); border-radius: 999px; padding: 4px 14px; font-size: .85rem; }
+@keyframes load { to { width: 100%; } }
+.a-top { opacity: 0; animation: topIn 3s cubic-bezier(.34,1.56,.64,1) forwards; }
+.a-logo { opacity: 0; transform: scale(.6); animation: logoIn 4s cubic-bezier(.34,1.45,.64,1) 2s forwards, pulse 3s ease-in-out 6s 1; }
+.a-bot { opacity: 0; animation: fadeIn 4s ease 5s forwards; }
+@keyframes topIn { 0% { opacity: 0; transform: translateY(-24px); } 70% { opacity: 1; transform: translateY(4px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes logoIn { 0% { opacity: 0; transform: scale(.6); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+@keyframes fadeIn { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .a-top, .a-logo, .a-bot { animation-duration: .01s; animation-delay: 0s; opacity: 1; transform: none; } }
+
+/* HUD */
+.hud { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line); padding-top: calc(10px + env(safe-area-inset-top, 0px)); padding-bottom: 10px; }
+.avatar { position: relative; width: 52px; height: 52px; flex: none; }
+.avatar img { width: 52px; height: 52px; border-radius: 50%; display: block; background: var(--cream); }
+.avatar .lv { position: absolute; right: -8px; bottom: -6px; background: var(--navy); border: 2px solid var(--navy-2); font-size: 12px; font-weight: 600; border-radius: 999px; padding: 0 6px; }
+.brand-t { color: var(--navy-hi); font-weight: 700; font-size: 1.1rem; line-height: 1.2; }
+.xpbar { height: 6px; background: var(--card-2); border-radius: 3px; overflow: hidden; }
+.xpbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--navy-2), var(--navy-hi)); transition: width .5s; }
+.coin { display: inline-block; width: 13px; height: 13px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffe27e, #d6a10b); vertical-align: -2px; }
+
+/* bottom tabs */
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: #0a1019; border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.tabs .in { max-width: 640px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
+.tabs button { background: none; border: 0; padding: 8px 2px 10px; display: grid; justify-items: center; gap: 2px; color: var(--muted); font-size: .72rem; }
+.tabs button .ic { font-size: 1.3rem; line-height: 1; }
+.tabs button[aria-current="page"] { color: var(--fg); }
+.tabs button[aria-current="page"] .ic { filter: drop-shadow(0 0 6px rgba(147,185,238,.6)); }
+main.screen { padding-top: 14px; padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; }
+
+/* components */
+.card { background: var(--card); border: 1.5px solid var(--line); border-radius: 22px; padding: 18px; min-width: 0; }
+.hero { background: linear-gradient(160deg, var(--navy-2), var(--navy) 75%); border-radius: 24px; padding: 20px; }
+.btn { border: 0; border-radius: 16px; padding: 11px 16px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-align: center; min-height: 46px; }
+.btn-navy { background: var(--navy); border: 1.5px solid var(--navy-2); }
+.btn-gold { background: var(--gold); color: var(--gold-ink); }
+.btn-black { background: #05080d; border: 1.5px solid #05080d; }
+.btn-ghost { background: transparent; border: 1.5px solid var(--line); }
+.btn-danger { background: transparent; border: 1.5px solid var(--bad); color: var(--bad); }
+.btn:disabled { opacity: .5; cursor: default; }
+.chip { flex: none; border: 1.5px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 13px; font-weight: 500; white-space: nowrap; font-size: .9rem; }
+.chip.on { background: var(--navy); border-color: var(--navy-2); }
+.crumbs { display: flex; gap: 6px; align-items: center; overflow-x: auto; scrollbar-width: none; }
+.crumbs::-webkit-scrollbar { display: none; }
+.tile { border-radius: 18px; padding: 12px 8px; display: grid; justify-items: center; text-align: center; border: 1.5px solid rgba(255,255,255,.08); background: rgba(5,10,20,.35); min-width: 0; }
+.tile:hover { border-color: rgba(255,255,255,.3); }
+.tile .k { font-size: .8rem; color: #c8d3e3; font-weight: 500; }
+.tile .v { font-size: 1.9rem; font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.tile .s { font-size: .74rem; color: #c8d3e3; }
+.tile.good { background: #20606b; border-color: #47b1ad; }
+.tile.sick { background: #403c69; border-color: #8a7fd0; }
+.money { border-radius: 14px; border: 1.5px solid var(--line); padding: 10px 12px; min-width: 0; }
+.money .k { font-size: .72rem; color: var(--muted); font-weight: 600; letter-spacing: .04em; }
+.money .v { font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.money.risk { background: #281e17; border-color: #4b3524; } .money.risk .v { color: var(--warn); }
+.money.net { background: #12291f; border-color: #24473a; } .money.net .v { color: var(--good); }
+.st { display: inline-flex; align-items: center; gap: 4px; font-size: .78rem; font-weight: 600; padding: 2px 10px; border-radius: 999px; border: 1.5px solid currentColor; white-space: nowrap; }
+.st-ดีมาก { color: var(--good); } .st-ดี { color: var(--ok); } .st-เริ่มป่วย { color: var(--warn); } .st-ป่วยหนัก { color: var(--bad); }
+.row { display: flex; justify-content: space-between; gap: 10px; }
+.vrow { width: 100%; text-align: left; background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; padding: 12px 14px; display: grid; gap: 4px; }
+.vrow:hover { border-color: var(--navy-2); }
+.gauge { height: 8px; border-radius: 4px; background: var(--card-2); overflow: hidden; display: flex; }
+.gauge i { display: block; height: 100%; }
+.field { display: grid; gap: 4px; }
+.field label { font-size: .85rem; color: var(--muted); }
+.field input, .search { width: 100%; background: var(--bg-2); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; min-width: 0; }
+.muted { color: var(--muted); }
+.small { font-size: .85rem; }
+.hidden-file { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.stamp { color: var(--good); border: 2px solid var(--good); border-radius: 8px; padding: 0 8px; font-weight: 600; font-size: .8rem; transform: rotate(-6deg); display: inline-block; }
+table.rep { width: 100%; border-collapse: collapse; font-size: .85rem; }
+table.rep th { text-align: left; color: var(--muted); font-weight: 500; padding: 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.rep td { padding: 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.rep .r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.scroll-x { overflow-x: auto; }
+
+/* modal */
+.overlay { position: fixed; inset: 0; z-index: 60; background: rgba(3,6,12,.72); display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.modal { width: min(560px, 100%); max-height: min(78vh, 720px); background: var(--bg-2); border: 1.5px solid var(--line); border-radius: 22px; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.modal .mh { padding: 16px 18px 10px; display: flex; justify-content: space-between; gap: 10px; align-items: start; }
+.modal .mb { overflow-y: auto; padding: 0 18px 12px; display: grid; gap: 8px; align-content: start; }
+.modal .mf { padding: 12px 18px 16px; border-top: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; }
+.x { background: var(--card-2); border: 0; width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem; flex: none; }
+.spin { width: 42px; height: 42px; border-radius: 50%; border: 4px solid var(--line); border-top-color: var(--gold); animation: sp 1s linear infinite; }
+@keyframes sp { to { transform: rotate(360deg); } }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 80; background: var(--gold); color: var(--gold-ink); font-weight: 600; border-radius: 999px; padding: 9px 18px; box-shadow: 0 8px 24px rgba(0,0,0,.4); max-width: calc(100% - 32px); text-align: center; }
+@media (prefers-reduced-motion: no-preference) { .toast { animation: pop .3s ease-out; } @keyframes pop { from { transform: translateX(-50%) scale(.85); opacity: 0; } } }
+</style>
+
+<div id="root"></div>
+<script type="application/json" id="seed">__SEED__</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11/dist/index.global.js"></script>
+<script>
+(function () {
+'use strict';
+const { useState, useEffect, useMemo, useRef, useCallback } = React;
+const html = htm.bind(React.createElement);
+
+/* ================= constants ================= */
+const LOGO = '__LOGO__';
+const STD = 280000;
+const SHEET_ID = '11aTk309P3EOuQMM5_mjRi5TDjV8h-cRlCj7I0F95i3I';
+const XLSX_FILE_ID = '1cV0t9yFH3oNWcZb8QqmNhxIlpEDPRzRC';
+// รายงาน (กข.คจ.) แยกตามจังหวัด แปลงเป็น Google Sheets: แถว 1-3 หัวตาราง, 4-60 หมู่บ้าน, 61 รวม (สูตร SUM)
+const REPORT_ID = '1PTag5sttxbMwKNyW0I8imipH489J9D1SQbfMwQAxdS4';
+const sheetUrl = (id) => 'https://docs.google.com/spreadsheets/d/' + id + '/edit';
+const vKey = (tambon, moo, name) => key(tambon) + '|' + key(moo) + '|' + key(normName(name));
+const SHEETS = 'Google Sheets', DRIVE = 'Google Drive';
+const XLSX_CDN = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+const POSTAL = { 'โนนสัง': '39130' };
+const K = { data: 'kkj.v2.villages', meta: 'kkj.v2.meta', game: 'kkj.v2.game', ui: 'kkj.v2.ui' };
+const SPLASH_MS = 9000;
+
+/* ================= helpers ================= */
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} },
+};
+const num = (v) => { if (typeof v === 'number') return Number.isFinite(v) ? v : 0; const s = String(v == null ? '' : v).replace(/[^0-9.\-]/g, ''); const x = parseFloat(s); return Number.isFinite(x) ? x : 0; };
+const txt = (v) => String(v == null ? '' : v).replace(/\s+/g, ' ').trim();
+const baht = (n) => (Math.round((+n || 0) * 100) / 100).toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const b0 = (n) => Math.round(+n || 0).toLocaleString('th-TH');
+const normName = (s) => { s = txt(s).replace(/^บ้าน\s*/, ''); return s ? 'บ้าน ' + s : ''; };
+const key = (s) => txt(s).replace(/\s+/g, '');
+const thDate = (d) => d.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+
+const STATUS = [
+  { id: 'ดีมาก', label: '😊 ดีมาก เกิน', min: 285000 },
+  { id: 'ดี', label: '🙂 ดี', min: STD },
+  { id: 'เริ่มป่วย', label: '🤒 เริ่มป่วย', min: STD * 0.9 },
+  { id: 'ป่วยหนัก', label: '🚑 ป่วยหนัก', min: -Infinity },
+];
+const statusOf = (net) => STATUS.find((s) => net >= s.min - 0.004);
+
+/* The one formula: รวมสุทธิ = บัญชี + ลูกหนี้ − เสี่ยง, เสี่ยง = มีปัญหา + เสียหาย */
+function finish(v) {
+  v.district = txt(v.district) || 'โนนสัง';
+  v.province = txt(v.province) || 'หนองบัวลำภู';
+  v.tambon = txt(v.tambon).replace(/^(ต\.|ตำบล)\s*/, '');
+  v.moo = txt(v.moo).replace(/^(ม\.|หมู่ที่|หมู่)\s*/, '');
+  v.name = normName(v.name);
+  ['deposit', 'loaned', 'problem', 'damaged', 'fund', 'hh', 'problemHH', 'damagedHH', 'savers', 'savings'].forEach((k) => { v[k] = num(v[k]); });
+  v.risk = Math.round((v.problem + v.damaged) * 100) / 100;
+  v.circ = Math.round((v.deposit + v.loaned) * 100) / 100;
+  v.net = Math.round((v.deposit + v.loaned - v.risk) * 100) / 100;
+  v.gap = Math.round((STD - v.net) * 100) / 100;
+  const s = statusOf(v.net); v.status = s.id; v.statusLabel = s.label;
+  v.good = v.net >= STD - 0.004;
+  const pc = POSTAL[v.district] || txt(v.postal);
+  v.address = v.addressOverride || [v.name, 'หมู่ที่ ' + v.moo, 'ต.' + v.tambon, 'อ.' + v.district, 'จ.' + v.province, pc].filter(Boolean).join(' ');
+  v.id = v.district + '-' + v.tambon + '-' + v.moo + '-' + v.name;
+  return v;
+}
+function seed() {
+  const rows = JSON.parse(document.getElementById('seed').textContent);
+  return rows.map((f) => finish({ no: f[0], province: 'หนองบัวลำภู', district: 'โนนสัง', tambon: f[1], moo: f[2], name: f[3], chair: f[4], phone: f[5], level: f[6], fund: f[7], hh: f[8], loaned: f[9], deposit: f[10],
+    problemHH: f[11], problem: f[12], problemCause: f[13], problemAction: f[14], damagedHH: 0, damaged: 0, group: f[15], savers: f[16], savings: f[17] }));
+}
+function agg(list) {
+  const s = (k) => list.reduce((a, v) => a + v[k], 0);
+  const by = (id) => list.filter((v) => v.status === id).length;
+  return { n: list.length, deposit: s('deposit'), loaned: s('loaned'), risk: s('risk'), circ: s('circ'), net: s('net'),
+    good: list.filter((v) => v.good).length, sick: list.filter((v) => !v.good).length,
+    dm: by('ดีมาก'), d: by('ดี'), ss: by('เริ่มป่วย'), sh: by('ป่วยหนัก') };
+}
+const uniq = (a) => [...new Set(a)];
+const districtsOf = (list) => { const c = {}; list.forEach((v) => { c[v.district] = (c[v.district] || 0) + 1; }); return Object.keys(c).sort((a, b) => c[b] - c[a] || a.localeCompare(b, 'th')); };
+
+/* ================= parsing ================= */
+// full Excel layout "(กข.คจ.) แยกตามจังหวัด": fixed column positions
+function rowsFromGrid(grid) {
+  let headerIdx = -1;
+  for (let i = 0; i < Math.min(20, grid.length); i++) {
+    const cells = (grid[i] || []).map((c) => txt(c));
+    if (cells.some((c) => c === 'จังหวัด') && cells.some((c) => c === 'อำเภอ')) { headerIdx = i; break; }
+  }
+  if (headerIdx < 0) return null;
+  const out = [];
+  for (let i = headerIdx + 2; i < grid.length; i++) {
+    const c = grid[i] || [];
+    if (!/^\d+$/.test(txt(c[0])) || !txt(c[5])) continue;
+    let phone = txt(c[7]).replace(/[^0-9]/g, ''); if (phone.length === 9) phone = '0' + phone;
+    out.push(finish({ no: num(c[0]), province: txt(c[1]).replace(/^(จ\.|จังหวัด)\s*/, ''), district: txt(c[2]).replace(/^(อ\.|อำเภอ)\s*/, ''), tambon: c[3], moo: c[4], name: c[5],
+      chair: txt(c[6]), phone, level: txt(c[8]).replace('ระดับ', '').trim(), fund: c[9], hh: c[10], loaned: c[11], deposit: c[12],
+      bookDate: txt(c[13]), bank: txt(c[14]), account: txt(c[15]), problemHH: c[22], problem: c[23], problemCause: txt(c[24]), problemAction: txt(c[25]),
+      damagedHH: c[26], damaged: c[27], damagedCause: txt(c[28]), damagedAction: txt(c[29]), group: txt(c[30]), savers: c[31], savings: c[32] }));
+  }
+  return out;
+}
+// simple CSV or the native Google Sheet: map by header names
+const ALIAS = {
+  province: ['จังหวัด'], district: ['อำเภอ'], tambon: ['ตำบล'], moo: ['หมู่', 'หมู่ที่'], name: ['หมู่บ้าน', 'ชื่อหมู่บ้าน กขคจ.', 'ชื่อหมู่บ้าน กข.คจ.', 'ชื่อหมู่บ้าน'],
+  deposit: ['บัญชี', 'เงินในบัญชี', 'เงินฝากธนาคาร'], loaned: ['ลูกหนี้', 'เงินลูกหนี้', 'เงินที่ยืม'], risk: ['เสี่ยง', 'เงินเสี่ยง (ลบออก)', 'เงินเสี่ยง'],
+  problem: ['เงินมีปัญหา'], damaged: ['เงินเสียหาย'], chair: ['ประธาน'], phone: ['เบอร์', 'เบอร์โทร'], address: ['full_address', 'ที่อยู่เต็ม'], no: ['ลำดับ', 'ลำดับที่'],
+};
+function rowsFromHeaders(grid) {
+  let hi = -1, map = null;
+  for (let i = 0; i < Math.min(20, grid.length); i++) {
+    const cells = (grid[i] || []).map((c) => txt(c));
+    const m = {};
+    for (const [k, names] of Object.entries(ALIAS)) { const j = cells.findIndex((c) => names.includes(c)); if (j >= 0) m[k] = j; }
+    if (m.name != null && m.deposit != null && m.loaned != null) { hi = i; map = m; break; }
+  }
+  if (hi < 0) return null;
+  const out = [];
+  for (let i = hi + 1; i < grid.length; i++) {
+    const c = grid[i] || []; const g = (k) => (map[k] == null ? '' : c[map[k]]);
+    if (!txt(g('name'))) continue;
+    const addr = txt(g('address'));
+    const district = txt(g('district')) || ((addr.match(/อ\.\s*(\S+)/) || [])[1] || '');
+    const province = txt(g('province')) || ((addr.match(/จ\.\s*(\S+)/) || [])[1] || '');
+    const risk = num(g('risk'));
+    const hasSplit = map.problem != null || map.damaged != null;
+    let phone = txt(g('phone')).replace(/[^0-9]/g, ''); if (phone.length === 9) phone = '0' + phone;
+    out.push(finish({ no: num(g('no')) || out.length + 1, province, district, tambon: g('tambon'), moo: g('moo'), name: g('name'), chair: txt(g('chair')), phone,
+      deposit: g('deposit'), loaned: g('loaned'), problem: hasSplit ? g('problem') : risk, damaged: hasSplit ? g('damaged') : 0, postal: ((addr.match(/(\d{5})\s*$/) || [])[1] || '') }));
+  }
+  return out;
+}
+function parseCSV(text) {
+  text = text.replace(/^﻿/, '');
+  const rows = []; let row = [], cur = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) { if (ch === '"' && text[i + 1] === '"') { cur += '"'; i++; } else if (ch === '"') q = false; else cur += ch; }
+    else if (ch === '"') q = true; else if (ch === ',') { row.push(cur); cur = ''; }
+    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; }
+    else cur += ch;
+  }
+  if (cur || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+function parseGrid(grid) {
+  const byHead = rowsFromHeaders(grid); if (byHead && byHead.length) return byHead; // simple CSV / native sheet
+  return rowsFromGrid(grid) || [];
+}
+// The Drive connector returns the .xlsx as flattened text: rebuild rows from it
+function rowsFromDriveText(text) {
+  const start = text.indexOf('หมายเหตุ,');
+  if (start < 0) return [];
+  const body = text.slice(start + 'หมายเหตุ,'.length).trim();
+  const chunks = body.split(/\s+(?=\d{1,4},[^,"\d][^,"]*,[^,"\d][^,"]*,[^,"\d][^,"]*,\d{1,3},)|\s+(?=รวมทั้งหมด,)/);
+  const grid = [[], ['ลำดับที่', 'จังหวัด', 'อำเภอ'], []];
+  chunks.forEach((ch) => { const r = parseCSV(ch.replace(/\n/g, ' ')); if (r[0]) grid.push(r[0]); });
+  return rowsFromGrid(grid) || [];
+}
+let xlsxPromise = null;
+function loadXLSX() {
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  if (!xlsxPromise) xlsxPromise = new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = XLSX_CDN; s.async = true;
+    s.onload = () => (window.XLSX ? res(window.XLSX) : rej(new Error('no XLSX')));
+    s.onerror = () => { xlsxPromise = null; rej(new Error('cdn')); };
+    document.head.appendChild(s);
+  });
+  return xlsxPromise;
+}
+async function readAnyFile(file) {
+  const name = file.name || '';
+  if (/\.csv$/i.test(name) || /csv|text\/plain/.test(file.type)) {
+    const text = await file.text();
+    return parseGrid(parseCSV(text));
+  }
+  let XLSX;
+  try { XLSX = await loadXLSX(); } catch (e) { throw new Error('โหลดตัวอ่าน Excel ไม่ได้ ให้เปิดไฟล์ใน Excel แล้วบันทึกเป็น CSV UTF-8 แล้วนำเข้าใหม่'); }
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(buf, { type: 'array' });
+  const names = wb.SheetNames.slice().sort((a, b) => (b.includes('แยกตามจังหวัด') ? 1 : 0) - (a.includes('แยกตามจังหวัด') ? 1 : 0));
+  for (const sn of names) {
+    const rows = parseGrid(XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, raw: true, defval: '' }));
+    if (rows.length) return rows;
+  }
+  return [];
+}
+
+/* ================= capabilities ================= */
+const cap = { mcp: null, dl: null };
+const capReady = (async () => {
+  try { cap.mcp = window.claude && window.claude.use ? await window.claude.use('mcp') : null; } catch (e) { cap.mcp = null; }
+  try { cap.dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { cap.dl = null; }
+})();
+function mcpMessage(e, server) {
+  const c = e && e.code;
+  if (c === 'server_not_connected' || c === 'selection_required') return 'ยังไม่ได้เชื่อม ' + server + ' ให้เพิ่มใน claude.ai → Settings → Connectors';
+  if (c === 'needs_reauth') return 'การเชื่อม ' + server + ' หมดอายุ ให้เชื่อมใหม่ใน claude.ai → Settings → Connectors';
+  if (c === 'not_in_manifest' || c === 'approval_required' || c === 'consent_required') return 'ยังไม่ได้อนุญาตให้แอปใช้ ' + server + ' กดปุ่มอีกครั้งแล้วเลือกอนุญาต';
+  if (c === 'blocked_by_policy') return 'องค์กรไม่อนุญาตให้ใช้ ' + server + ' ในแอปนี้';
+  if (c === 'server_unavailable' || c === 'upstream_error') return server + ' ไม่ตอบสนองชั่วคราว ลองใหม่อีกครั้ง';
+  if (c === 'tool_error') return server + ' แจ้งข้อผิดพลาด: ' + (e.message || '');
+  return (e && e.message) || 'เกิดข้อผิดพลาด';
+}
+async function saveFile(filename, data, mime) {
+  await capReady;
+  if (cap.dl) { await cap.dl.save({ filename, data }); return 'saved'; }
+  const blob = data instanceof Blob ? data : new Blob([data], { type: mime });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  return 'saved';
+}
+
+/* ================= export ================= */
+const SHEET_HEAD = ['ลำดับ', 'หมู่', 'ตำบล', 'ชื่อหมู่บ้าน กขคจ.', 'ประธาน', 'เบอร์โทร', 'เงินในบัญชี', 'เงินลูกหนี้', 'เงินเสี่ยง (ลบออก)', 'รวมสุทธิ = บัญชี+ลูกหนี้-เสี่ยง', '280K - สุทธิ (ขาด/เกิน)', 'สถานะสุขภาพ', 'ที่อยู่เต็ม', 'ตำบล'];
+function villageRows(list) {
+  return list.map((v, i) => [i + 1, v.moo, v.tambon, v.name, v.chair, v.phone, v.deposit, v.loaned, v.risk, v.net, v.gap, v.statusLabel, v.address, v.tambon]);
+}
+function tambonRows(list) {
+  const out = [];
+  uniq(list.map((v) => v.district + '|' + v.tambon)).forEach((k) => {
+    const [d, t] = k.split('|'); const a = agg(list.filter((v) => v.district === d && v.tambon === t));
+    out.push([d, t, a.n, a.good, a.sick, a.deposit, a.loaned, a.risk, a.net]);
+  });
+  return out;
+}
+const csvCell = (x) => { const s = String(x == null ? '' : x); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+function toCSV(rows) { return '﻿' + rows.map((r) => r.map(csvCell).join(',')).join('\r\n'); }
+
+/* ================= game ================= */
+// ตำแหน่งตามเลเวล: Lv1 พัฒนากร · Lv2 พัฒนาการอำเภอ · Lv3 พัฒนาการจังหวัด
+const RANKS = [
+  { name: 'พัฒนากร', xp: 0, img: '__LV1__' },
+  { name: 'พัฒนาการอำเภอ', xp: 400, img: '__LV2__' },
+  { name: 'พัฒนาการจังหวัด', xp: 800, img: '__LV3__' },
+];
+const levelOf = (xp) => 1 + Math.floor(xp / 400);
+const rankIdx = (xp) => Math.min(RANKS.length - 1, levelOf(xp) - 1);
+const rankOf = (xp) => RANKS[rankIdx(xp)].name;
+const mascotOf = (xp) => RANKS[rankIdx(xp)].img;
+
+/* ================= small components ================= */
+function Logo({ size = 52, src }) { return html`<img src=${src || LOGO} alt="" width=${size} height=${size} style=${{ width: size, height: size, borderRadius: '50%', display: 'block', background: 'var(--cream)' }} />`; }
+function Status({ v }) { return html`<span class=${'st st-' + v.status}>${v.statusLabel}</span>`; }
+function Money({ a, label }) {
+  return html`<div class="grid grid-cols-2 gap-2">
+    <div class="money" style=${{ gridColumn: '1 / -1' }}><div class="k">หมุนเวียน (บัญชี + ลูกหนี้)${label ? ' · ' + label : ''}</div><div class="v">${b0(a.circ)} ฿</div></div>
+    <div class="money risk"><div class="k">เสี่ยงรวม</div><div class="v">${b0(a.risk)} ฿</div></div>
+    <div class="money net"><div class="k">สุทธิ</div><div class="v">${b0(a.net)} ฿</div></div>
+  </div>`;
+}
+function Gauge({ a }) {
+  const w = (x) => (a.n ? (x / a.n) * 100 : 0) + '%';
+  return html`<div class="gauge" role="img" aria-label=${'ดีมาก ' + a.dm + ' ดี ' + a.d + ' เริ่มป่วย ' + a.ss + ' ป่วยหนัก ' + a.sh}>
+    <i style=${{ width: w(a.dm), background: 'var(--good)' }}></i><i style=${{ width: w(a.d), background: 'var(--ok)' }}></i><i style=${{ width: w(a.ss), background: 'var(--warn)' }}></i><i style=${{ width: w(a.sh), background: 'var(--bad)' }}></i></div>`;
+}
+function Tiles({ list, onOpen }) {
+  const a = agg(list);
+  return html`<div class="grid grid-cols-3 gap-2">
+    <button class="tile" type="button" onClick=${() => onOpen('all')}><span class="k">ทั้งหมด</span><span class="v">${a.n}</span><span class="s">หมู่บ้าน ›</span></button>
+    <button class="tile good" type="button" onClick=${() => onOpen('good')}><span class="k">เงินครบ ≥280K</span><span class="v">${a.good}</span><span class="s">ดีมาก ${a.dm} + ดี ${a.d} ›</span></button>
+    <button class="tile sick" type="button" onClick=${() => onOpen('sick')}><span class="k">ป่วย</span><span class="v">${a.sick}</span><span class="s">ต้องดูแล ›</span></button>
+  </div>`;
+}
+function VRow({ v, onOpen, checked }) {
+  return html`<button class="vrow" type="button" onClick=${() => onOpen(v)}>
+    <div class="row items-start"><div class="min-w-0"><div class="font-semibold">${v.name} <span class="muted small">หมู่ ${v.moo}</span></div><div class="muted small">ต.${v.tambon} อ.${v.district}</div></div><${Status} v=${v} /></div>
+    <div class="row small"><span class="muted">สุทธิ</span><b class="num" style=${{ color: v.good ? 'var(--fg)' : 'var(--bad)' }}>${baht(v.net)} ฿</b></div>
+    <div class="row small"><span class="muted">${v.gap > 0 ? 'ขาดจาก 280K' : 'เกิน 280K'}</span><span class="num">${baht(Math.abs(v.gap))} ฿</span></div>
+    ${checked ? html`<div><span class="stamp">ตรวจแล้ว</span></div>` : null}
+  </button>`;
+}
+function Modal({ title, sub, onClose, children, footer }) {
+  useEffect(() => { const k = (e) => { if (e.key === 'Escape') onClose(); }; window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k); }, [onClose]);
+  return html`<div class="overlay" role="dialog" aria-modal="true" aria-label=${title} onClick=${(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div class="modal">
+      <div class="mh"><div class="min-w-0"><div class="text-lg font-semibold">${title}</div>${sub ? html`<div class="muted small">${sub}</div>` : null}</div><button class="x" type="button" aria-label="ปิด" onClick=${onClose}>✕</button></div>
+      <div class="mb">${children}</div>
+      ${footer ? html`<div class="mf">${footer}</div>` : null}
+    </div></div>`;
+}
+
+/* ================= splash ================= */
+function Splash({ onDone }) {
+  const [out, setOut] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setOut(true), SPLASH_MS); return () => clearTimeout(t); }, []);
+  useEffect(() => { if (out) { const t = setTimeout(onDone, 800); return () => clearTimeout(t); } }, [out]);
+  return html`<div class=${'splash' + (out ? ' out' : '')} aria-label="เข็มทิศแก้หนี้ กข.คจ.">
+    <button class="skip" type="button" onClick=${() => setOut(true)}>ข้าม ›</button>
+    <div>
+      <div class="lockup">
+        <div class="top a-top">เข็มทิศแก้หนี้</div>
+        <img class="a-logo" src=${LOGO} alt="หมอแก้หนี้" />
+        <div class="bot a-bot">กข.คจ.</div>
+      </div>
+      <div class="loading"><span>กำลังโหลด...</span><span class="bar"><i></i></span><span class="small" style=${{ opacity: .7 }}>หมอแก้หนี้ by Olifsuriya</span></div>
+    </div>
+  </div>`;
+}
+
+/* ================= app ================= */
+function App() {
+  const [splash, setSplash] = useState(true);
+  const [villages, setVillages] = useState(() => { const s = store.get(K.data, null); return Array.isArray(s) && s.length ? s.map(finish) : seed(); });
+  const [meta, setMeta] = useState(() => store.get(K.meta, { source: 'ข้อมูลชีต ปีงบประมาณ 2569', at: null, sheetRows: null }));
+  const [game, setGame] = useState(() => Object.assign({ xp: 0, coins: 0, checked: {}, wards: {}, badges: {} }, store.get(K.game, {})));
+  const [tab, setTab] = useState('clinic');
+  const [path, setPath] = useState({});
+  const [modal, setModal] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [mcpOk, setMcpOk] = useState(null);
+  const toastT = useRef();
+
+  useEffect(() => { store.set(K.data, villages); }, [villages]);
+  useEffect(() => { store.set(K.meta, meta); }, [meta]);
+  useEffect(() => { store.set(K.game, game); }, [game]);
+  useEffect(() => { capReady.then(() => setMcpOk(!!cap.mcp)); }, []);
+
+  const say = useCallback((m) => { setToast(m); clearTimeout(toastT.current); toastT.current = setTimeout(() => setToast(null), 2600); }, []);
+  const award = useCallback((xp, coins, msg) => {
+    setGame((g) => { const before = levelOf(g.xp); const n = Object.assign({}, g, { xp: g.xp + xp, coins: g.coins + coins }); if (levelOf(n.xp) > before) setTimeout(() => say(rankIdx(n.xp) > rankIdx(g.xp) ? '🎉 เลื่อนตำแหน่งเป็น ' + rankOf(n.xp) : '🎉 ขึ้น Lv' + levelOf(n.xp)), 900); return n; });
+    say(msg + ' +' + xp + ' XP' + (coins ? ' +' + coins + ' เหรียญ' : ''));
+  }, [say]);
+
+  const go = (p, t) => { setPath(p); if (t) setTab(t); setModal(null); window.scrollTo({ top: 0 }); };
+  const openVillage = (v) => go({ district: v.district, tambon: v.tambon, id: v.id }, 'clinic');
+  const openList = (list, kind, scope) => {
+    const sel = kind === 'good' ? list.filter((v) => v.good) : kind === 'sick' ? list.filter((v) => !v.good) : list;
+    const title = (kind === 'good' ? 'เงินครบ ≥280K' : kind === 'sick' ? 'ป่วย · ต้องดูแล' : 'ทั้งหมด') + ' · ' + sel.length + ' หมู่บ้าน';
+    setModal({ type: 'list', title, sub: scope, items: sel.slice().sort((a, b) => a.net - b.net) });
+  };
+
+  function replaceVillages(rows, label) {
+    const districts = new Set(rows.map((v) => v.district));
+    setVillages((cur) => cur.filter((v) => !districts.has(v.district)).concat(rows));
+    setMeta((m) => Object.assign({}, m, { source: label, at: new Date().toISOString() }));
+    return [...districts];
+  }
+
+  /* ---------- import ---------- */
+  async function importFile(file) {
+    setModal({ type: 'import', stage: 'reading', name: file.name });
+    try {
+      const rows = await readAnyFile(file);
+      if (!rows.length) throw new Error('ไม่พบแถวข้อมูลหมู่บ้าน ตรวจว่าเป็นชีต (กข.คจ.) แยกตามจังหวัด หรือ CSV ที่มีหัว หมู่บ้าน, บัญชี, ลูกหนี้');
+      const ds = replaceVillages(rows, 'ไฟล์ ' + file.name);
+      setModal({ type: 'import', stage: 'done', name: file.name, rows, districts: ds });
+      award(50, 20, 'นำเข้า ' + rows.length + ' หมู่บ้าน');
+    } catch (e) { setModal({ type: 'import', stage: 'error', name: file.name, error: e.message || String(e) }); }
+  }
+
+  /* ---------- Google Sheets / Drive ---------- */
+  const [sync, setSync] = useState({ busy: false, msg: '', err: '' });
+  async function pullSheet() {
+    setSync({ busy: true, msg: 'กำลังดึงข้อมูลจาก Google Sheets...', err: '' });
+    try {
+      const r = await cap.mcp.callTool(SHEETS, 'get_values', { spreadsheetId: SHEET_ID, range: 'A1:N1000' }, { cache: false });
+      const values = (r.payload && r.payload.values) || [];
+      const rows = rowsFromHeaders(values) || [];
+      if (!rows.length) throw new Error('ไม่พบแถวข้อมูลในชีต');
+      // keep the problem/damaged split from local data when the total matches
+      const local = new Map(villages.map((v) => [key(v.tambon) + '|' + key(v.moo) + '|' + key(v.name), v]));
+      const merged = rows.map((v) => { const o = local.get(key(v.tambon) + '|' + key(v.moo) + '|' + key(v.name)); if (!o) return v;
+        const keep = Math.abs(o.risk - v.problem) < 0.01; return finish(Object.assign({}, o, { chair: v.chair || o.chair, phone: v.phone || o.phone, deposit: v.deposit, loaned: v.loaned, problem: keep ? o.problem : v.problem, damaged: keep ? o.damaged : 0, no: v.no })); });
+      replaceVillages(merged, 'Google Sheets (ดึงล่าสุด)');
+      setMeta((m) => Object.assign({}, m, { sheetRows: values.length - 1, source: 'Google Sheets (ดึงล่าสุด)', at: new Date().toISOString() }));
+      setSync({ busy: false, msg: 'ดึงข้อมูลแล้ว ' + merged.length + ' หมู่บ้าน', err: '' });
+      award(30, 10, 'ซิงค์จากชีต');
+    } catch (e) { setSync({ busy: false, msg: '', err: mcpMessage(e, SHEETS) }); }
+  }
+  async function pushSheet() {
+    setModal(null);
+    setSync({ busy: true, msg: 'กำลังส่งข้อมูลขึ้น Google Sheets...', err: '' });
+    try {
+      const list = villages.filter((v) => v.district === 'โนนสัง').sort((a, b) => a.no - b.no);
+      const cur = await cap.mcp.callTool(SHEETS, 'get_values', { spreadsheetId: SHEET_ID, range: 'A1:N1000' }, { cache: false });
+      const have = Math.max(0, (((cur.payload && cur.payload.values) || []).length) - 1);
+      const n = list.length;
+      const ai = list.map((v, i) => [i + 1, isNaN(+v.moo) ? v.moo : +v.moo, v.tambon, v.name, v.chair, v.phone, v.deposit, v.loaned, v.risk]);
+      const ln = list.map((v) => [v.statusLabel, v.address, v.tambon]);
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'A2:I' + (n + 1), values: ai }, { cache: false });
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'L2:N' + (n + 1), values: ln }, { cache: false });
+      if (n > have) { // new rows have no formula yet: write the computed numbers
+        const jk = list.slice(have).map((v) => [v.net, v.gap]);
+        await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'J' + (have + 2) + ':K' + (n + 1), values: jk }, { cache: false });
+      }
+      if (have > n) {
+        const blank = Array.from({ length: have - n }, () => Array(14).fill(''));
+        await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'A' + (n + 2) + ':N' + (have + 1), values: blank }, { cache: false });
+      }
+      setSync({ busy: false, msg: 'ส่งขึ้นชีตแล้ว ' + n + ' หมู่บ้าน (อ.โนนสัง)', err: '' });
+      award(30, 10, 'ส่งข้อมูลขึ้นชีต');
+    } catch (e) { setSync({ busy: false, msg: '', err: mcpMessage(e, SHEETS) + ' (ข้อมูลในชีตอาจถูกเขียนไปบางส่วน ให้กดดึงข้อมูลเพื่อตรวจ)' }); }
+  }
+  async function pushReportOne(v) {
+    try {
+      const cur = await cap.mcp.callTool(SHEETS, 'get_values', { spreadsheetId: REPORT_ID, range: 'A1:F1000' }, { cache: false });
+      const values = (cur.payload && cur.payload.values) || [];
+      const want = vKey(v.tambon, v.moo, v.name);
+      const idx = values.findIndex((r, i) => i >= 3 && /^\d+$/.test(txt(r[0])) && vKey(r[3], r[4], r[5]) === want);
+      if (idx < 0) return 'รายงาน กข.คจ.: ไม่พบหมู่บ้านนี้';
+      const r = idx + 1;
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: REPORT_ID, range: 'L' + r + ':M' + r, values: [[v.loaned, v.deposit]] }, { cache: false });
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: REPORT_ID, range: 'X' + r, values: [[v.problem]] }, { cache: false });
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: REPORT_ID, range: 'AB' + r, values: [[v.damaged]] }, { cache: false });
+      return 'รายงาน กข.คจ.: อัปเดตแถว ' + r + ' แล้ว';
+    } catch (e) { return 'รายงาน กข.คจ.: ' + mcpMessage(e, SHEETS); }
+  }
+  async function pushOne(v) {
+    const a = await pushReportOne(v);
+    const b = await pushNativeOne(v);
+    return a + ' · ' + b;
+  }
+  async function pushNativeOne(v) {
+    try {
+      const cur = await cap.mcp.callTool(SHEETS, 'get_values', { spreadsheetId: SHEET_ID, range: 'A1:N1000' }, { cache: false });
+      const values = (cur.payload && cur.payload.values) || [];
+      const idx = values.findIndex((r, i) => i > 0 && key(r[2]) === key(v.tambon) && key(r[1]) === key(v.moo) && key(r[3]) === key(v.name));
+      if (idx < 0) return 'ชีตคลินิก: ไม่พบหมู่บ้านนี้';
+      const r = idx + 1;
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'G' + r + ':I' + r, values: [[v.deposit, v.loaned, v.risk]] }, { cache: false });
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'L' + r, values: [[v.statusLabel]] }, { cache: false });
+      return 'ชีตคลินิก: อัปเดตแถว ' + r + ' แล้ว';
+    } catch (e) { return 'ชีตคลินิก: ' + mcpMessage(e, SHEETS); }
+  }
+  async function pullReport() {
+    setSync({ busy: true, msg: 'กำลังดึงรายงาน กข.คจ. จาก Google Sheets...', err: '' });
+    try {
+      const r = await cap.mcp.callTool(SHEETS, 'get_values', { spreadsheetId: REPORT_ID, range: 'A1:AI1000' }, { cache: false });
+      const rows = rowsFromGrid((r.payload && r.payload.values) || []) || [];
+      if (!rows.length) throw new Error('ไม่พบแถวข้อมูลหมู่บ้านในรายงาน');
+      replaceVillages(rows, 'รายงาน กข.คจ. (Google Sheets)');
+      setSync({ busy: false, msg: 'ดึงรายงานแล้ว ' + rows.length + ' หมู่บ้าน', err: '' });
+      award(30, 10, 'ซิงค์จากรายงาน');
+    } catch (e) { setSync({ busy: false, msg: '', err: e.code ? mcpMessage(e, SHEETS) : e.message }); }
+  }
+  async function pushReport() {
+    setModal(null);
+    setSync({ busy: true, msg: 'กำลังส่งตัวเลขขึ้นรายงาน กข.คจ....', err: '' });
+    try {
+      const cur = await cap.mcp.callTool(SHEETS, 'get_values', { spreadsheetId: REPORT_ID, range: 'A1:AI1000' }, { cache: false });
+      const values = (cur.payload && cur.payload.values) || [];
+      const dataIdx = values.map((r, i) => (i >= 3 && /^\d+$/.test(txt(r[0])) ? i : -1)).filter((i) => i >= 0);
+      if (!dataIdx.length) throw new Error('ไม่พบแถวหมู่บ้านในรายงาน');
+      const first = dataIdx[0], last = dataIdx[dataIdx.length - 1];
+      const byKey = new Map(villages.map((v) => [v.district + '|' + vKey(v.tambon, v.moo, v.name), v]));
+      const LM = [], X = [], AB = []; let matched = 0;
+      for (let i = first; i <= last; i++) {
+        const r = values[i] || [];
+        const v = dataIdx.includes(i) ? byKey.get(txt(r[2]).replace(/^(อ\.|อำเภอ)\s*/, '') + '|' + vKey(r[3], r[4], r[5])) : null;
+        if (v) matched++;
+        LM.push(v ? [v.loaned, v.deposit] : [num(r[11]), num(r[12])]);
+        X.push([v ? v.problem : num(r[23])]); AB.push([v ? v.damaged : num(r[27])]);
+      }
+      const a = first + 1, b = last + 1;
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: REPORT_ID, range: 'L' + a + ':M' + b, values: LM }, { cache: false });
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: REPORT_ID, range: 'X' + a + ':X' + b, values: X }, { cache: false });
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: REPORT_ID, range: 'AB' + a + ':AB' + b, values: AB }, { cache: false });
+      const districts = new Set(dataIdx.map((i) => txt(values[i][2])));
+      const missing = villages.filter((v) => districts.has(v.district)).length - matched;
+      setSync({ busy: false, msg: 'ส่งขึ้นรายงานแล้ว ' + matched + ' หมู่บ้าน' + (missing > 0 ? ' · ' + missing + ' หมู่บ้านในแอปไม่มีในรายงาน จึงไม่ได้เพิ่ม' : ''), err: '' });
+      award(30, 10, 'ส่งตัวเลขขึ้นรายงาน');
+    } catch (e) { setSync({ busy: false, msg: '', err: (e.code ? mcpMessage(e, SHEETS) : e.message) + ' (ถ้าเขียนไปบางส่วน ให้กดดึงรายงานเพื่อตรวจ)' }); }
+  }
+  async function readOldXlsx() {
+    setSync({ busy: true, msg: 'กำลังอ่านไฟล์ Excel เดิมจาก Google Drive...', err: '' });
+    try {
+      const r = await cap.mcp.callTool(DRIVE, 'read_file_content', { fileId: XLSX_FILE_ID }, { cache: false });
+      const p = r.payload; const text = typeof p === 'string' ? p : (p && (p.fileContent || p.content)) || '';
+      const rows = rowsFromDriveText(text);
+      if (!rows.length) throw new Error('อ่านแถวข้อมูลจากไฟล์ไม่ได้ รูปแบบไฟล์อาจเปลี่ยนไป');
+      replaceVillages(rows, 'ไฟล์ Excel เดิมใน Drive');
+      setSync({ busy: false, msg: 'อ่านไฟล์เดิมแล้ว ' + rows.length + ' หมู่บ้าน', err: '' });
+      award(30, 10, 'อ่านไฟล์เดิมจาก Drive');
+    } catch (e) { setSync({ busy: false, msg: '', err: e.code ? mcpMessage(e, DRIVE) : e.message }); }
+  }
+
+  /* ---------- export ---------- */
+  async function exportExcel(list) {
+    try {
+      const XLSX = await loadXLSX();
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['อำเภอ', 'ตำบล', 'หมู่บ้าน', 'เงินครบ', 'ป่วย', 'บัญชี', 'ลูกหนี้', 'เสี่ยง', 'สุทธิ']].concat(tambonRows(list))), 'สรุปรายตำบล');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([SHEET_HEAD].concat(villageRows(list))), 'รายหมู่บ้าน');
+      const out = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+      await saveFile('เข็มทิศแก้หนี้-กขคจ-' + new Date().toISOString().slice(0, 10) + '.xlsx', new Uint8Array(out), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      award(15, 5, 'ส่งออก Excel');
+    } catch (e) { say(e && e.code === 'declined' ? 'ยกเลิกการบันทึกไฟล์' : e && e.code ? 'บันทึกไฟล์ไม่ได้ในหน้านี้' : 'โหลดตัวสร้าง Excel ไม่ได้ ใช้ส่งออก CSV แทน'); }
+  }
+  async function exportCSV(list) {
+    try { await saveFile('เข็มทิศแก้หนี้-กขคจ-' + new Date().toISOString().slice(0, 10) + '.csv', toCSV([SHEET_HEAD].concat(villageRows(list))), 'text/csv'); award(15, 5, 'ส่งออก CSV'); }
+    catch (e) { say(e && e.code === 'declined' ? 'ยกเลิกการบันทึกไฟล์' : 'บันทึกไฟล์ไม่ได้ในหน้านี้'); }
+  }
+
+  /* ---------- village actions ---------- */
+  function updateVillage(id, patch) { setVillages((cur) => cur.map((v) => (v.id === id ? finish(Object.assign({}, v, patch)) : v))); }
+  function checkVillage(v) {
+    if (game.checked[v.id]) return;
+    setGame((g) => Object.assign({}, g, { checked: Object.assign({}, g.checked, { [v.id]: new Date().toISOString() }) }));
+    award(v.good ? 20 : 40, v.good ? 10 : 30, v.good ? 'ตรวจสุขภาพแล้ว' : 'ดูแลเคสป่วยแล้ว');
+  }
+  function enterWard(district, tambon) {
+    const k = district + '|' + tambon;
+    if (!game.wards[k]) { setGame((g) => Object.assign({}, g, { wards: Object.assign({}, g.wards, { [k]: 1 }) })); award(5, 0, 'เปิดวอร์ด ต.' + tambon); }
+    go({ district, tambon });
+  }
+
+  const fileRef = useRef();
+  const pickFile = () => { if (fileRef.current) fileRef.current.click(); };
+  const onFile = (e) => { const f = e.target.files && e.target.files[0]; if (f) importFile(f); e.target.value = ''; };
+
+  const lv = levelOf(game.xp), into = game.xp % 400;
+  const ctx = { villages, meta, game, path, go, openVillage, openList, enterWard, checkVillage, updateVillage, pushOne, setModal, say, award, pickFile, mcpOk, sync, pullSheet, readOldXlsx, exportExcel, exportCSV, setTab, setVillages, setMeta, setGame, pushAll: pushSheet, pullReport, pushReport };
+
+  return html`<${React.Fragment}>
+    ${splash ? html`<${Splash} onDone=${() => setSplash(false)} />` : null}
+    <input ref=${fileRef} id="fileInput" class="hidden-file" type="file" accept=".xlsx,.xls,.csv" style=${{ position: 'absolute', left: '-9999px' }} onChange=${onFile} />
+    <div class="shell">
+      <header class="hud gut">
+        <div class="flex items-center gap-3">
+          <div class="avatar"><${Logo} size=${52} src=${mascotOf(game.xp)} /><span class="lv">Lv${lv}</span></div>
+          <div class="min-w-0 flex-1">
+            <div class="brand-t">เข็มทิศแก้หนี้ กข.คจ.</div>
+            <div class="muted small truncate">หมอแก้หนี้ by Olifsuriya · ${rankOf(game.xp)}</div>
+            <div class="flex items-center gap-2 small mt-1"><span class="xpbar flex-1" style=${{ maxWidth: 140 }}><i style=${{ width: (into / 4) + '%' }}></i></span><span class="num muted">${into}/400 XP</span><span class="num">${b0(game.coins)} <i class="coin" aria-label="เหรียญ"></i></span></div>
+          </div>
+          <button class="btn btn-gold" type="button" style=${{ minHeight: 40, padding: '8px 12px' }} onClick=${pickFile}>📥 นำเข้า</button>
+        </div>
+      </header>
+      <main class="screen gut">
+        ${tab === 'clinic' ? html`<${Clinic} ...${ctx} />` : null}
+        ${tab === 'patients' ? html`<${Patients} ...${ctx} />` : null}
+        ${tab === 'report' ? html`<${Report} ...${ctx} />` : null}
+        ${tab === 'data' ? html`<${DataTab} ...${ctx} />` : null}
+        ${tab === 'me' ? html`<${Me} ...${ctx} />` : null}
+      </main>
+      <nav class="tabs" aria-label="เมนูหลัก"><div class="in">
+        ${[['clinic', '🏥', 'คลินิก'], ['patients', '🩺', 'คนไข้'], ['report', '📋', 'รายงาน'], ['data', '📥', 'ข้อมูล'], ['me', '🎮', 'หมอ']].map(([id, ic, l]) => html`
+          <button key=${id} type="button" aria-current=${tab === id ? 'page' : null} onClick=${() => { setTab(id); if (id === 'clinic') setPath({}); window.scrollTo({ top: 0 }); }}><span class="ic" aria-hidden="true">${ic}</span>${l}</button>`)}
+      </div></nav>
+    </div>
+    ${modal ? html`<${ModalHost} modal=${modal} ctx=${ctx} close=${() => setModal(null)} />` : null}
+    ${toast ? html`<div class="toast" role="status">${toast}</div>` : null}
+  </${React.Fragment}>`;
+}
+
+/* ================= modal host ================= */
+function ModalHost({ modal, ctx, close }) {
+  if (modal.type === 'list') {
+    return html`<${Modal} title=${modal.title} sub=${modal.sub} onClose=${close}>
+      ${modal.items.length ? modal.items.map((v) => html`<${VRow} key=${v.id} v=${v} checked=${!!ctx.game.checked[v.id]} onOpen=${ctx.openVillage} />`) : html`<p class="muted">ไม่มีหมู่บ้านในกลุ่มนี้</p>`}
+    </${Modal}>`;
+  }
+  if (modal.type === 'import') {
+    if (modal.stage === 'reading') return html`<${Modal} title="กำลังอ่านไฟล์..." sub=${modal.name} onClose=${close}><div class="grid justify-items-center gap-3 py-6"><div class="spin"></div><p class="muted">กำลังอ่านและคำนวณ รวมสุทธิ = บัญชี + ลูกหนี้ − เสี่ยง</p></div></${Modal}>`;
+    if (modal.stage === 'error') return html`<${Modal} title="นำเข้าไม่สำเร็จ" sub=${modal.name} onClose=${close} footer=${html`<button class="btn btn-gold flex-1" type="button" onClick=${() => { close(); ctx.pickFile(); }}>เลือกไฟล์ใหม่</button>`}><p style=${{ color: 'var(--bad)' }}>${modal.error}</p></${Modal}>`;
+    const a = agg(modal.rows);
+    return html`<${Modal} title=${'นำเข้าสำเร็จ ' + modal.rows.length + ' หมู่บ้าน'} sub=${modal.name + ' · อ.' + modal.districts.join(', อ.')} onClose=${close}
+      footer=${html`<button class="btn btn-navy flex-1" type="button" onClick=${() => ctx.go({}, 'clinic')}>ไปหน้า อำเภอ ›</button>`}>
+      <p class="small muted">เงินครบ ${a.good} · ป่วย ${a.sick} · ข้อมูลอำเภอเดิมที่ชื่อซ้ำถูกแทนที่ด้วยไฟล์นี้</p>
+      <p class="small font-semibold">5 รายการแรก</p>
+      ${modal.rows.slice(0, 5).map((v) => html`<div key=${v.id} class="card" style=${{ padding: 12 }}><div class="row"><b>${v.name}</b><${Status} v=${v} /></div><div class="muted small">${v.address}</div><div class="small num">${baht(v.deposit)} + ${baht(v.loaned)} − ${baht(v.risk)} = <b>${baht(v.net)}</b></div></div>`)}
+    </${Modal}>`;
+  }
+  if (modal.type === 'confirmPush') {
+    return html`<${Modal} title=${modal.title || 'ส่งขึ้น Google Sheets ทั้งหมด?'} onClose=${close} footer=${html`<button class="btn btn-ghost flex-1" type="button" onClick=${close}>ยกเลิก</button><button class="btn btn-gold flex-1" type="button" onClick=${modal.run}>ยืนยัน เขียนทับ</button>`}>
+      <p>${modal.body || 'แอปจะเขียนข้อมูล อ.โนนสัง ทุกหมู่บ้านทับคอลัมน์ A–I และ L–N ในชีต "คลินิกแก้หนี้ NBL 280K" สูตรในคอลัมน์ J–K ยังอยู่เหมือนเดิม'}</p>
+      <p class="muted small">ถ้ามีคนแก้ชีตหลังจากที่ดึงข้อมูลล่าสุด การแก้นั้นจะถูกทับ แนะนำให้กด "ดึงจากชีต" ก่อน</p>
+    </${Modal}>`;
+  }
+  if (modal.type === 'confirmReset') {
+    return html`<${Modal} title=${modal.title} onClose=${close} footer=${html`<button class="btn btn-ghost flex-1" type="button" onClick=${close}>ยกเลิก</button><button class="btn btn-danger flex-1" type="button" onClick=${() => { modal.run(); close(); }}>ยืนยัน</button>`}><p>${modal.body}</p></${Modal}>`;
+  }
+  return null;
+}
+
+/* ================= clinic (drill-down) ================= */
+function Crumbs({ path, go, villages }) {
+  const v = path.id ? villages.find((x) => x.id === path.id) : null;
+  const items = [{ l: 'อำเภอ', p: {} }];
+  if (path.district) items.push({ l: 'อ.' + path.district, p: { district: path.district } });
+  if (path.tambon) items.push({ l: 'ต.' + path.tambon, p: { district: path.district, tambon: path.tambon } });
+  if (v) items.push({ l: v.name, p: path });
+  return html`<nav class="crumbs" aria-label="ตำแหน่ง">
+    ${items.length > 1 ? html`<button class="chip" type="button" aria-label="ย้อนกลับ" onClick=${() => go(items[items.length - 2].p)}>‹</button>` : null}
+    ${items.map((it, i) => html`<${React.Fragment} key=${i}>${i ? html`<span class="muted" aria-hidden="true">›</span>` : null}<button class=${'chip' + (i === items.length - 1 ? ' on' : '')} type="button" aria-current=${i === items.length - 1 ? 'page' : null} onClick=${() => go(it.p)}>${it.l}</button></${React.Fragment}>`)}
+  </nav>`;
+}
+function UnitCard({ title, badge, sub, list, primary, onPrimary, secondary, onSecondary }) {
+  const a = agg(list);
+  return html`<section class="card grid gap-3">
+    <div class="flex items-center gap-3"><div style=${{ padding: 4, borderRadius: '50%', border: '3px solid var(--card-2)' }}><${Logo} size=${54} /></div>
+      <div class="min-w-0"><div class="flex flex-wrap items-center gap-2"><span class="text-xl font-semibold" style=${{ color: 'var(--navy-hi)' }}>${title}</span>${badge ? html`<span class="chip on" style=${{ fontSize: '.75rem', padding: '2px 10px' }}>${badge}</span>` : null}</div><div class="muted small">${sub}</div></div></div>
+    <${Money} a=${a} />
+    <${Gauge} a=${a} />
+    <div class="small"><b style=${{ color: 'var(--good)' }}>เงินครบ ${a.good} = ดี</b><span class="muted"> · ดีมาก ${a.dm} · ดี ${a.d}</span> · <b style=${{ color: a.sick ? 'var(--bad)' : 'var(--muted)' }}>ป่วย ${a.sick}</b><span class="muted"> (เริ่มป่วย ${a.ss} · ป่วยหนัก ${a.sh})</span></div>
+    <div class="grid grid-cols-2 gap-2"><button class="btn btn-navy" type="button" onClick=${onPrimary}>${primary}</button><button class="btn btn-ghost" type="button" onClick=${onSecondary}>${secondary}</button></div>
+  </section>`;
+}
+function Clinic(ctx) {
+  const { villages, path, go, openList, enterWard } = ctx;
+  if (path.id) { const v = villages.find((x) => x.id === path.id); if (v) return html`<${Crumbs} ...${ctx} /><${Village} v=${v} ...${ctx} />`; }
+  if (path.tambon) {
+    const list = villages.filter((v) => v.district === path.district && v.tambon === path.tambon).sort((a, b) => a.net - b.net);
+    const scope = 'ต.' + path.tambon + ' อ.' + path.district;
+    return html`<${Crumbs} ...${ctx} />
+      <section class="hero grid gap-3"><div class="text-2xl font-bold">วอร์ดตำบล${path.tambon}</div><div class="small" style=${{ color: '#cfdaea' }}>${scope} · ${list.length} หมู่บ้าน · เรียงจากสุทธิน้อยไปมาก</div><${Tiles} list=${list} onOpen=${(k) => openList(list, k, scope)} /><${Money} a=${agg(list)} label=${'ต.' + path.tambon} /></section>
+      <div class="grid gap-2">${list.map((v) => html`<${VRow} key=${v.id} v=${v} checked=${!!ctx.game.checked[v.id]} onOpen=${ctx.openVillage} />`)}</div>`;
+  }
+  if (path.district) {
+    const dl = villages.filter((v) => v.district === path.district);
+    const tambons = uniq(dl.map((v) => v.tambon)).map((t) => ({ t, list: dl.filter((v) => v.tambon === t) })).sort((a, b) => agg(b.list).sick - agg(a.list).sick || b.list.length - a.list.length);
+    const scope = 'อ.' + path.district + ' จ.' + (dl[0] ? dl[0].province : '');
+    return html`<${Crumbs} ...${ctx} />
+      <section class="hero grid gap-3"><div class="text-2xl font-bold">อำเภอ${path.district}</div><div class="small" style=${{ color: '#cfdaea' }}>${scope} · ${tambons.length} ตำบล · ${dl.length} หมู่บ้าน</div><${Tiles} list=${dl} onOpen=${(k) => openList(dl, k, scope)} /></section>
+      ${tambons.map(({ t, list }) => html`<${UnitCard} key=${t} title=${'ตำบล ' + t} badge=${'อ.' + path.district} sub=${list.length + ' หมู่บ้าน · ต.' + t + ' อ.' + path.district} list=${list}
+        primary=${'เข้าวอร์ด › ' + list.length + ' หมู่'} onPrimary=${() => enterWard(path.district, t)} secondary=${'ป่วย ' + agg(list).sick + ' ›'} onSecondary=${() => openList(list, 'sick', 'ต.' + t)} />`)}`;
+  }
+  const districts = districtsOf(villages);
+  const provs = uniq(villages.map((v) => v.province));
+  return html`
+    <section class="hero grid gap-4">
+      <div class="flex items-start justify-between gap-3"><div class="min-w-0"><div class="small font-semibold" style=${{ letterSpacing: '.12em', color: '#c9d7ec' }}>NBL 280K · หมอแก้หนี้ BY OLIFSURIYA</div><div class="text-3xl font-bold mt-1">คลินิกหนี้ 280K</div><div class="small mt-1" style=${{ color: '#cfdaea' }}>จ.${provs.join(', จ.')} · ${districts.length} อำเภอ · ${villages.length} หมู่บ้าน · ${ctx.meta.source}</div></div><div style=${{ borderRadius: '50%', border: '3px solid var(--navy-2)', flex: 'none' }}><${Logo} size=${60} /></div></div>
+      <${Tiles} list=${villages} onOpen=${(k) => openList(villages, k, 'ทุกอำเภอ')} />
+      <div class="small" style=${{ color: '#cfdaea' }}>รวมสุทธิ = บัญชี + ลูกหนี้ − เสี่ยง (มีปัญหา + เสียหาย) · ≥ 280,000 = เงินครบ</div>
+    </section>
+    ${districts.map((d) => { const list = villages.filter((v) => v.district === d); const t = uniq(list.map((v) => v.tambon)).length;
+      return html`<${UnitCard} key=${d} title=${'อำเภอ ' + d} badge=${'จ.' + list[0].province} sub=${'อ.' + d + ' จ.' + list[0].province + ' ' + (POSTAL[d] || '') + ' · ' + list.length + ' หมู่บ้าน'} list=${list}
+        primary=${'ดูตำบล › ' + t + ' ตำบล'} onPrimary=${() => go({ district: d })} secondary=${'ดู ' + list.length + ' หมู่บ้าน ›'} onSecondary=${() => openList(list, 'all', 'อ.' + d)} />`; })}
+    <button class="btn btn-gold" type="button" onClick=${ctx.pickFile}>📥 เลือกไฟล์ Excel/CSV เพิ่มอำเภอ</button>`;
+}
+
+/* ================= village (exam room) ================= */
+function Village(ctx) {
+  const { v, game, checkVillage, updateVillage, pushOne, say, villages, openVillage, mcpOk } = ctx;
+  const [edit, setEdit] = useState(false);
+  const [form, setForm] = useState({});
+  const [pushMsg, setPushMsg] = useState('');
+  const [pushing, setPushing] = useState(false);
+  useEffect(() => { setEdit(false); setPushMsg(''); }, [v.id]);
+  const checked = !!game.checked[v.id];
+  const ward = villages.filter((x) => x.district === v.district && x.tambon === v.tambon && x.id !== v.id && !game.checked[x.id]).sort((a, b) => a.net - b.net);
+  const next = ward[0];
+  const dx = [], rx = [];
+  if (!v.good) { dx.push('รวมสุทธิ ' + baht(v.net) + ' บาท ขาดจาก 280,000 อยู่ ' + baht(v.gap) + ' บาท'); rx.push('ตรวจยอดเงินฝากกับสมุดบัญชี และทะเบียนลูกหนี้ ให้ครบ 280,000'); }
+  if (v.problem > 0) { dx.push('เงินมีปัญหา ' + baht(v.problem) + ' บาท' + (v.problemHH ? ' (' + v.problemHH + ' ครัวเรือน)' : '') + (v.problemCause ? ' สาเหตุ: ' + v.problemCause : '')); rx.push('ประชุมคณะกรรมการ ติดตามทวงถาม ทำหนังสือรับสภาพหนี้กับครัวเรือนที่ค้างชำระ'); if (v.problemAction) rx.push('ติดตามผลที่รายงานไว้: ' + v.problemAction); }
+  if (v.damaged > 0) { dx.push('เงินเสียหาย ' + baht(v.damaged) + ' บาท' + (v.damagedCause ? ' สาเหตุ: ' + v.damagedCause : '')); rx.push('ตั้งคณะกรรมการตรวจสอบข้อเท็จจริง และรายงานอำเภอ'); }
+  if (v.circ && v.deposit / v.circ >= 0.4) { dx.push('เงินค้างในบัญชี ' + Math.round(v.deposit / v.circ * 100) + '% ครัวเรือนยืมน้อย'); rx.push('ประชาสัมพันธ์ให้ครัวเรือนยากจนยื่นยืมเงินประกอบอาชีพตามระเบียบ'); }
+  if (!dx.length) { dx.push('สุขภาพดี เงินครบตามมาตรฐาน 280,000'); rx.push('ติดตามตามรอบปกติ และยกเป็นหมู่บ้านตัวอย่าง'); }
+  const startEdit = () => { setForm({ deposit: v.deposit, loaned: v.loaned, problem: v.problem, damaged: v.damaged }); setEdit(true); };
+  const save = async () => {
+    const patch = { deposit: num(form.deposit), loaned: num(form.loaned), problem: num(form.problem), damaged: num(form.damaged) };
+    updateVillage(v.id, patch); setEdit(false); say('บันทึกในเครื่องแล้ว');
+    if (mcpOk) { setPushing(true); setPushMsg('กำลังอัปเดต Google Sheets...'); const m = await pushOne(finish(Object.assign({}, v, patch))); setPushMsg(m); setPushing(false); }
+  };
+  const copy = (t, el) => { try { navigator.clipboard.writeText(t).then(() => say('คัดลอกแล้ว'), () => say('คัดลอกไม่ได้ กดค้างที่ตัวเลขเพื่อคัดลอก')); } catch (e) { say('คัดลอกไม่ได้ กดค้างที่ตัวเลขเพื่อคัดลอก'); } };
+  const pct = (x) => Math.max(0, Math.min(100, x)) + '%';
+  return html`
+    <section class="card grid gap-3">
+      <div class="flex items-center gap-3"><${Logo} size=${64} /><div class="min-w-0"><div class="text-xl font-semibold" style=${{ color: 'var(--navy-hi)' }}>${v.name}</div><div class="muted small">${v.address}</div></div></div>
+      <div class="flex flex-wrap items-center gap-2"><${Status} v=${v} />${checked ? html`<span class="stamp">ตรวจแล้ว</span>` : null}</div>
+      <div class="grid grid-cols-2 gap-2 small">
+        <div><div class="muted">ประธาน</div><div>${v.chair || '—'}</div></div>
+        <div><div class="muted">เบอร์โทร</div><div class="flex items-center gap-2"><span class="num" style=${{ userSelect: 'all' }}>${v.phone || '—'}</span>${v.phone ? html`<button class="chip" type="button" style=${{ padding: '1px 10px' }} onClick=${() => copy(v.phone)}>คัดลอก</button>` : null}</div></div>
+        ${v.level ? html`<div><div class="muted">ระดับศักยภาพ</div><div>${v.level}</div></div>` : null}
+        ${v.hh ? html`<div><div class="muted">ครัวเรือนที่ยืม</div><div class="num">${b0(v.hh)}</div></div>` : null}
+      </div>
+    </section>
+    <section class="card grid gap-3">
+      <div class="font-semibold">📟 จอสัญญาณชีพ</div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="money"><div class="k">เงินในบัญชี</div><div class="v">${baht(v.deposit)}</div></div>
+        <div class="money"><div class="k">เงินลูกหนี้</div><div class="v">${baht(v.loaned)}</div></div>
+        <div class="money risk"><div class="k">เงินเสี่ยง (มีปัญหา ${b0(v.problem)} + เสียหาย ${b0(v.damaged)})</div><div class="v">${baht(v.risk)}</div></div>
+        <div class="money net"><div class="k">รวมสุทธิ</div><div class="v" style=${{ color: v.good ? 'var(--good)' : 'var(--bad)' }}>${baht(v.net)}</div></div>
+      </div>
+      <div class="small num muted">${baht(v.deposit)} + ${baht(v.loaned)} − ${baht(v.risk)} = <b style=${{ color: 'var(--fg)' }}>${baht(v.net)}</b> · ${v.gap > 0 ? 'ขาด ' + baht(v.gap) : 'เกิน ' + baht(-v.gap)} จาก 280,000</div>
+      <div><div class="row small"><span>รวมสุทธิ เทียบ 280K</span><span class="num">${Math.round(v.net / STD * 100)}%</span></div><div class="gauge"><i style=${{ width: pct(v.net / STD * 100), background: v.good ? 'var(--good)' : 'var(--bad)' }}></i></div></div>
+      ${edit ? html`<div class="grid grid-cols-2 gap-2">
+          ${[['deposit', 'เงินในบัญชี'], ['loaned', 'เงินลูกหนี้'], ['problem', 'เงินมีปัญหา'], ['damaged', 'เงินเสียหาย']].map(([k, l]) => html`<div class="field" key=${k}><label for=${'f-' + k}>${l}</label><input id=${'f-' + k} inputmode="decimal" value=${form[k]} onInput=${(e) => setForm(Object.assign({}, form, { [k]: e.target.value }))} /></div>`)}
+          <div class="small muted" style=${{ gridColumn: '1 / -1' }}>รวมสุทธิใหม่ = <b class="num" style=${{ color: 'var(--fg)' }}>${baht(num(form.deposit) + num(form.loaned) - num(form.problem) - num(form.damaged))}</b> บาท</div>
+          <button class="btn btn-ghost" type="button" onClick=${() => setEdit(false)}>ยกเลิก</button><button class="btn btn-gold" type="button" onClick=${save}>บันทึก${mcpOk ? ' + ส่งขึ้นชีต' : ''}</button>
+        </div>` : html`<button class="btn btn-ghost" type="button" onClick=${startEdit}>✏️ แก้ตัวเลขของหมู่บ้านนี้</button>`}
+      ${pushMsg ? html`<div class="small" style=${{ color: pushing ? 'var(--muted)' : 'var(--ok)' }}>${pushMsg}</div>` : null}
+    </section>
+    <section class="card grid gap-2"><div class="font-semibold">🩺 ผลวินิจฉัย</div><ul class="grid gap-1 pl-5 list-disc">${dx.map((d, i) => html`<li key=${i}>${d}</li>`)}</ul></section>
+    <section class="card grid gap-2"><div class="font-semibold">💊 ใบสั่งการรักษา</div><ol class="grid gap-1 pl-5 list-decimal">${rx.map((d, i) => html`<li key=${i}>${d}</li>`)}</ol>
+      <div class="grid grid-cols-2 gap-2 mt-2">
+        <button class="btn btn-gold" type="button" disabled=${checked} onClick=${() => checkVillage(v)}>${checked ? '✓ ตรวจแล้ว' : '✓ บันทึกการตรวจ'}</button>
+        <button class="btn btn-navy" type="button" disabled=${!next} onClick=${() => { if (!checked) checkVillage(v); openVillage(next); }}>${next ? 'คนไข้ถัดไป ›' : 'ตรวจครบวอร์ด'}</button>
+      </div>
+      ${next ? html`<div class="muted small">ถัดไป: ${next.name} (${next.statusLabel})</div>` : null}
+    </section>`;
+}
+
+/* ================= patients ================= */
+function Patients(ctx) {
+  const { villages, openVillage, game } = ctx;
+  const [q, setQ] = useState(''); const [f, setF] = useState('all'); const [d, setD] = useState('');
+  const districts = districtsOf(villages);
+  const base = villages.filter((v) => !d || v.district === d);
+  const list = base.filter((v) => (f === 'all' || (f === 'good' ? v.good : f === 'sick' ? !v.good : v.status === f)) && (!q || (v.name + ' ' + v.tambon + ' ' + v.chair + ' ' + v.district).includes(q.trim()))).sort((a, b) => a.net - b.net);
+  const a = agg(base);
+  return html`<section class="grid gap-3">
+    <div class="text-xl font-semibold">🩺 คนไข้ทั้งหมด</div>
+    <input class="search" type="search" id="pq" placeholder="ค้นหา หมู่บ้าน ตำบล ประธาน" aria-label="ค้นหา" value=${q} onInput=${(e) => setQ(e.target.value)} />
+    ${districts.length > 1 ? html`<div class="crumbs"><button class=${'chip' + (!d ? ' on' : '')} type="button" onClick=${() => setD('')}>ทุกอำเภอ</button>${districts.map((x) => html`<button key=${x} class=${'chip' + (d === x ? ' on' : '')} type="button" onClick=${() => setD(x)}>อ.${x}</button>`)}</div>` : null}
+    <div class="crumbs">${[['all', 'ทั้งหมด ' + a.n], ['good', 'เงินครบ ' + a.good], ['sick', 'ป่วย ' + a.sick], ['ดีมาก', '😊 ' + a.dm], ['ดี', '🙂 ' + a.d], ['เริ่มป่วย', '🤒 ' + a.ss], ['ป่วยหนัก', '🚑 ' + a.sh]].map(([k, l]) => html`<button key=${k} class=${'chip' + (f === k ? ' on' : '')} type="button" aria-pressed=${f === k} onClick=${() => setF(k)}>${l}</button>`)}</div>
+    <div class="muted small">แสดง ${list.length} หมู่บ้าน · เรียงจากรวมสุทธิน้อยไปมาก</div>
+    <div class="grid gap-2">${list.map((v) => html`<${VRow} key=${v.id} v=${v} checked=${!!game.checked[v.id]} onOpen=${openVillage} />`)}</div>
+  </section>`;
+}
+
+/* ================= report ================= */
+function Report(ctx) {
+  const { villages, exportExcel, exportCSV, say, award, openVillage, meta } = ctx;
+  const districts = districtsOf(villages);
+  const [d, setD] = useState(districts[0] || '');
+  const list = villages.filter((v) => !d || v.district === d);
+  const a = agg(list);
+  const prov = list[0] ? list[0].province : '';
+  const tambons = uniq(list.map((v) => v.tambon)).map((t) => ({ t, a: agg(list.filter((v) => v.tambon === t)) })).sort((x, y) => y.a.sick - x.a.sick || x.t.localeCompare(y.t, 'th'));
+  const sick = list.filter((v) => !v.good).sort((x, y) => x.net - y.net);
+  const today = thDate(new Date());
+  const text = [
+    'รายงานสรุปสถานะกองทุน กข.คจ. (เข็มทิศแก้หนี้ กข.คจ.)',
+    'อ.' + d + ' จ.' + prov + ' · ข้อมูล ณ ' + today,
+    '',
+    '1. ภาพรวม: ' + a.n + ' หมู่บ้าน เงินครบ 280,000 บาท ' + a.good + ' หมู่บ้าน (ดีมาก ' + a.dm + ', ดี ' + a.d + ') ป่วย ' + a.sick + ' หมู่บ้าน (เริ่มป่วย ' + a.ss + ', ป่วยหนัก ' + a.sh + ')',
+    '2. เงินทุน: เงินในบัญชี ' + baht(a.deposit) + ' บาท + เงินลูกหนี้ ' + baht(a.loaned) + ' บาท = หมุนเวียน ' + baht(a.circ) + ' บาท',
+    '   เงินเสี่ยง (มีปัญหา + เสียหาย) ' + baht(a.risk) + ' บาท · รวมสุทธิ ' + baht(a.net) + ' บาท',
+    '3. หมู่บ้านที่ต้องเร่งแก้ไข:',
+    ...(sick.length ? sick.map((v, i) => '   ' + (i + 1) + ') ' + v.name + ' หมู่ที่ ' + v.moo + ' ต.' + v.tambon + ' รวมสุทธิ ' + baht(v.net) + ' บาท ขาด ' + baht(v.gap) + ' บาท' + (v.problemCause ? ' (' + v.problemCause + ')' : '')) : ['   ไม่มี']),
+    '4. ข้อเสนอ: ติดตามทวงถามครัวเรือนที่ค้างชำระ ทำหนังสือรับสภาพหนี้ และรายงานผลทุกเดือน',
+    '',
+    'สูตร: รวมสุทธิ = เงินในบัญชี + เงินลูกหนี้ − เงินเสี่ยง (เงินมีปัญหา + เงินเสียหาย) · ≥ 280,000 = เงินครบ',
+    'จัดทำโดย หมอแก้หนี้ by Olifsuriya',
+  ].join('\n');
+  const copy = () => { try { navigator.clipboard.writeText(text).then(() => { say('คัดลอกรายงานแล้ว'); award(10, 0, 'ทำรายงาน'); }, () => say('คัดลอกไม่ได้ กดค้างที่ข้อความเพื่อเลือก')); } catch (e) { say('คัดลอกไม่ได้ กดค้างที่ข้อความเพื่อเลือก'); } };
+  return html`<section class="grid gap-3">
+    <div class="flex items-center justify-between gap-2"><div class="text-xl font-semibold">📋 รายงานเสนอผู้บังคับบัญชา</div></div>
+    ${districts.length > 1 ? html`<div class="crumbs">${districts.map((x) => html`<button key=${x} class=${'chip' + (d === x ? ' on' : '')} type="button" onClick=${() => setD(x)}>อ.${x}</button>`)}</div>` : null}
+    <article class="card grid gap-3" style=${{ background: 'var(--cream)', color: '#1b2a40', borderColor: '#d9cfb6' }}>
+      <div class="flex items-center gap-3"><${Logo} size=${56} /><div><div class="font-bold" style=${{ color: 'var(--navy)', fontSize: '1.1rem' }}>รายงานสรุปกองทุน กข.คจ.</div><div class="small">อ.${d} จ.${prov} · ข้อมูล ณ ${today}</div><div class="small" style=${{ opacity: .7 }}>แหล่งข้อมูล: ${meta.source}</div></div></div>
+      <div class="grid grid-cols-3 gap-2 text-center">
+        ${[['หมู่บ้าน', a.n, '#1E3A5F'], ['เงินครบ', a.good, '#1b7a52'], ['ป่วย', a.sick, '#b4332f']].map(([k, n, c]) => html`<div key=${k} style=${{ border: '1.5px solid #d9cfb6', borderRadius: 14, padding: 8 }}><div class="small">${k}</div><div class="text-2xl font-bold num" style=${{ color: c }}>${n}</div></div>`)}
+      </div>
+      <p class="small">เงินในบัญชี <b class="num">${baht(a.deposit)}</b> + เงินลูกหนี้ <b class="num">${baht(a.loaned)}</b> − เงินเสี่ยง <b class="num" style=${{ color: '#b4332f' }}>${baht(a.risk)}</b> = รวมสุทธิ <b class="num">${baht(a.net)}</b> บาท</p>
+      <div class="scroll-x"><table class="rep" style=${{ color: '#1b2a40' }}>
+        <thead><tr><th style=${{ color: '#5b6b80' }}>ตำบล</th><th class="r" style=${{ color: '#5b6b80' }}>หมู่</th><th class="r" style=${{ color: '#5b6b80' }}>ครบ</th><th class="r" style=${{ color: '#5b6b80' }}>ป่วย</th><th class="r" style=${{ color: '#5b6b80' }}>เสี่ยง</th><th class="r" style=${{ color: '#5b6b80' }}>สุทธิ</th></tr></thead>
+        <tbody>${tambons.map(({ t, a }) => html`<tr key=${t}><td>${t}</td><td class="r">${a.n}</td><td class="r">${a.good}</td><td class="r" style=${{ color: a.sick ? '#b4332f' : 'inherit', fontWeight: a.sick ? 600 : 400 }}>${a.sick}</td><td class="r">${b0(a.risk)}</td><td class="r">${b0(a.net)}</td></tr>`)}</tbody>
+      </table></div>
+      <div class="font-semibold" style=${{ color: 'var(--navy)' }}>หมู่บ้านที่ต้องเร่งแก้ไข (${sick.length})</div>
+      ${sick.length ? html`<ol class="grid gap-1 pl-5 list-decimal small">${sick.map((v) => html`<li key=${v.id}><button type="button" style=${{ background: 'none', border: 0, padding: 0, textAlign: 'left', color: 'inherit', textDecoration: 'underline' }} onClick=${() => openVillage(v)}>${v.name} หมู่ที่ ${v.moo} ต.${v.tambon}</button> · สุทธิ <b class="num">${baht(v.net)}</b> ขาด <b class="num" style=${{ color: '#b4332f' }}>${baht(v.gap)}</b>${v.problemCause ? ' · ' + v.problemCause : ''}</li>`)}</ol>` : html`<p class="small">ไม่มีหมู่บ้านป่วย</p>`}
+      <p class="small" style=${{ opacity: .75 }}>สูตร: รวมสุทธิ = เงินในบัญชี + เงินลูกหนี้ − เงินเสี่ยง (มีปัญหา + เสียหาย) · ≥ 280,000 = เงินครบ</p>
+    </article>
+    <div class="grid grid-cols-3 gap-2">
+      <button class="btn btn-gold" type="button" onClick=${copy}>📋 คัดลอก</button>
+      <button class="btn btn-navy" type="button" onClick=${() => exportExcel(list)}>📊 Excel</button>
+      <button class="btn btn-ghost" type="button" onClick=${() => exportCSV(list)}>📄 CSV</button>
+    </div>
+    <details class="card"><summary class="cursor-pointer muted">ข้อความรายงาน (สำหรับวางใน LINE หรือหนังสือ)</summary><pre class="small mt-2" style=${{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', userSelect: 'all' }}>${text}</pre></details>
+  </section>`;
+}
+
+/* ================= data / sync ================= */
+function DataTab(ctx) {
+  const { villages, meta, mcpOk, sync, pullSheet, readOldXlsx, setModal, pickFile, exportExcel, exportCSV, setVillages, setMeta } = ctx;
+  const at = meta.at ? new Date(meta.at).toLocaleString('th-TH') : '—';
+  return html`<section class="grid gap-3">
+    <div class="text-xl font-semibold">📥 ข้อมูล นำเข้า ส่งออก ซิงค์</div>
+    <div class="card grid gap-2 small"><div class="row"><span class="muted">แหล่งข้อมูลตอนนี้</span><b>${meta.source}</b></div><div class="row"><span class="muted">อัปเดตล่าสุด</span><span>${at}</span></div><div class="row"><span class="muted">จำนวน</span><span>${villages.length} หมู่บ้าน · ${uniq(villages.map((v) => v.district)).length} อำเภอ</span></div></div>
+
+    <section class="card grid gap-3">
+      <div class="font-semibold">นำเข้าไฟล์ Excel / CSV</div>
+      <button class="btn btn-gold" type="button" onClick=${pickFile}>📥 เลือกไฟล์ Excel/CSV</button>
+      <label for="fileInput" class="btn btn-ghost small" style=${{ minHeight: 40 }}>ถ้าปุ่มบนไม่เปิด แตะที่นี่แทน</label>
+      <div class="small muted grid gap-1">
+        <p>• ชีต "(กข.คจ.) แยกตามจังหวัด": แถว 0 หัวเรื่อง แถว 1 หัวหลัก แถว 2 หัวรอง แถว 3 เป็นต้นไปคือข้อมูล แอปหาแถวที่มีช่อง "จังหวัด" และ "อำเภอ" ใน 20 แถวแรกเอง</p>
+        <p>• คอลัมน์: 1 จังหวัด · 2 อำเภอ · 3 ตำบล · 4 หมู่ที่ · 5 หมู่บ้าน · 6 ประธาน · 7 เบอร์ · 11 ลูกหนี้ · 12 บัญชี · 23 เงินมีปัญหา · 27 เงินเสียหาย</p>
+        <p>• CSV แบบง่าย หัวตาราง: จังหวัด,อำเภอ,ตำบล,หมู่,หมู่บ้าน,บัญชี,ลูกหนี้,เสี่ยง,ประธาน,เบอร์,full_address</p>
+        <p>• นำเข้าอำเภอใหม่จะเพิ่มเข้าไป ส่วนอำเภอที่มีอยู่แล้วจะถูกแทนที่ด้วยไฟล์ใหม่</p>
+      </div>
+    </section>
+
+    <section class="card grid gap-3">
+      <div class="font-semibold">🔄 Google Sheets ซิงค์ 2 ทาง</div>
+      <p class="small muted">ใช้บัญชี Google ของคนที่เปิดแอป ต้องมีสิทธิ์แก้ชีต · แก้ตัวเลขในหน้าหมู่บ้านแล้วกดบันทึก แอปจะเขียนลงทั้ง 2 ชีตให้</p>
+      ${mcpOk === false ? html`<p class="small" style=${{ color: 'var(--warn)' }}>หน้านี้เชื่อม Google ไม่ได้ (เปิดนอก claude.ai หรือยังไม่ได้เชื่อม Connector) ใช้การนำเข้าไฟล์แทนได้</p>` : null}
+      <div class="small font-semibold">1. รายงาน (กข.คจ.) แยกตามจังหวัด <a href=${sheetUrl(REPORT_ID)} target="_blank" rel="noopener" style=${{ color: 'var(--navy-hi)' }}>เปิดชีต ↗</a></div>
+      <p class="small muted">แอปเขียนเฉพาะช่อง L ลูกหนี้ · M บัญชี · X เงินมีปัญหา · AB เงินเสียหาย แถวรวมด้านล่างคำนวณเอง</p>
+      <div class="grid grid-cols-2 gap-2">
+        <button class="btn btn-navy" type="button" disabled=${!mcpOk || sync.busy} onClick=${ctx.pullReport}>⬇️ ดึงจากรายงาน</button>
+        <button class="btn btn-ghost" type="button" disabled=${!mcpOk || sync.busy} onClick=${() => setModal({ type: 'confirmPush', title: 'ส่งตัวเลขขึ้นรายงาน กข.คจ.?', body: 'แอปจะเขียนลูกหนี้ บัญชี เงินมีปัญหา และเงินเสียหาย ของทุกหมู่บ้านที่มีในรายงาน ทับช่อง L, M, X, AB ข้อมูลช่องอื่นไม่ถูกแตะ', run: ctx.pushReport })}>⬆️ ส่งขึ้นรายงาน</button>
+      </div>
+      <div class="small font-semibold">2. ชีตคลินิกแก้หนี้ NBL 280K <a href=${sheetUrl(SHEET_ID)} target="_blank" rel="noopener" style=${{ color: 'var(--navy-hi)' }}>เปิดชีต ↗</a></div>
+      <div class="grid grid-cols-2 gap-2">
+        <button class="btn btn-navy" type="button" disabled=${!mcpOk || sync.busy} onClick=${pullSheet}>⬇️ ดึงจากชีต</button>
+        <button class="btn btn-ghost" type="button" disabled=${!mcpOk || sync.busy} onClick=${() => setModal({ type: 'confirmPush', run: ctx.pushAll })}>⬆️ ส่งขึ้นชีตทั้งหมด</button>
+      </div>
+      <button class="btn btn-ghost" type="button" disabled=${!mcpOk || sync.busy} onClick=${readOldXlsx}>📂 อ่านไฟล์ Excel ต้นฉบับ (.xlsx อ่านอย่างเดียว)</button>
+      <p class="small muted">คนที่แก้ตัวเลขในชีตโดยตรง ให้กดปุ่ม ดึง เพื่อเอาค่าล่าสุดเข้าแอป</p>
+      ${sync.busy ? html`<div class="flex items-center gap-2 small"><div class="spin" style=${{ width: 20, height: 20, borderWidth: 3 }}></div>${sync.msg}</div>` : null}
+      ${!sync.busy && sync.msg ? html`<div class="small" style=${{ color: 'var(--good)' }}>✓ ${sync.msg}</div>` : null}
+      ${sync.err ? html`<div class="small" style=${{ color: 'var(--bad)' }}>${sync.err}</div>` : null}
+    </section>
+
+    <section class="card grid gap-3">
+      <div class="font-semibold">📤 ส่งออก</div>
+      <div class="grid grid-cols-2 gap-2"><button class="btn btn-navy" type="button" onClick=${() => exportExcel(villages)}>📊 Excel (.xlsx)</button><button class="btn btn-ghost" type="button" onClick=${() => exportCSV(villages)}>📄 CSV</button></div>
+    </section>
+
+    <button class="btn btn-danger" type="button" onClick=${() => setModal({ type: 'confirmReset', title: 'กลับไปใช้ข้อมูลตั้งต้น?', body: 'ข้อมูลที่นำเข้าหรือแก้ในเครื่องนี้จะหาย และกลับไปใช้ข้อมูลชีต 57 หมู่บ้านของ อ.โนนสัง', run: () => { setVillages(seed()); setMeta({ source: 'ข้อมูลชีต ปีงบประมาณ 2569', at: new Date().toISOString(), sheetRows: null }); } })}>กลับไปใช้ข้อมูลตั้งต้น</button>
+  </section>`;
+}
+
+/* ================= me (game) ================= */
+function Me(ctx) {
+  const { game, villages, setModal, setGame } = ctx;
+  const lv = levelOf(game.xp), into = game.xp % 400;
+  const checked = villages.filter((v) => game.checked[v.id]).length;
+  const sickAll = villages.filter((v) => !v.good); const sickDone = sickAll.filter((v) => game.checked[v.id]).length;
+  const tambons = uniq(villages.map((v) => v.district + '|' + v.tambon));
+  const fullWards = tambons.filter((k) => villages.filter((v) => v.district + '|' + v.tambon === k).every((v) => game.checked[v.id])).length;
+  const badges = [
+    ['🩺', 'ตรวจคนไข้รายแรก', checked >= 1], ['🏥', 'ตรวจครบ 1 วอร์ด', fullWards >= 1], ['🚑', 'ดูแลเคสป่วยครบ', sickAll.length > 0 && sickDone === sickAll.length],
+    ['🧭', 'ตรวจครบทุกหมู่บ้าน', checked === villages.length && villages.length > 0], ['🌸', 'พัฒนาการอำเภอ', lv >= 2], ['👑', 'พัฒนาการจังหวัด', lv >= 3],
+  ];
+  return html`<section class="grid gap-3">
+    <section class="hero grid gap-3 justify-items-center text-center">
+      <${Logo} size=${120} src=${mascotOf(game.xp)} /><span class="chip on" style=${{ fontWeight: 600 }}>Lv${lv}</span>
+      <div class="text-2xl font-bold">${rankOf(game.xp)}</div>
+      <div class="w-full max-w-xs"><div class="xpbar" style=${{ height: 10 }}><i style=${{ width: (into / 4) + '%' }}></i></div><div class="small mt-1 num">${into}/400 XP · รวม ${b0(game.xp)} XP · ${b0(game.coins)} <i class="coin"></i></div></div>
+    </section>
+    <div class="grid grid-cols-3 gap-2 text-center">
+      <div class="card" style=${{ padding: 12 }}><div class="text-2xl font-semibold num">${checked}</div><div class="small muted">ตรวจแล้ว/${villages.length}</div></div>
+      <div class="card" style=${{ padding: 12 }}><div class="text-2xl font-semibold num">${sickDone}</div><div class="small muted">เคสป่วย/${sickAll.length}</div></div>
+      <div class="card" style=${{ padding: 12 }}><div class="text-2xl font-semibold num">${fullWards}</div><div class="small muted">วอร์ดครบ/${tambons.length}</div></div>
+    </div>
+    <section class="card grid gap-3"><div class="font-semibold">🧭 เส้นทางตำแหน่ง</div>
+      <div class="grid grid-cols-3 gap-2 text-center">${RANKS.map((r, i) => { const on = rankIdx(game.xp) >= i, cur = rankIdx(game.xp) === i;
+        return html`<div key=${r.name} class="grid justify-items-center gap-1" style=${{ border: '1.5px solid ' + (cur ? 'var(--gold)' : 'var(--line)'), borderRadius: 16, padding: '10px 6px', opacity: on ? 1 : .45, filter: on ? 'none' : 'grayscale(1)' }}>
+          <${Logo} size=${64} src=${r.img} /><div class="small font-semibold">Lv${i + 1} ${r.name}</div>
+          <div style=${{ fontSize: '.72rem', color: cur ? 'var(--gold)' : 'var(--muted)' }}>${cur ? 'ตำแหน่งปัจจุบัน' : on ? 'ผ่านแล้ว' : 'ปลดล็อกที่ ' + r.xp + ' XP'}</div></div>`; })}</div>
+    </section>
+    <section class="card grid gap-2"><div class="font-semibold">🏅 เหรียญตรา</div><div class="grid grid-cols-3 gap-2">${badges.map(([i, l, ok]) => html`<div key=${l} class="text-center" style=${{ opacity: ok ? 1 : .35, border: '1.5px solid var(--line)', borderRadius: 14, padding: 8 }}><div class="text-2xl">${i}</div><div class="small">${l}</div></div>`)}</div></section>
+    <section class="card grid gap-1 small muted"><div class="font-semibold" style=${{ color: 'var(--fg)' }}>วิธีเก็บ XP</div><p>ตรวจหมู่บ้านที่เงินครบ +20 XP · ดูแลเคสป่วย +40 XP · เปิดวอร์ดใหม่ +5 · นำเข้าไฟล์ +50 · ซิงค์ชีต +30 · ส่งออก +15 · 400 XP เลื่อนเป็นพัฒนาการอำเภอ · 800 XP เลื่อนเป็นพัฒนาการจังหวัด</p><p>คะแนนเก็บในเครื่องนี้เท่านั้น</p></section>
+    <button class="btn btn-danger" type="button" onClick=${() => setModal({ type: 'confirmReset', title: 'เริ่มเกมใหม่?', body: 'XP เหรียญ และสถานะตรวจแล้วทั้งหมดในเครื่องนี้จะถูกล้าง', run: () => setGame({ xp: 0, coins: 0, checked: {}, wards: {}, badges: {} }) })}>เริ่มเกมใหม่</button>
+  </section>`;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(html`<${App} />`);
+})();
+</script>
