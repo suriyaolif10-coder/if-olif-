@@ -1,0 +1,919 @@
+<title>เข็มทิศแก้หนี้ กข.คจ.</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="หมอแก้หนี้ by Olifsuriya · ตรวจสุขภาพกองทุน กข.คจ. 280K อ.โนนสัง จ.หนองบัวลำภู">
+<meta property="og:title" content="เข็มทิศแก้หนี้ กข.คจ.">
+<meta property="og:description" content="หมอแก้หนี้ by Olifsuriya · ตรวจสุขภาพกองทุน กข.คจ. 280K อ.โนนสัง จ.หนองบัวลำภู">
+<meta property="og:image" content="https://raw.githubusercontent.com/suriyaolif10-coder/if-olif-/ccr-a1b29fa4-4rl4fs/kkj-app/brand/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0f1724">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap">
+<style>
+/* Layout: mobile game clinic. Fixed top HUD, one scrolling screen, fixed bottom tab bar; modals sit centred. */
+:root {
+  --bg: #0f1724;
+  --bg-2: #152034;
+  --card: #0b111c;
+  --card-2: #1a2539;
+  --line: #2a3850;
+  --fg: #ecf1f8;
+  --muted: #9aa8bd;
+  --navy: #1E3A5F;
+  --navy-2: #2d5689;
+  --navy-hi: #93b9ee;
+  --cream: #f6f1e4;
+  --gold: #f6c51b;
+  --gold-ink: #1d1604;
+  --good: #3fcf8e;
+  --ok: #8fc7ff;
+  --warn: #f2a541;
+  --bad: #f06a6a;
+  --font: "Kanit", "Noto Sans Thai", "Leelawadee UI", "Thonburi", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.5; }
+button, input, select, label { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--navy-hi); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+.gut { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.shell { max-width: 640px; margin: 0 auto; min-height: 100%; position: relative; }
+
+/* splash */
+.splash { position: fixed; inset: 0; z-index: 100; background: var(--cream); display: grid; place-items: center; transition: opacity .8s ease; }
+.splash.out { opacity: 0; pointer-events: none; }
+.lockup { display: grid; justify-items: center; width: min(78vw, 340px); }
+.lockup .top { color: var(--navy); font-weight: 700; font-size: clamp(2rem, 11vw, 3.1rem); line-height: 1; padding-top: .3em; white-space: nowrap; margin-bottom: calc(min(78vw, 340px) * .05 - .12em); }
+.lockup img { width: 100%; height: auto; display: block; border-radius: 50%; }
+.lockup .bot { color: var(--navy); font-weight: 700; font-size: clamp(1.6rem, 8.5vw, 2.4rem); line-height: 1.1; margin-top: calc(min(78vw, 340px) * .03); }
+.splash .loading { margin-top: 28px; color: var(--navy); font-weight: 500; display: grid; gap: 8px; justify-items: center; }
+.splash .bar { width: 180px; height: 6px; border-radius: 3px; background: rgba(30,58,95,.15); overflow: hidden; }
+.splash .bar i { display: block; height: 100%; width: 0; background: var(--navy); animation: load 9s linear forwards; }
+.splash .skip { position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(14px + env(safe-area-inset-top, 0px)); background: none; border: 1px solid rgba(30,58,95,.3); color: var(--navy); border-radius: 999px; padding: 4px 14px; font-size: .85rem; }
+@keyframes load { to { width: 100%; } }
+.a-top { opacity: 0; animation: topIn 3s cubic-bezier(.34,1.56,.64,1) forwards; }
+.a-logo { opacity: 0; transform: scale(.6); animation: logoIn 4s cubic-bezier(.34,1.45,.64,1) 2s forwards, pulse 3s ease-in-out 6s 1; }
+.a-bot { opacity: 0; animation: fadeIn 4s ease 5s forwards; }
+@keyframes topIn { 0% { opacity: 0; transform: translateY(-24px); } 70% { opacity: 1; transform: translateY(4px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes logoIn { 0% { opacity: 0; transform: scale(.6); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+@keyframes fadeIn { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .a-top, .a-logo, .a-bot { animation-duration: .01s; animation-delay: 0s; opacity: 1; transform: none; } }
+
+/* HUD */
+.hud { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line); padding-top: calc(10px + env(safe-area-inset-top, 0px)); padding-bottom: 10px; }
+.avatar { position: relative; width: 52px; height: 52px; flex: none; }
+.avatar img { width: 52px; height: 52px; border-radius: 50%; display: block; background: var(--cream); }
+.avatar .lv { position: absolute; right: -8px; bottom: -6px; background: var(--navy); border: 2px solid var(--navy-2); font-size: 12px; font-weight: 600; border-radius: 999px; padding: 0 6px; }
+.brand-t { color: var(--navy-hi); font-weight: 700; font-size: 1.1rem; line-height: 1.2; }
+.xpbar { height: 6px; background: var(--card-2); border-radius: 3px; overflow: hidden; }
+.xpbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--navy-2), var(--navy-hi)); transition: width .5s; }
+.coin { display: inline-block; width: 13px; height: 13px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffe27e, #d6a10b); vertical-align: -2px; }
+
+/* bottom tabs */
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: #0a1019; border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.tabs .in { max-width: 640px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
+.tabs button { background: none; border: 0; padding: 8px 2px 10px; display: grid; justify-items: center; gap: 2px; color: var(--muted); font-size: .72rem; }
+.tabs button .ic { font-size: 1.3rem; line-height: 1; }
+.tabs button[aria-current="page"] { color: var(--fg); }
+.tabs button[aria-current="page"] .ic { filter: drop-shadow(0 0 6px rgba(147,185,238,.6)); }
+main.screen { padding-top: 14px; padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; }
+
+/* components */
+.card { background: var(--card); border: 1.5px solid var(--line); border-radius: 22px; padding: 18px; min-width: 0; }
+.hero { background: linear-gradient(160deg, var(--navy-2), var(--navy) 75%); border-radius: 24px; padding: 20px; }
+.btn { border: 0; border-radius: 16px; padding: 11px 16px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-align: center; min-height: 46px; }
+.btn-navy { background: var(--navy); border: 1.5px solid var(--navy-2); }
+.btn-gold { background: var(--gold); color: var(--gold-ink); }
+.btn-black { background: #05080d; border: 1.5px solid #05080d; }
+.btn-ghost { background: transparent; border: 1.5px solid var(--line); }
+.btn-danger { background: transparent; border: 1.5px solid var(--bad); color: var(--bad); }
+.btn:disabled { opacity: .5; cursor: default; }
+.chip { flex: none; border: 1.5px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 13px; font-weight: 500; white-space: nowrap; font-size: .9rem; }
+.chip.on { background: var(--navy); border-color: var(--navy-2); }
+.crumbs { display: flex; gap: 6px; align-items: center; overflow-x: auto; scrollbar-width: none; }
+.crumbs::-webkit-scrollbar { display: none; }
+.tile { border-radius: 18px; padding: 12px 8px; display: grid; justify-items: center; text-align: center; border: 1.5px solid rgba(255,255,255,.08); background: rgba(5,10,20,.35); min-width: 0; }
+.tile:hover { border-color: rgba(255,255,255,.3); }
+.tile .k { font-size: .8rem; color: #c8d3e3; font-weight: 500; }
+.tile .v { font-size: 1.9rem; font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.tile .s { font-size: .74rem; color: #c8d3e3; }
+.tile.good { background: #20606b; border-color: #47b1ad; }
+.tile.sick { background: #403c69; border-color: #8a7fd0; }
+.money { border-radius: 14px; border: 1.5px solid var(--line); padding: 10px 12px; min-width: 0; }
+.money .k { font-size: .72rem; color: var(--muted); font-weight: 600; letter-spacing: .04em; }
+.money .v { font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.money.risk { background: #281e17; border-color: #4b3524; } .money.risk .v { color: var(--warn); }
+.money.net { background: #12291f; border-color: #24473a; } .money.net .v { color: var(--good); }
+.st { display: inline-flex; align-items: center; gap: 4px; font-size: .78rem; font-weight: 600; padding: 2px 10px; border-radius: 999px; border: 1.5px solid currentColor; white-space: nowrap; }
+.st-ดีมาก { color: var(--good); } .st-ดี { color: var(--ok); } .st-เริ่มป่วย { color: var(--warn); } .st-ป่วยหนัก { color: var(--bad); }
+.row { display: flex; justify-content: space-between; gap: 10px; }
+.vrow { width: 100%; text-align: left; background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; padding: 12px 14px; display: grid; gap: 4px; }
+.vrow:hover { border-color: var(--navy-2); }
+.gauge { height: 8px; border-radius: 4px; background: var(--card-2); overflow: hidden; display: flex; }
+.gauge i { display: block; height: 100%; }
+.field { display: grid; gap: 4px; }
+.field label { font-size: .85rem; color: var(--muted); }
+.field input, .search { width: 100%; background: var(--bg-2); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; min-width: 0; }
+.muted { color: var(--muted); }
+.small { font-size: .85rem; }
+.hidden-file { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.stamp { color: var(--good); border: 2px solid var(--good); border-radius: 8px; padding: 0 8px; font-weight: 600; font-size: .8rem; transform: rotate(-6deg); display: inline-block; }
+table.rep { width: 100%; border-collapse: collapse; font-size: .85rem; }
+table.rep th { text-align: left; color: var(--muted); font-weight: 500; padding: 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.rep td { padding: 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.rep .r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.scroll-x { overflow-x: auto; }
+
+/* modal */
+.overlay { position: fixed; inset: 0; z-index: 60; background: rgba(3,6,12,.72); display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.modal { width: min(560px, 100%); max-height: min(78vh, 720px); background: var(--bg-2); border: 1.5px solid var(--line); border-radius: 22px; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.modal .mh { padding: 16px 18px 10px; display: flex; justify-content: space-between; gap: 10px; align-items: start; }
+.modal .mb { overflow-y: auto; padding: 0 18px 12px; display: grid; gap: 8px; align-content: start; }
+.modal .mf { padding: 12px 18px 16px; border-top: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; }
+.x { background: var(--card-2); border: 0; width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem; flex: none; }
+.spin { width: 42px; height: 42px; border-radius: 50%; border: 4px solid var(--line); border-top-color: var(--gold); animation: sp 1s linear infinite; }
+@keyframes sp { to { transform: rotate(360deg); } }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 80; background: var(--gold); color: var(--gold-ink); font-weight: 600; border-radius: 999px; padding: 9px 18px; box-shadow: 0 8px 24px rgba(0,0,0,.4); max-width: calc(100% - 32px); text-align: center; }
+@media (prefers-reduced-motion: no-preference) { .toast { animation: pop .3s ease-out; } @keyframes pop { from { transform: translateX(-50%) scale(.85); opacity: 0; } } }
+</style>
+
+<div id="root"></div>
+<script type="application/json" id="seed">[[1,"บ้านค้อ","6","บ้าน ท่าศิลา","นายจรัญ ฤาชา","0807534921","2",292500,54,280000,12500,0,0,"","","บ้านท่าศิลา",20,1000],[2,"หนองเรือ","10","บ้าน โนนสะอาด","นางสาวพรสวรรค์ บาลี","0625256380","1",280934.41,26,248500,32434.41,0,0,"","","บ้านโนนสะอาด",20,1000],[3,"บ้านถิ่น","9","บ้าน หนองสวรรค์","นายสุพจน์ พิมพ์คต","0930836897","1",280518.52,2,280000,518.52,0,0,"","","บ้านหนองสวรรค์",20,1000],[4,"บ้านค้อ","2","บ้าน โคกป่ากุง","นายธวัชชัย พุดเพาะ","0951693488","2",280042.43,42,230962,49080.43,0,0,"","","บ้านโคกป่ากุง",30,3000],[5,"โนนเมือง","7","บ้าน ภูศรีทอง","นายสมพงศ์ สารีคาน","0956761195","3",280000,40,120000,160000,0,0,"","","บ้านภูศรีทอง",32,3200],[6,"นิคมพัฒนา","10","บ้าน ดงบาก","นายธนทัต ผางเวศ","0927282475","2",280500,20,280000,500,0,0,"","","บ้านดงบาก",20,1000],[7,"หนองเรือ","11","บ้าน หนองเรือ","นายลุน รัตนะวงศ์","0655505977","2",280025.24,8,262500,17525.24,0,0,"","","บ้านหนองเรือ",20,1000],[8,"นิคมพัฒนา","4","บ้าน โคกสง่า","นายประครอง สอนคำมี","0828403362","2",287827.72,28,272000,15827.72,0,0,"","","บ้านโคกสง่า",20,1000],[9,"บ้านถิ่น","8","บ้าน นิคมโคกม่วง","นายไสว ไพราม","0808347811","2",280732.79,20,251300,29432.79,0,0,"","","",0,0],[10,"ปางกู่","9","บ้าน นิคมศรีวิไล","นายวิสุทธิ์ สีทาแก","0930836473","2",282004.64,29,280000,2004.64,0,0,"","","",0,0],[11,"โคกม่วง","6","บ้าน หนองปิง","นายธนา โพธิ์วงศ์","0833562836","1",284608,52,186600,98008,0,0,"","","บ้านหนองปิง",20,1000],[12,"โนนสัง","11","บ้าน โคกกลางสามัคคี","นายสุริยา แก้วกันยา","0926410561","3",287710.74,0,283500,4210.74,0,0,"","","โคกกลางสามัคคี",246,1019300],[13,"หนองเรือ","3","บ้าน หนองลุมพุก","นายวีระพงษ์ หาญบัญญัติ","0870324055","3",340119,0,280000,60119,0,0,"","","บ้านหนองลุมพุก",35,10080],[14,"หนองเรือ","7","บ้าน หนองกุงคำไฮ","นางรัศมี โสมมีชัย","0919868887","3",281467.84,84,281000,467.84,0,0,"","","บ้านหนองกุงคำไฮ",20,1000],[15,"โนนเมือง","6","บ้าน ห้วยมะหรี่","นายบุญมี สมดี","0823039499","3",280465.57,27,280000,465.57,0,0,"","","บ้านห้วยมะหรี่",20,1000],[16,"บ้านถิ่น","3","บ้าน หิ่นสิ่ว","นายพวง ช่างจักร","0937801704","2",282917.64,37,280000,2917.64,0,0,"","","",0,0],[17,"นิคมพัฒนา","7","บ้าน นิคมทองหลาง","นายวิระ สิงห์น้อย","0615741409","3",288435.66,28,280000,8435.66,0,0,"","","นิคมทองหลาง",36,231900],[18,"นิคมพัฒนา","11","บ้าน โคกเจริญ","นายกิตติชัย ภูเงิน","0625573055","2",285935.87,2,280000,5935.87,0,0,"","","โคกเจริญ",82,469990],[19,"โคกใหญ่","6","บ้าน หนองเเสบง","นายประภาส สายศรี","0610798350","3",280481.83,6,280000,481.83,0,0,"","","หนองสะแบง",730,4818075],[20,"ปางกู่","4","บ้าน หนองแวงโป่งสัง","นายชินพัฒน์ ช่างทองคำ","0879498329","2",282126.14,38,282000,126.14,0,0,"","","หนองแวงโป่งสัง",154,142540],[21,"ปางกู่","5","บ้าน โสกปลาขาว","นางสาววิภาดา อิ่มนาง","0386400848","2",280338.79,0,280000,338.79,0,0,"","","บ้านโสกปากขาว",20,1000],[22,"ปางกู่","6","บ้าน หนองหญ้าปล้อง","นางทองใบ สุพรรณ","0862422016","2",280936.05,0,280000,936.05,0,0,"","","หนองหญ้าปล้อง",87,146000],[23,"บ้านถิ่น","7","บ้าน โนนคูณ","นายธนพล สาผุยทำ","0913748362","2",280000,32,220000,0,7,60000,"ขาดวินัยในการใช้ทรัพย์สิน","ไปพบเพื่อทวงถาม","",0,0],[24,"นิคมพัฒนา","1","บ้าน นิคมพัฒนา","นายสมบัติ ที่ดินดำ","0802501924","1",280000,22,226677,53323,0,0,"","","บ้านนิคมพัฒนา",20,1000],[25,"โนนสัง","4","บ้าน โนนภูทอง","นางหนูพัตร บุญธะนะ","0851027971","3",281633.51,0,263900,17733.51,0,0,"","","โนนภูทอง",80,1080000],[26,"โนนสัง","5","บ้าน โคกกลาง","นายอานนท์ ขนันทอง","0857605949","3",280846.66,40,280400,446.66,0,0,"","","บ้านโคกกลาง",20,1000],[27,"ปางกู่","2","บ้าน โสกแดง","นายพีระศักดิ์ ยอดตา","0895085497","2",280949.23,54,280000,949.23,0,0,"","","",0,0],[28,"โคกใหญ่","5","บ้าน โคกน้อย","นายสังคม หมื่นทอง","0848872602","2",280365.33,0,280000,365.33,0,0,"","","โนนปอแดง",117,565500],[29,"โนนเมือง","5","บ้าน ห้วยบง","นายชัยวัฒน์ วงไชยา","0957800860","1",280420,31,280000,420,0,0,"","","ห้วยบง",331,1411130],[30,"โคกม่วง","8","บ้าน วังมน","นายพิกุล ไพรหน่าย","0856454196","1",280000,13,107574,172426,0,0,"","","",0,0],[31,"โคกใหญ่","4","บ้าน โนนปอแดง","นายรุ่งเรืองชัย เย็นวัฒนา","0850013769","2",280390,42,204900,75490,0,0,"","","โนนปอแดง",117,565500],[32,"นิคมพัฒนา","9","บ้าน โสกม่วง","นายประยูร รามหริ่ง","0981423765","2",280867.93,0,236000,44867.93,0,0,"","","บ้านโสกม่วง",20,1000],[33,"โคกใหญ่","7","บ้าน โนนยาว","นายประทีป วงศ์แก้ว","0652670531","2",280365.33,40,280000,365.33,0,0,"","","โนนยาว",84,111100],[34,"บ้านถิ่น","5","บ้าน โสกก้านเหลือง","นายทองขาน อาจหาญ","0935965299","3",293797.33,29,290000,3797.33,0,0,"","","",0,0],[35,"โคกใหญ่","3","บ้าน หนองตานา","นายสงวน ชาชุม","0933367445","2",280781.83,0,280000,781.83,0,0,"","","หนองตานา",248,1866520],[36,"กุดดู่","10","บ้าน หัวขัวสันติสุข","นายปัญญาวุธ ผาสีกา","0855383127","3",280347.43,37,280000,347.43,0,0,"","","หัวขัวสันติสุข",40,43000],[37,"กุดดู่","4","บ้าน กุดคอเมย","นายพินิจ ขานตา","0807537706","2",288951.4,42,280000,8951.4,0,0,"","","บ้านกุดคอเมย",20,1000],[38,"บ้านค้อ","4","บ้าน กุดฉิม","นายมณเทียร ภูหวดน้อย","0862375148","1",280288.55,22,280008,280.55,0,0,"","","",0,0],[39,"กุดดู่","7","บ้าน หัวขัว","นายเจริญ ละลี","0828497011","2",280114.83,0,280000,114.83,0,0,"","","หัวขัว",40,35000],[40,"บ้านถิ่น","4","บ้าน หนองเล้าข้าว","นายกิตติพัฒน์ พิมพ์โคตร","0639692474","1",280105.25,5,100000,105.25,45,180000,"ขาดวินัยในการใช้ทรัพย์สิน","เรียกพบคณะกรรมการเพื่อขอชำระเงินยืม/พักหนี้สื่อรับสภาพหนี้","",0,0],[41,"กุดดู่","5","บ้าน หนองโดน","นายประสิทธิ์ ฐานะ","0653068521","2",290619.53,40,280000,10619.53,0,0,"","","หนองโดน",111,291000],[42,"กุดดู่","8","บ้าน โสกช้าง","นายชาญ โคตรเพชร","0811835638","2",288951.4,37,280000,8951.4,0,0,"","","โสกช้าง",85,103100],[43,"หนองเรือ","6","บ้าน หนองกุงจารย์ผาง","นายคำเดื่อง สายสิงห์","0971368710","1",280187,30,109500,124687,5,46000,"ขาดวินัยในการใช้ทรัพย์สิน","ไปพบเพื่อทวงถาม","",0,0],[44,"หนองเรือ","8","บ้าน นาล้อม","นางสาวพิมพ์ใจ แผงเพชร","0937081867","3",280387,48,280000,387,0,0,"","","บ้านนาล้อม",30,3000],[45,"หนองเรือ","9","บ้าน หนองโน","นายเรียบ สมสันต์","0614086230","3",280026.26,8,280000,26.26,0,0,"","","หนองโน",86,1085600],[46,"โคกม่วง","7","บ้าน บุ่งบก","นายสันติ เนื่องคำอินทร์","0927698532","1",280014,30,231800,48214,0,0,"","","บ้านโคกม่วง",20,1000],[47,"โคกม่วง","4","บ้าน แมด","นายกิตติศักดิ์ ด้วงคำจันทร์","0933416351","3",286613.77,0,215500,71113.77,0,0,"","","แมด",25,5000],[48,"โคกม่วง","5","บ้าน ตาดไฮ","นายสมพงษ์ พรมไตร","0872145183","3",286613.77,41,215500,71113.77,0,0,"","","บ้านตาดไฮ",25,7500],[49,"นิคมพัฒนา","6","บ้าน หนองนาเลิง","นายวีระ สิงห์น้อย","0850129642","2",291010.38,15,280000,11010.38,0,0,"","","บ้านหนองนาเลิง",20,1000],[50,"บ้านค้อ","7","บ้าน หนองนกเขียน","นายศรทอง ชุมแวงวาปี","0617084509","2",282446.77,43,280000,2446.77,0,0,"","","บ้านหนองนกเขียน",20,1000],[51,"บ้านค้อ","8","บ้าน กุดแห่","นางสมพิศ สายตรี","0986604298","2",281002.11,40,280000,1002.11,0,0,"","","",0,0],[52,"หนองเรือ","4","บ้าน ท่าลาด","นายอภิโชค ไชยรส","0872318439","2",280000,61,143842,136158,0,0,"","","บ้าท่าลาด",150,3500000],[53,"บ้านค้อ","3","บ้าน หนองงูเหลือม","นางหนูทิพย์ คลังกลาง","0810505284","2",280000,20,245432,34568,0,0,"","","",0,0],[54,"หนองเรือ","2","บ้าน โคกป่ากุง","นายกิตติศักดิ์ ทิพย์เนตร","0969658636","3",284424.4,5,280000,4424.4,0,0,"","","บ้านโคกป่ากุง",30,3000],[55,"โคกม่วง","9","บ้าน ชัยมงคล","นายคมพยัคฆ์ ดวงคำ","0982405242","1",280032,0,119050,15632,1,145350,"อื่น ๆ","ประชุมคณะกรรมการ/ตั้งคณะกรรมการตรวจสอบข้อเท็จจริง เพื่อหาแนวทางเร่งรัด","บ้านโคกม่วง",20,1000],[56,"โคกม่วง","2","บ้าน โคกศรีเรือง","นายวิมล นามขำ","0622382493","3",281502,31,278734,2768,0,0,"","","บ้านโคกศรีเมือง",20,1000],[57,"โคกม่วง","1","บ้าน โคกม่วง","นายมนตรี นครชัย","0956571562","1",287012,51,286000,1012,0,0,"","","บ้านโคกม่วง",20,1000]]</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11/dist/index.global.js"></script>
+<script>
+(function () {
+'use strict';
+const { useState, useEffect, useMemo, useRef, useCallback } = React;
+const html = htm.bind(React.createElement);
+
+/* ================= constants ================= */
+const LOGO = 'data:image/webp;base64,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';
+const STD = 280000;
+const SHEET_ID = '11aTk309P3EOuQMM5_mjRi5TDjV8h-cRlCj7I0F95i3I';
+const XLSX_FILE_ID = '1cV0t9yFH3oNWcZb8QqmNhxIlpEDPRzRC';
+const SHEETS = 'Google Sheets', DRIVE = 'Google Drive';
+const XLSX_CDN = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+const POSTAL = { 'โนนสัง': '39130' };
+const K = { data: 'kkj.v2.villages', meta: 'kkj.v2.meta', game: 'kkj.v2.game', ui: 'kkj.v2.ui' };
+const SPLASH_MS = 9000;
+
+/* ================= helpers ================= */
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} },
+};
+const num = (v) => { if (typeof v === 'number') return Number.isFinite(v) ? v : 0; const s = String(v == null ? '' : v).replace(/[^0-9.\-]/g, ''); const x = parseFloat(s); return Number.isFinite(x) ? x : 0; };
+const txt = (v) => String(v == null ? '' : v).replace(/\s+/g, ' ').trim();
+const baht = (n) => (Math.round((+n || 0) * 100) / 100).toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const b0 = (n) => Math.round(+n || 0).toLocaleString('th-TH');
+const normName = (s) => { s = txt(s).replace(/^บ้าน\s*/, ''); return s ? 'บ้าน ' + s : ''; };
+const key = (s) => txt(s).replace(/\s+/g, '');
+const thDate = (d) => d.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+
+const STATUS = [
+  { id: 'ดีมาก', label: '😊 ดีมาก เกิน', min: 285000 },
+  { id: 'ดี', label: '🙂 ดี', min: STD },
+  { id: 'เริ่มป่วย', label: '🤒 เริ่มป่วย', min: STD * 0.9 },
+  { id: 'ป่วยหนัก', label: '🚑 ป่วยหนัก', min: -Infinity },
+];
+const statusOf = (net) => STATUS.find((s) => net >= s.min - 0.004);
+
+/* The one formula: รวมสุทธิ = บัญชี + ลูกหนี้ − เสี่ยง, เสี่ยง = มีปัญหา + เสียหาย */
+function finish(v) {
+  v.district = txt(v.district) || 'โนนสัง';
+  v.province = txt(v.province) || 'หนองบัวลำภู';
+  v.tambon = txt(v.tambon).replace(/^(ต\.|ตำบล)\s*/, '');
+  v.moo = txt(v.moo).replace(/^(ม\.|หมู่ที่|หมู่)\s*/, '');
+  v.name = normName(v.name);
+  ['deposit', 'loaned', 'problem', 'damaged', 'fund', 'hh', 'problemHH', 'damagedHH', 'savers', 'savings'].forEach((k) => { v[k] = num(v[k]); });
+  v.risk = Math.round((v.problem + v.damaged) * 100) / 100;
+  v.circ = Math.round((v.deposit + v.loaned) * 100) / 100;
+  v.net = Math.round((v.deposit + v.loaned - v.risk) * 100) / 100;
+  v.gap = Math.round((STD - v.net) * 100) / 100;
+  const s = statusOf(v.net); v.status = s.id; v.statusLabel = s.label;
+  v.good = v.net >= STD - 0.004;
+  const pc = POSTAL[v.district] || txt(v.postal);
+  v.address = v.addressOverride || [v.name, 'หมู่ที่ ' + v.moo, 'ต.' + v.tambon, 'อ.' + v.district, 'จ.' + v.province, pc].filter(Boolean).join(' ');
+  v.id = v.district + '-' + v.tambon + '-' + v.moo + '-' + v.name;
+  return v;
+}
+function seed() {
+  const rows = JSON.parse(document.getElementById('seed').textContent);
+  return rows.map((f) => finish({ no: f[0], province: 'หนองบัวลำภู', district: 'โนนสัง', tambon: f[1], moo: f[2], name: f[3], chair: f[4], phone: f[5], level: f[6], fund: f[7], hh: f[8], loaned: f[9], deposit: f[10],
+    problemHH: f[11], problem: f[12], problemCause: f[13], problemAction: f[14], damagedHH: 0, damaged: 0, group: f[15], savers: f[16], savings: f[17] }));
+}
+function agg(list) {
+  const s = (k) => list.reduce((a, v) => a + v[k], 0);
+  const by = (id) => list.filter((v) => v.status === id).length;
+  return { n: list.length, deposit: s('deposit'), loaned: s('loaned'), risk: s('risk'), circ: s('circ'), net: s('net'),
+    good: list.filter((v) => v.good).length, sick: list.filter((v) => !v.good).length,
+    dm: by('ดีมาก'), d: by('ดี'), ss: by('เริ่มป่วย'), sh: by('ป่วยหนัก') };
+}
+const uniq = (a) => [...new Set(a)];
+const districtsOf = (list) => { const c = {}; list.forEach((v) => { c[v.district] = (c[v.district] || 0) + 1; }); return Object.keys(c).sort((a, b) => c[b] - c[a] || a.localeCompare(b, 'th')); };
+
+/* ================= parsing ================= */
+// full Excel layout "(กข.คจ.) แยกตามจังหวัด": fixed column positions
+function rowsFromGrid(grid) {
+  let headerIdx = -1;
+  for (let i = 0; i < Math.min(20, grid.length); i++) {
+    const cells = (grid[i] || []).map((c) => txt(c));
+    if (cells.some((c) => c === 'จังหวัด') && cells.some((c) => c === 'อำเภอ')) { headerIdx = i; break; }
+  }
+  if (headerIdx < 0) return null;
+  const out = [];
+  for (let i = headerIdx + 2; i < grid.length; i++) {
+    const c = grid[i] || [];
+    if (!/^\d+$/.test(txt(c[0])) || !txt(c[5])) continue;
+    let phone = txt(c[7]).replace(/[^0-9]/g, ''); if (phone.length === 9) phone = '0' + phone;
+    out.push(finish({ no: num(c[0]), province: txt(c[1]).replace(/^(จ\.|จังหวัด)\s*/, ''), district: txt(c[2]).replace(/^(อ\.|อำเภอ)\s*/, ''), tambon: c[3], moo: c[4], name: c[5],
+      chair: txt(c[6]), phone, level: txt(c[8]).replace('ระดับ', '').trim(), fund: c[9], hh: c[10], loaned: c[11], deposit: c[12],
+      bookDate: txt(c[13]), bank: txt(c[14]), account: txt(c[15]), problemHH: c[22], problem: c[23], problemCause: txt(c[24]), problemAction: txt(c[25]),
+      damagedHH: c[26], damaged: c[27], damagedCause: txt(c[28]), damagedAction: txt(c[29]), group: txt(c[30]), savers: c[31], savings: c[32] }));
+  }
+  return out;
+}
+// simple CSV or the native Google Sheet: map by header names
+const ALIAS = {
+  province: ['จังหวัด'], district: ['อำเภอ'], tambon: ['ตำบล'], moo: ['หมู่', 'หมู่ที่'], name: ['หมู่บ้าน', 'ชื่อหมู่บ้าน กขคจ.', 'ชื่อหมู่บ้าน กข.คจ.', 'ชื่อหมู่บ้าน'],
+  deposit: ['บัญชี', 'เงินในบัญชี', 'เงินฝากธนาคาร'], loaned: ['ลูกหนี้', 'เงินลูกหนี้', 'เงินที่ยืม'], risk: ['เสี่ยง', 'เงินเสี่ยง (ลบออก)', 'เงินเสี่ยง'],
+  problem: ['เงินมีปัญหา'], damaged: ['เงินเสียหาย'], chair: ['ประธาน'], phone: ['เบอร์', 'เบอร์โทร'], address: ['full_address', 'ที่อยู่เต็ม'], no: ['ลำดับ', 'ลำดับที่'],
+};
+function rowsFromHeaders(grid) {
+  let hi = -1, map = null;
+  for (let i = 0; i < Math.min(20, grid.length); i++) {
+    const cells = (grid[i] || []).map((c) => txt(c));
+    const m = {};
+    for (const [k, names] of Object.entries(ALIAS)) { const j = cells.findIndex((c) => names.includes(c)); if (j >= 0) m[k] = j; }
+    if (m.name != null && m.deposit != null && m.loaned != null) { hi = i; map = m; break; }
+  }
+  if (hi < 0) return null;
+  const out = [];
+  for (let i = hi + 1; i < grid.length; i++) {
+    const c = grid[i] || []; const g = (k) => (map[k] == null ? '' : c[map[k]]);
+    if (!txt(g('name'))) continue;
+    const addr = txt(g('address'));
+    const district = txt(g('district')) || ((addr.match(/อ\.\s*(\S+)/) || [])[1] || '');
+    const province = txt(g('province')) || ((addr.match(/จ\.\s*(\S+)/) || [])[1] || '');
+    const risk = num(g('risk'));
+    const hasSplit = map.problem != null || map.damaged != null;
+    let phone = txt(g('phone')).replace(/[^0-9]/g, ''); if (phone.length === 9) phone = '0' + phone;
+    out.push(finish({ no: num(g('no')) || out.length + 1, province, district, tambon: g('tambon'), moo: g('moo'), name: g('name'), chair: txt(g('chair')), phone,
+      deposit: g('deposit'), loaned: g('loaned'), problem: hasSplit ? g('problem') : risk, damaged: hasSplit ? g('damaged') : 0, postal: ((addr.match(/(\d{5})\s*$/) || [])[1] || '') }));
+  }
+  return out;
+}
+function parseCSV(text) {
+  text = text.replace(/^﻿/, '');
+  const rows = []; let row = [], cur = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) { if (ch === '"' && text[i + 1] === '"') { cur += '"'; i++; } else if (ch === '"') q = false; else cur += ch; }
+    else if (ch === '"') q = true; else if (ch === ',') { row.push(cur); cur = ''; }
+    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; }
+    else cur += ch;
+  }
+  if (cur || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+function parseGrid(grid) {
+  const byHead = rowsFromHeaders(grid); if (byHead && byHead.length) return byHead; // simple CSV / native sheet
+  return rowsFromGrid(grid) || [];
+}
+// The Drive connector returns the .xlsx as flattened text: rebuild rows from it
+function rowsFromDriveText(text) {
+  const start = text.indexOf('หมายเหตุ,');
+  if (start < 0) return [];
+  const body = text.slice(start + 'หมายเหตุ,'.length).trim();
+  const chunks = body.split(/\s+(?=\d{1,4},[^,"\d][^,"]*,[^,"\d][^,"]*,[^,"\d][^,"]*,\d{1,3},)|\s+(?=รวมทั้งหมด,)/);
+  const grid = [[], ['ลำดับที่', 'จังหวัด', 'อำเภอ'], []];
+  chunks.forEach((ch) => { const r = parseCSV(ch.replace(/\n/g, ' ')); if (r[0]) grid.push(r[0]); });
+  return rowsFromGrid(grid) || [];
+}
+let xlsxPromise = null;
+function loadXLSX() {
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  if (!xlsxPromise) xlsxPromise = new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = XLSX_CDN; s.async = true;
+    s.onload = () => (window.XLSX ? res(window.XLSX) : rej(new Error('no XLSX')));
+    s.onerror = () => { xlsxPromise = null; rej(new Error('cdn')); };
+    document.head.appendChild(s);
+  });
+  return xlsxPromise;
+}
+async function readAnyFile(file) {
+  const name = file.name || '';
+  if (/\.csv$/i.test(name) || /csv|text\/plain/.test(file.type)) {
+    const text = await file.text();
+    return parseGrid(parseCSV(text));
+  }
+  let XLSX;
+  try { XLSX = await loadXLSX(); } catch (e) { throw new Error('โหลดตัวอ่าน Excel ไม่ได้ ให้เปิดไฟล์ใน Excel แล้วบันทึกเป็น CSV UTF-8 แล้วนำเข้าใหม่'); }
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(buf, { type: 'array' });
+  const names = wb.SheetNames.slice().sort((a, b) => (b.includes('แยกตามจังหวัด') ? 1 : 0) - (a.includes('แยกตามจังหวัด') ? 1 : 0));
+  for (const sn of names) {
+    const rows = parseGrid(XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, raw: true, defval: '' }));
+    if (rows.length) return rows;
+  }
+  return [];
+}
+
+/* ================= capabilities ================= */
+const cap = { mcp: null, dl: null };
+const capReady = (async () => {
+  try { cap.mcp = window.claude && window.claude.use ? await window.claude.use('mcp') : null; } catch (e) { cap.mcp = null; }
+  try { cap.dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { cap.dl = null; }
+})();
+function mcpMessage(e, server) {
+  const c = e && e.code;
+  if (c === 'server_not_connected' || c === 'selection_required') return 'ยังไม่ได้เชื่อม ' + server + ' ให้เพิ่มใน claude.ai → Settings → Connectors';
+  if (c === 'needs_reauth') return 'การเชื่อม ' + server + ' หมดอายุ ให้เชื่อมใหม่ใน claude.ai → Settings → Connectors';
+  if (c === 'not_in_manifest' || c === 'approval_required' || c === 'consent_required') return 'ยังไม่ได้อนุญาตให้แอปใช้ ' + server + ' กดปุ่มอีกครั้งแล้วเลือกอนุญาต';
+  if (c === 'blocked_by_policy') return 'องค์กรไม่อนุญาตให้ใช้ ' + server + ' ในแอปนี้';
+  if (c === 'server_unavailable' || c === 'upstream_error') return server + ' ไม่ตอบสนองชั่วคราว ลองใหม่อีกครั้ง';
+  if (c === 'tool_error') return server + ' แจ้งข้อผิดพลาด: ' + (e.message || '');
+  return (e && e.message) || 'เกิดข้อผิดพลาด';
+}
+async function saveFile(filename, data, mime) {
+  await capReady;
+  if (cap.dl) { await cap.dl.save({ filename, data }); return 'saved'; }
+  const blob = data instanceof Blob ? data : new Blob([data], { type: mime });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  return 'saved';
+}
+
+/* ================= export ================= */
+const SHEET_HEAD = ['ลำดับ', 'หมู่', 'ตำบล', 'ชื่อหมู่บ้าน กขคจ.', 'ประธาน', 'เบอร์โทร', 'เงินในบัญชี', 'เงินลูกหนี้', 'เงินเสี่ยง (ลบออก)', 'รวมสุทธิ = บัญชี+ลูกหนี้-เสี่ยง', '280K - สุทธิ (ขาด/เกิน)', 'สถานะสุขภาพ', 'ที่อยู่เต็ม', 'ตำบล'];
+function villageRows(list) {
+  return list.map((v, i) => [i + 1, v.moo, v.tambon, v.name, v.chair, v.phone, v.deposit, v.loaned, v.risk, v.net, v.gap, v.statusLabel, v.address, v.tambon]);
+}
+function tambonRows(list) {
+  const out = [];
+  uniq(list.map((v) => v.district + '|' + v.tambon)).forEach((k) => {
+    const [d, t] = k.split('|'); const a = agg(list.filter((v) => v.district === d && v.tambon === t));
+    out.push([d, t, a.n, a.good, a.sick, a.deposit, a.loaned, a.risk, a.net]);
+  });
+  return out;
+}
+const csvCell = (x) => { const s = String(x == null ? '' : x); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+function toCSV(rows) { return '﻿' + rows.map((r) => r.map(csvCell).join(',')).join('\r\n'); }
+
+/* ================= game ================= */
+const RANKS = ['นักศึกษาแพทย์', 'แพทย์ฝึกหัด', 'แพทย์ประจำบ้าน', 'หมอแก้หนี้', 'หมอใหญ่ กข.คจ.'];
+const levelOf = (xp) => 1 + Math.floor(xp / 400);
+const rankOf = (xp) => RANKS[Math.min(RANKS.length - 1, levelOf(xp) - 1)];
+
+/* ================= small components ================= */
+function Logo({ size = 52 }) { return html`<img src=${LOGO} alt="" width=${size} height=${size} style=${{ width: size, height: size, borderRadius: '50%', display: 'block', background: 'var(--cream)' }} />`; }
+function Status({ v }) { return html`<span class=${'st st-' + v.status}>${v.statusLabel}</span>`; }
+function Money({ a, label }) {
+  return html`<div class="grid grid-cols-2 gap-2">
+    <div class="money" style=${{ gridColumn: '1 / -1' }}><div class="k">หมุนเวียน (บัญชี + ลูกหนี้)${label ? ' · ' + label : ''}</div><div class="v">${b0(a.circ)} ฿</div></div>
+    <div class="money risk"><div class="k">เสี่ยงรวม</div><div class="v">${b0(a.risk)} ฿</div></div>
+    <div class="money net"><div class="k">สุทธิ</div><div class="v">${b0(a.net)} ฿</div></div>
+  </div>`;
+}
+function Gauge({ a }) {
+  const w = (x) => (a.n ? (x / a.n) * 100 : 0) + '%';
+  return html`<div class="gauge" role="img" aria-label=${'ดีมาก ' + a.dm + ' ดี ' + a.d + ' เริ่มป่วย ' + a.ss + ' ป่วยหนัก ' + a.sh}>
+    <i style=${{ width: w(a.dm), background: 'var(--good)' }}></i><i style=${{ width: w(a.d), background: 'var(--ok)' }}></i><i style=${{ width: w(a.ss), background: 'var(--warn)' }}></i><i style=${{ width: w(a.sh), background: 'var(--bad)' }}></i></div>`;
+}
+function Tiles({ list, onOpen }) {
+  const a = agg(list);
+  return html`<div class="grid grid-cols-3 gap-2">
+    <button class="tile" type="button" onClick=${() => onOpen('all')}><span class="k">ทั้งหมด</span><span class="v">${a.n}</span><span class="s">หมู่บ้าน ›</span></button>
+    <button class="tile good" type="button" onClick=${() => onOpen('good')}><span class="k">เงินครบ ≥280K</span><span class="v">${a.good}</span><span class="s">ดีมาก ${a.dm} + ดี ${a.d} ›</span></button>
+    <button class="tile sick" type="button" onClick=${() => onOpen('sick')}><span class="k">ป่วย</span><span class="v">${a.sick}</span><span class="s">ต้องดูแล ›</span></button>
+  </div>`;
+}
+function VRow({ v, onOpen, checked }) {
+  return html`<button class="vrow" type="button" onClick=${() => onOpen(v)}>
+    <div class="row items-start"><div class="min-w-0"><div class="font-semibold">${v.name} <span class="muted small">หมู่ ${v.moo}</span></div><div class="muted small">ต.${v.tambon} อ.${v.district}</div></div><${Status} v=${v} /></div>
+    <div class="row small"><span class="muted">สุทธิ</span><b class="num" style=${{ color: v.good ? 'var(--fg)' : 'var(--bad)' }}>${baht(v.net)} ฿</b></div>
+    <div class="row small"><span class="muted">${v.gap > 0 ? 'ขาดจาก 280K' : 'เกิน 280K'}</span><span class="num">${baht(Math.abs(v.gap))} ฿</span></div>
+    ${checked ? html`<div><span class="stamp">ตรวจแล้ว</span></div>` : null}
+  </button>`;
+}
+function Modal({ title, sub, onClose, children, footer }) {
+  useEffect(() => { const k = (e) => { if (e.key === 'Escape') onClose(); }; window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k); }, [onClose]);
+  return html`<div class="overlay" role="dialog" aria-modal="true" aria-label=${title} onClick=${(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div class="modal">
+      <div class="mh"><div class="min-w-0"><div class="text-lg font-semibold">${title}</div>${sub ? html`<div class="muted small">${sub}</div>` : null}</div><button class="x" type="button" aria-label="ปิด" onClick=${onClose}>✕</button></div>
+      <div class="mb">${children}</div>
+      ${footer ? html`<div class="mf">${footer}</div>` : null}
+    </div></div>`;
+}
+
+/* ================= splash ================= */
+function Splash({ onDone }) {
+  const [out, setOut] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setOut(true), SPLASH_MS); return () => clearTimeout(t); }, []);
+  useEffect(() => { if (out) { const t = setTimeout(onDone, 800); return () => clearTimeout(t); } }, [out]);
+  return html`<div class=${'splash' + (out ? ' out' : '')} aria-label="เข็มทิศแก้หนี้ กข.คจ.">
+    <button class="skip" type="button" onClick=${() => setOut(true)}>ข้าม ›</button>
+    <div>
+      <div class="lockup">
+        <div class="top a-top">เข็มทิศแก้หนี้</div>
+        <img class="a-logo" src=${LOGO} alt="หมอแก้หนี้" />
+        <div class="bot a-bot">กข.คจ.</div>
+      </div>
+      <div class="loading"><span>กำลังโหลด...</span><span class="bar"><i></i></span><span class="small" style=${{ opacity: .7 }}>หมอแก้หนี้ by Olifsuriya</span></div>
+    </div>
+  </div>`;
+}
+
+/* ================= app ================= */
+function App() {
+  const [splash, setSplash] = useState(true);
+  const [villages, setVillages] = useState(() => { const s = store.get(K.data, null); return Array.isArray(s) && s.length ? s.map(finish) : seed(); });
+  const [meta, setMeta] = useState(() => store.get(K.meta, { source: 'ข้อมูลชีต ปีงบประมาณ 2569', at: null, sheetRows: null }));
+  const [game, setGame] = useState(() => Object.assign({ xp: 0, coins: 0, checked: {}, wards: {}, badges: {} }, store.get(K.game, {})));
+  const [tab, setTab] = useState('clinic');
+  const [path, setPath] = useState({});
+  const [modal, setModal] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [mcpOk, setMcpOk] = useState(null);
+  const toastT = useRef();
+
+  useEffect(() => { store.set(K.data, villages); }, [villages]);
+  useEffect(() => { store.set(K.meta, meta); }, [meta]);
+  useEffect(() => { store.set(K.game, game); }, [game]);
+  useEffect(() => { capReady.then(() => setMcpOk(!!cap.mcp)); }, []);
+
+  const say = useCallback((m) => { setToast(m); clearTimeout(toastT.current); toastT.current = setTimeout(() => setToast(null), 2600); }, []);
+  const award = useCallback((xp, coins, msg) => {
+    setGame((g) => { const before = levelOf(g.xp); const n = Object.assign({}, g, { xp: g.xp + xp, coins: g.coins + coins }); if (levelOf(n.xp) > before) setTimeout(() => say('🎉 เลื่อนขั้นเป็น Lv' + levelOf(n.xp) + ' ' + rankOf(n.xp)), 900); return n; });
+    say(msg + ' +' + xp + ' XP' + (coins ? ' +' + coins + ' เหรียญ' : ''));
+  }, [say]);
+
+  const go = (p, t) => { setPath(p); if (t) setTab(t); setModal(null); window.scrollTo({ top: 0 }); };
+  const openVillage = (v) => go({ district: v.district, tambon: v.tambon, id: v.id }, 'clinic');
+  const openList = (list, kind, scope) => {
+    const sel = kind === 'good' ? list.filter((v) => v.good) : kind === 'sick' ? list.filter((v) => !v.good) : list;
+    const title = (kind === 'good' ? 'เงินครบ ≥280K' : kind === 'sick' ? 'ป่วย · ต้องดูแล' : 'ทั้งหมด') + ' · ' + sel.length + ' หมู่บ้าน';
+    setModal({ type: 'list', title, sub: scope, items: sel.slice().sort((a, b) => a.net - b.net) });
+  };
+
+  function replaceVillages(rows, label) {
+    const districts = new Set(rows.map((v) => v.district));
+    setVillages((cur) => cur.filter((v) => !districts.has(v.district)).concat(rows));
+    setMeta((m) => Object.assign({}, m, { source: label, at: new Date().toISOString() }));
+    return [...districts];
+  }
+
+  /* ---------- import ---------- */
+  async function importFile(file) {
+    setModal({ type: 'import', stage: 'reading', name: file.name });
+    try {
+      const rows = await readAnyFile(file);
+      if (!rows.length) throw new Error('ไม่พบแถวข้อมูลหมู่บ้าน ตรวจว่าเป็นชีต (กข.คจ.) แยกตามจังหวัด หรือ CSV ที่มีหัว หมู่บ้าน, บัญชี, ลูกหนี้');
+      const ds = replaceVillages(rows, 'ไฟล์ ' + file.name);
+      setModal({ type: 'import', stage: 'done', name: file.name, rows, districts: ds });
+      award(50, 20, 'นำเข้า ' + rows.length + ' หมู่บ้าน');
+    } catch (e) { setModal({ type: 'import', stage: 'error', name: file.name, error: e.message || String(e) }); }
+  }
+
+  /* ---------- Google Sheets / Drive ---------- */
+  const [sync, setSync] = useState({ busy: false, msg: '', err: '' });
+  async function pullSheet() {
+    setSync({ busy: true, msg: 'กำลังดึงข้อมูลจาก Google Sheets...', err: '' });
+    try {
+      const r = await cap.mcp.callTool(SHEETS, 'get_values', { spreadsheetId: SHEET_ID, range: 'A1:N1000' }, { cache: false });
+      const values = (r.payload && r.payload.values) || [];
+      const rows = rowsFromHeaders(values) || [];
+      if (!rows.length) throw new Error('ไม่พบแถวข้อมูลในชีต');
+      // keep the problem/damaged split from local data when the total matches
+      const local = new Map(villages.map((v) => [key(v.tambon) + '|' + key(v.moo) + '|' + key(v.name), v]));
+      const merged = rows.map((v) => { const o = local.get(key(v.tambon) + '|' + key(v.moo) + '|' + key(v.name)); if (!o) return v;
+        const keep = Math.abs(o.risk - v.problem) < 0.01; return finish(Object.assign({}, o, { chair: v.chair || o.chair, phone: v.phone || o.phone, deposit: v.deposit, loaned: v.loaned, problem: keep ? o.problem : v.problem, damaged: keep ? o.damaged : 0, no: v.no })); });
+      replaceVillages(merged, 'Google Sheets (ดึงล่าสุด)');
+      setMeta((m) => Object.assign({}, m, { sheetRows: values.length - 1, source: 'Google Sheets (ดึงล่าสุด)', at: new Date().toISOString() }));
+      setSync({ busy: false, msg: 'ดึงข้อมูลแล้ว ' + merged.length + ' หมู่บ้าน', err: '' });
+      award(30, 10, 'ซิงค์จากชีต');
+    } catch (e) { setSync({ busy: false, msg: '', err: mcpMessage(e, SHEETS) }); }
+  }
+  async function pushSheet() {
+    setModal(null);
+    setSync({ busy: true, msg: 'กำลังส่งข้อมูลขึ้น Google Sheets...', err: '' });
+    try {
+      const list = villages.filter((v) => v.district === 'โนนสัง').sort((a, b) => a.no - b.no);
+      const cur = await cap.mcp.callTool(SHEETS, 'get_values', { spreadsheetId: SHEET_ID, range: 'A1:N1000' }, { cache: false });
+      const have = Math.max(0, (((cur.payload && cur.payload.values) || []).length) - 1);
+      const n = list.length;
+      const ai = list.map((v, i) => [i + 1, isNaN(+v.moo) ? v.moo : +v.moo, v.tambon, v.name, v.chair, v.phone, v.deposit, v.loaned, v.risk]);
+      const ln = list.map((v) => [v.statusLabel, v.address, v.tambon]);
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'A2:I' + (n + 1), values: ai }, { cache: false });
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'L2:N' + (n + 1), values: ln }, { cache: false });
+      if (n > have) { // new rows have no formula yet: write the computed numbers
+        const jk = list.slice(have).map((v) => [v.net, v.gap]);
+        await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'J' + (have + 2) + ':K' + (n + 1), values: jk }, { cache: false });
+      }
+      if (have > n) {
+        const blank = Array.from({ length: have - n }, () => Array(14).fill(''));
+        await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'A' + (n + 2) + ':N' + (have + 1), values: blank }, { cache: false });
+      }
+      setSync({ busy: false, msg: 'ส่งขึ้นชีตแล้ว ' + n + ' หมู่บ้าน (อ.โนนสัง)', err: '' });
+      award(30, 10, 'ส่งข้อมูลขึ้นชีต');
+    } catch (e) { setSync({ busy: false, msg: '', err: mcpMessage(e, SHEETS) + ' (ข้อมูลในชีตอาจถูกเขียนไปบางส่วน ให้กดดึงข้อมูลเพื่อตรวจ)' }); }
+  }
+  async function pushOne(v) {
+    try {
+      const cur = await cap.mcp.callTool(SHEETS, 'get_values', { spreadsheetId: SHEET_ID, range: 'A1:N1000' }, { cache: false });
+      const values = (cur.payload && cur.payload.values) || [];
+      const idx = values.findIndex((r, i) => i > 0 && key(r[2]) === key(v.tambon) && key(r[1]) === key(v.moo) && key(r[3]) === key(v.name));
+      if (idx < 0) return 'ไม่พบหมู่บ้านนี้ในชีต ใช้ปุ่ม "ส่งขึ้นชีตทั้งหมด" ในแท็บข้อมูล';
+      const r = idx + 1;
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'G' + r + ':I' + r, values: [[v.deposit, v.loaned, v.risk]] }, { cache: false });
+      await cap.mcp.callTool(SHEETS, 'update_values', { spreadsheetId: SHEET_ID, range: 'L' + r, values: [[v.statusLabel]] }, { cache: false });
+      return 'อัปเดตแถว ' + r + ' ในชีตแล้ว';
+    } catch (e) { return mcpMessage(e, SHEETS); }
+  }
+  async function readOldXlsx() {
+    setSync({ busy: true, msg: 'กำลังอ่านไฟล์ Excel เดิมจาก Google Drive...', err: '' });
+    try {
+      const r = await cap.mcp.callTool(DRIVE, 'read_file_content', { fileId: XLSX_FILE_ID }, { cache: false });
+      const p = r.payload; const text = typeof p === 'string' ? p : (p && (p.fileContent || p.content)) || '';
+      const rows = rowsFromDriveText(text);
+      if (!rows.length) throw new Error('อ่านแถวข้อมูลจากไฟล์ไม่ได้ รูปแบบไฟล์อาจเปลี่ยนไป');
+      replaceVillages(rows, 'ไฟล์ Excel เดิมใน Drive');
+      setSync({ busy: false, msg: 'อ่านไฟล์เดิมแล้ว ' + rows.length + ' หมู่บ้าน', err: '' });
+      award(30, 10, 'อ่านไฟล์เดิมจาก Drive');
+    } catch (e) { setSync({ busy: false, msg: '', err: e.code ? mcpMessage(e, DRIVE) : e.message }); }
+  }
+
+  /* ---------- export ---------- */
+  async function exportExcel(list) {
+    try {
+      const XLSX = await loadXLSX();
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['อำเภอ', 'ตำบล', 'หมู่บ้าน', 'เงินครบ', 'ป่วย', 'บัญชี', 'ลูกหนี้', 'เสี่ยง', 'สุทธิ']].concat(tambonRows(list))), 'สรุปรายตำบล');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([SHEET_HEAD].concat(villageRows(list))), 'รายหมู่บ้าน');
+      const out = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+      await saveFile('เข็มทิศแก้หนี้-กขคจ-' + new Date().toISOString().slice(0, 10) + '.xlsx', new Uint8Array(out), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      award(15, 5, 'ส่งออก Excel');
+    } catch (e) { say(e && e.code === 'declined' ? 'ยกเลิกการบันทึกไฟล์' : e && e.code ? 'บันทึกไฟล์ไม่ได้ในหน้านี้' : 'โหลดตัวสร้าง Excel ไม่ได้ ใช้ส่งออก CSV แทน'); }
+  }
+  async function exportCSV(list) {
+    try { await saveFile('เข็มทิศแก้หนี้-กขคจ-' + new Date().toISOString().slice(0, 10) + '.csv', toCSV([SHEET_HEAD].concat(villageRows(list))), 'text/csv'); award(15, 5, 'ส่งออก CSV'); }
+    catch (e) { say(e && e.code === 'declined' ? 'ยกเลิกการบันทึกไฟล์' : 'บันทึกไฟล์ไม่ได้ในหน้านี้'); }
+  }
+
+  /* ---------- village actions ---------- */
+  function updateVillage(id, patch) { setVillages((cur) => cur.map((v) => (v.id === id ? finish(Object.assign({}, v, patch)) : v))); }
+  function checkVillage(v) {
+    if (game.checked[v.id]) return;
+    setGame((g) => Object.assign({}, g, { checked: Object.assign({}, g.checked, { [v.id]: new Date().toISOString() }) }));
+    award(v.good ? 20 : 40, v.good ? 10 : 30, v.good ? 'ตรวจสุขภาพแล้ว' : 'ดูแลเคสป่วยแล้ว');
+  }
+  function enterWard(district, tambon) {
+    const k = district + '|' + tambon;
+    if (!game.wards[k]) { setGame((g) => Object.assign({}, g, { wards: Object.assign({}, g.wards, { [k]: 1 }) })); award(5, 0, 'เปิดวอร์ด ต.' + tambon); }
+    go({ district, tambon });
+  }
+
+  const fileRef = useRef();
+  const pickFile = () => { if (fileRef.current) fileRef.current.click(); };
+  const onFile = (e) => { const f = e.target.files && e.target.files[0]; if (f) importFile(f); e.target.value = ''; };
+
+  const lv = levelOf(game.xp), into = game.xp % 400;
+  const ctx = { villages, meta, game, path, go, openVillage, openList, enterWard, checkVillage, updateVillage, pushOne, setModal, say, award, pickFile, mcpOk, sync, pullSheet, readOldXlsx, exportExcel, exportCSV, setTab, setVillages, setMeta, setGame, pushAll: pushSheet };
+
+  return html`<${React.Fragment}>
+    ${splash ? html`<${Splash} onDone=${() => setSplash(false)} />` : null}
+    <input ref=${fileRef} id="fileInput" class="hidden-file" type="file" accept=".xlsx,.xls,.csv" style=${{ position: 'absolute', left: '-9999px' }} onChange=${onFile} />
+    <div class="shell">
+      <header class="hud gut">
+        <div class="flex items-center gap-3">
+          <div class="avatar"><${Logo} size=${52} /><span class="lv">Lv${lv}</span></div>
+          <div class="min-w-0 flex-1">
+            <div class="brand-t">เข็มทิศแก้หนี้ กข.คจ.</div>
+            <div class="muted small truncate">หมอแก้หนี้ by Olifsuriya · ${rankOf(game.xp)}</div>
+            <div class="flex items-center gap-2 small mt-1"><span class="xpbar flex-1" style=${{ maxWidth: 140 }}><i style=${{ width: (into / 4) + '%' }}></i></span><span class="num muted">${into}/400 XP</span><span class="num">${b0(game.coins)} <i class="coin" aria-label="เหรียญ"></i></span></div>
+          </div>
+          <button class="btn btn-gold" type="button" style=${{ minHeight: 40, padding: '8px 12px' }} onClick=${pickFile}>📥 นำเข้า</button>
+        </div>
+      </header>
+      <main class="screen gut">
+        ${tab === 'clinic' ? html`<${Clinic} ...${ctx} />` : null}
+        ${tab === 'patients' ? html`<${Patients} ...${ctx} />` : null}
+        ${tab === 'report' ? html`<${Report} ...${ctx} />` : null}
+        ${tab === 'data' ? html`<${DataTab} ...${ctx} />` : null}
+        ${tab === 'me' ? html`<${Me} ...${ctx} />` : null}
+      </main>
+      <nav class="tabs" aria-label="เมนูหลัก"><div class="in">
+        ${[['clinic', '🏥', 'คลินิก'], ['patients', '🩺', 'คนไข้'], ['report', '📋', 'รายงาน'], ['data', '📥', 'ข้อมูล'], ['me', '🎮', 'หมอ']].map(([id, ic, l]) => html`
+          <button key=${id} type="button" aria-current=${tab === id ? 'page' : null} onClick=${() => { setTab(id); if (id === 'clinic') setPath({}); window.scrollTo({ top: 0 }); }}><span class="ic" aria-hidden="true">${ic}</span>${l}</button>`)}
+      </div></nav>
+    </div>
+    ${modal ? html`<${ModalHost} modal=${modal} ctx=${ctx} close=${() => setModal(null)} />` : null}
+    ${toast ? html`<div class="toast" role="status">${toast}</div>` : null}
+  </${React.Fragment}>`;
+}
+
+/* ================= modal host ================= */
+function ModalHost({ modal, ctx, close }) {
+  if (modal.type === 'list') {
+    return html`<${Modal} title=${modal.title} sub=${modal.sub} onClose=${close}>
+      ${modal.items.length ? modal.items.map((v) => html`<${VRow} key=${v.id} v=${v} checked=${!!ctx.game.checked[v.id]} onOpen=${ctx.openVillage} />`) : html`<p class="muted">ไม่มีหมู่บ้านในกลุ่มนี้</p>`}
+    </${Modal}>`;
+  }
+  if (modal.type === 'import') {
+    if (modal.stage === 'reading') return html`<${Modal} title="กำลังอ่านไฟล์..." sub=${modal.name} onClose=${close}><div class="grid justify-items-center gap-3 py-6"><div class="spin"></div><p class="muted">กำลังอ่านและคำนวณ รวมสุทธิ = บัญชี + ลูกหนี้ − เสี่ยง</p></div></${Modal}>`;
+    if (modal.stage === 'error') return html`<${Modal} title="นำเข้าไม่สำเร็จ" sub=${modal.name} onClose=${close} footer=${html`<button class="btn btn-gold flex-1" type="button" onClick=${() => { close(); ctx.pickFile(); }}>เลือกไฟล์ใหม่</button>`}><p style=${{ color: 'var(--bad)' }}>${modal.error}</p></${Modal}>`;
+    const a = agg(modal.rows);
+    return html`<${Modal} title=${'นำเข้าสำเร็จ ' + modal.rows.length + ' หมู่บ้าน'} sub=${modal.name + ' · อ.' + modal.districts.join(', อ.')} onClose=${close}
+      footer=${html`<button class="btn btn-navy flex-1" type="button" onClick=${() => ctx.go({}, 'clinic')}>ไปหน้า อำเภอ ›</button>`}>
+      <p class="small muted">เงินครบ ${a.good} · ป่วย ${a.sick} · ข้อมูลอำเภอเดิมที่ชื่อซ้ำถูกแทนที่ด้วยไฟล์นี้</p>
+      <p class="small font-semibold">5 รายการแรก</p>
+      ${modal.rows.slice(0, 5).map((v) => html`<div key=${v.id} class="card" style=${{ padding: 12 }}><div class="row"><b>${v.name}</b><${Status} v=${v} /></div><div class="muted small">${v.address}</div><div class="small num">${baht(v.deposit)} + ${baht(v.loaned)} − ${baht(v.risk)} = <b>${baht(v.net)}</b></div></div>`)}
+    </${Modal}>`;
+  }
+  if (modal.type === 'confirmPush') {
+    return html`<${Modal} title="ส่งขึ้น Google Sheets ทั้งหมด?" onClose=${close} footer=${html`<button class="btn btn-ghost flex-1" type="button" onClick=${close}>ยกเลิก</button><button class="btn btn-gold flex-1" type="button" onClick=${modal.run}>ยืนยัน เขียนทับ</button>`}>
+      <p>แอปจะเขียนข้อมูล อ.โนนสัง ทุกหมู่บ้านทับคอลัมน์ A–I และ L–N ในชีต "คลินิกแก้หนี้ NBL 280K" สูตรในคอลัมน์ J–K ยังอยู่เหมือนเดิม</p>
+      <p class="muted small">ถ้ามีคนแก้ชีตหลังจากที่ดึงข้อมูลล่าสุด การแก้นั้นจะถูกทับ แนะนำให้กด "ดึงจากชีต" ก่อน</p>
+    </${Modal}>`;
+  }
+  if (modal.type === 'confirmReset') {
+    return html`<${Modal} title=${modal.title} onClose=${close} footer=${html`<button class="btn btn-ghost flex-1" type="button" onClick=${close}>ยกเลิก</button><button class="btn btn-danger flex-1" type="button" onClick=${() => { modal.run(); close(); }}>ยืนยัน</button>`}><p>${modal.body}</p></${Modal}>`;
+  }
+  return null;
+}
+
+/* ================= clinic (drill-down) ================= */
+function Crumbs({ path, go, villages }) {
+  const v = path.id ? villages.find((x) => x.id === path.id) : null;
+  const items = [{ l: 'อำเภอ', p: {} }];
+  if (path.district) items.push({ l: 'อ.' + path.district, p: { district: path.district } });
+  if (path.tambon) items.push({ l: 'ต.' + path.tambon, p: { district: path.district, tambon: path.tambon } });
+  if (v) items.push({ l: v.name, p: path });
+  return html`<nav class="crumbs" aria-label="ตำแหน่ง">
+    ${items.length > 1 ? html`<button class="chip" type="button" aria-label="ย้อนกลับ" onClick=${() => go(items[items.length - 2].p)}>‹</button>` : null}
+    ${items.map((it, i) => html`<${React.Fragment} key=${i}>${i ? html`<span class="muted" aria-hidden="true">›</span>` : null}<button class=${'chip' + (i === items.length - 1 ? ' on' : '')} type="button" aria-current=${i === items.length - 1 ? 'page' : null} onClick=${() => go(it.p)}>${it.l}</button></${React.Fragment}>`)}
+  </nav>`;
+}
+function UnitCard({ title, badge, sub, list, primary, onPrimary, secondary, onSecondary }) {
+  const a = agg(list);
+  return html`<section class="card grid gap-3">
+    <div class="flex items-center gap-3"><div style=${{ padding: 4, borderRadius: '50%', border: '3px solid var(--card-2)' }}><${Logo} size=${54} /></div>
+      <div class="min-w-0"><div class="flex flex-wrap items-center gap-2"><span class="text-xl font-semibold" style=${{ color: 'var(--navy-hi)' }}>${title}</span>${badge ? html`<span class="chip on" style=${{ fontSize: '.75rem', padding: '2px 10px' }}>${badge}</span>` : null}</div><div class="muted small">${sub}</div></div></div>
+    <${Money} a=${a} />
+    <${Gauge} a=${a} />
+    <div class="small"><b style=${{ color: 'var(--good)' }}>เงินครบ ${a.good} = ดี</b><span class="muted"> · ดีมาก ${a.dm} · ดี ${a.d}</span> · <b style=${{ color: a.sick ? 'var(--bad)' : 'var(--muted)' }}>ป่วย ${a.sick}</b><span class="muted"> (เริ่มป่วย ${a.ss} · ป่วยหนัก ${a.sh})</span></div>
+    <div class="grid grid-cols-2 gap-2"><button class="btn btn-navy" type="button" onClick=${onPrimary}>${primary}</button><button class="btn btn-ghost" type="button" onClick=${onSecondary}>${secondary}</button></div>
+  </section>`;
+}
+function Clinic(ctx) {
+  const { villages, path, go, openList, enterWard } = ctx;
+  if (path.id) { const v = villages.find((x) => x.id === path.id); if (v) return html`<${Crumbs} ...${ctx} /><${Village} v=${v} ...${ctx} />`; }
+  if (path.tambon) {
+    const list = villages.filter((v) => v.district === path.district && v.tambon === path.tambon).sort((a, b) => a.net - b.net);
+    const scope = 'ต.' + path.tambon + ' อ.' + path.district;
+    return html`<${Crumbs} ...${ctx} />
+      <section class="hero grid gap-3"><div class="text-2xl font-bold">วอร์ดตำบล${path.tambon}</div><div class="small" style=${{ color: '#cfdaea' }}>${scope} · ${list.length} หมู่บ้าน · เรียงจากสุทธิน้อยไปมาก</div><${Tiles} list=${list} onOpen=${(k) => openList(list, k, scope)} /><${Money} a=${agg(list)} label=${'ต.' + path.tambon} /></section>
+      <div class="grid gap-2">${list.map((v) => html`<${VRow} key=${v.id} v=${v} checked=${!!ctx.game.checked[v.id]} onOpen=${ctx.openVillage} />`)}</div>`;
+  }
+  if (path.district) {
+    const dl = villages.filter((v) => v.district === path.district);
+    const tambons = uniq(dl.map((v) => v.tambon)).map((t) => ({ t, list: dl.filter((v) => v.tambon === t) })).sort((a, b) => agg(b.list).sick - agg(a.list).sick || b.list.length - a.list.length);
+    const scope = 'อ.' + path.district + ' จ.' + (dl[0] ? dl[0].province : '');
+    return html`<${Crumbs} ...${ctx} />
+      <section class="hero grid gap-3"><div class="text-2xl font-bold">อำเภอ${path.district}</div><div class="small" style=${{ color: '#cfdaea' }}>${scope} · ${tambons.length} ตำบล · ${dl.length} หมู่บ้าน</div><${Tiles} list=${dl} onOpen=${(k) => openList(dl, k, scope)} /></section>
+      ${tambons.map(({ t, list }) => html`<${UnitCard} key=${t} title=${'ตำบล ' + t} badge=${'อ.' + path.district} sub=${list.length + ' หมู่บ้าน · ต.' + t + ' อ.' + path.district} list=${list}
+        primary=${'เข้าวอร์ด › ' + list.length + ' หมู่'} onPrimary=${() => enterWard(path.district, t)} secondary=${'ป่วย ' + agg(list).sick + ' ›'} onSecondary=${() => openList(list, 'sick', 'ต.' + t)} />`)}`;
+  }
+  const districts = districtsOf(villages);
+  const provs = uniq(villages.map((v) => v.province));
+  return html`
+    <section class="hero grid gap-4">
+      <div class="flex items-start justify-between gap-3"><div class="min-w-0"><div class="small font-semibold" style=${{ letterSpacing: '.12em', color: '#c9d7ec' }}>NBL 280K · หมอแก้หนี้ BY OLIFSURIYA</div><div class="text-3xl font-bold mt-1">คลินิกหนี้ 280K</div><div class="small mt-1" style=${{ color: '#cfdaea' }}>จ.${provs.join(', จ.')} · ${districts.length} อำเภอ · ${villages.length} หมู่บ้าน · ${ctx.meta.source}</div></div><div style=${{ borderRadius: '50%', border: '3px solid var(--navy-2)', flex: 'none' }}><${Logo} size=${60} /></div></div>
+      <${Tiles} list=${villages} onOpen=${(k) => openList(villages, k, 'ทุกอำเภอ')} />
+      <div class="small" style=${{ color: '#cfdaea' }}>รวมสุทธิ = บัญชี + ลูกหนี้ − เสี่ยง (มีปัญหา + เสียหาย) · ≥ 280,000 = เงินครบ</div>
+    </section>
+    ${districts.map((d) => { const list = villages.filter((v) => v.district === d); const t = uniq(list.map((v) => v.tambon)).length;
+      return html`<${UnitCard} key=${d} title=${'อำเภอ ' + d} badge=${'จ.' + list[0].province} sub=${'อ.' + d + ' จ.' + list[0].province + ' ' + (POSTAL[d] || '') + ' · ' + list.length + ' หมู่บ้าน'} list=${list}
+        primary=${'ดูตำบล › ' + t + ' ตำบล'} onPrimary=${() => go({ district: d })} secondary=${'ดู ' + list.length + ' หมู่บ้าน ›'} onSecondary=${() => openList(list, 'all', 'อ.' + d)} />`; })}
+    <button class="btn btn-gold" type="button" onClick=${ctx.pickFile}>📥 เลือกไฟล์ Excel/CSV เพิ่มอำเภอ</button>`;
+}
+
+/* ================= village (exam room) ================= */
+function Village(ctx) {
+  const { v, game, checkVillage, updateVillage, pushOne, say, villages, openVillage, mcpOk } = ctx;
+  const [edit, setEdit] = useState(false);
+  const [form, setForm] = useState({});
+  const [pushMsg, setPushMsg] = useState('');
+  const [pushing, setPushing] = useState(false);
+  useEffect(() => { setEdit(false); setPushMsg(''); }, [v.id]);
+  const checked = !!game.checked[v.id];
+  const ward = villages.filter((x) => x.district === v.district && x.tambon === v.tambon && x.id !== v.id && !game.checked[x.id]).sort((a, b) => a.net - b.net);
+  const next = ward[0];
+  const dx = [], rx = [];
+  if (!v.good) { dx.push('รวมสุทธิ ' + baht(v.net) + ' บาท ขาดจาก 280,000 อยู่ ' + baht(v.gap) + ' บาท'); rx.push('ตรวจยอดเงินฝากกับสมุดบัญชี และทะเบียนลูกหนี้ ให้ครบ 280,000'); }
+  if (v.problem > 0) { dx.push('เงินมีปัญหา ' + baht(v.problem) + ' บาท' + (v.problemHH ? ' (' + v.problemHH + ' ครัวเรือน)' : '') + (v.problemCause ? ' สาเหตุ: ' + v.problemCause : '')); rx.push('ประชุมคณะกรรมการ ติดตามทวงถาม ทำหนังสือรับสภาพหนี้กับครัวเรือนที่ค้างชำระ'); if (v.problemAction) rx.push('ติดตามผลที่รายงานไว้: ' + v.problemAction); }
+  if (v.damaged > 0) { dx.push('เงินเสียหาย ' + baht(v.damaged) + ' บาท' + (v.damagedCause ? ' สาเหตุ: ' + v.damagedCause : '')); rx.push('ตั้งคณะกรรมการตรวจสอบข้อเท็จจริง และรายงานอำเภอ'); }
+  if (v.circ && v.deposit / v.circ >= 0.4) { dx.push('เงินค้างในบัญชี ' + Math.round(v.deposit / v.circ * 100) + '% ครัวเรือนยืมน้อย'); rx.push('ประชาสัมพันธ์ให้ครัวเรือนยากจนยื่นยืมเงินประกอบอาชีพตามระเบียบ'); }
+  if (!dx.length) { dx.push('สุขภาพดี เงินครบตามมาตรฐาน 280,000'); rx.push('ติดตามตามรอบปกติ และยกเป็นหมู่บ้านตัวอย่าง'); }
+  const startEdit = () => { setForm({ deposit: v.deposit, loaned: v.loaned, problem: v.problem, damaged: v.damaged }); setEdit(true); };
+  const save = async () => {
+    const patch = { deposit: num(form.deposit), loaned: num(form.loaned), problem: num(form.problem), damaged: num(form.damaged) };
+    updateVillage(v.id, patch); setEdit(false); say('บันทึกในเครื่องแล้ว');
+    if (mcpOk && v.district === 'โนนสัง') { setPushing(true); setPushMsg('กำลังอัปเดต Google Sheets...'); const m = await pushOne(finish(Object.assign({}, v, patch))); setPushMsg(m); setPushing(false); }
+  };
+  const copy = (t, el) => { try { navigator.clipboard.writeText(t).then(() => say('คัดลอกแล้ว'), () => say('คัดลอกไม่ได้ กดค้างที่ตัวเลขเพื่อคัดลอก')); } catch (e) { say('คัดลอกไม่ได้ กดค้างที่ตัวเลขเพื่อคัดลอก'); } };
+  const pct = (x) => Math.max(0, Math.min(100, x)) + '%';
+  return html`
+    <section class="card grid gap-3">
+      <div class="flex items-center gap-3"><${Logo} size=${64} /><div class="min-w-0"><div class="text-xl font-semibold" style=${{ color: 'var(--navy-hi)' }}>${v.name}</div><div class="muted small">${v.address}</div></div></div>
+      <div class="flex flex-wrap items-center gap-2"><${Status} v=${v} />${checked ? html`<span class="stamp">ตรวจแล้ว</span>` : null}</div>
+      <div class="grid grid-cols-2 gap-2 small">
+        <div><div class="muted">ประธาน</div><div>${v.chair || '—'}</div></div>
+        <div><div class="muted">เบอร์โทร</div><div class="flex items-center gap-2"><span class="num" style=${{ userSelect: 'all' }}>${v.phone || '—'}</span>${v.phone ? html`<button class="chip" type="button" style=${{ padding: '1px 10px' }} onClick=${() => copy(v.phone)}>คัดลอก</button>` : null}</div></div>
+        ${v.level ? html`<div><div class="muted">ระดับศักยภาพ</div><div>${v.level}</div></div>` : null}
+        ${v.hh ? html`<div><div class="muted">ครัวเรือนที่ยืม</div><div class="num">${b0(v.hh)}</div></div>` : null}
+      </div>
+    </section>
+    <section class="card grid gap-3">
+      <div class="font-semibold">📟 จอสัญญาณชีพ</div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="money"><div class="k">เงินในบัญชี</div><div class="v">${baht(v.deposit)}</div></div>
+        <div class="money"><div class="k">เงินลูกหนี้</div><div class="v">${baht(v.loaned)}</div></div>
+        <div class="money risk"><div class="k">เงินเสี่ยง (มีปัญหา ${b0(v.problem)} + เสียหาย ${b0(v.damaged)})</div><div class="v">${baht(v.risk)}</div></div>
+        <div class="money net"><div class="k">รวมสุทธิ</div><div class="v" style=${{ color: v.good ? 'var(--good)' : 'var(--bad)' }}>${baht(v.net)}</div></div>
+      </div>
+      <div class="small num muted">${baht(v.deposit)} + ${baht(v.loaned)} − ${baht(v.risk)} = <b style=${{ color: 'var(--fg)' }}>${baht(v.net)}</b> · ${v.gap > 0 ? 'ขาด ' + baht(v.gap) : 'เกิน ' + baht(-v.gap)} จาก 280,000</div>
+      <div><div class="row small"><span>รวมสุทธิ เทียบ 280K</span><span class="num">${Math.round(v.net / STD * 100)}%</span></div><div class="gauge"><i style=${{ width: pct(v.net / STD * 100), background: v.good ? 'var(--good)' : 'var(--bad)' }}></i></div></div>
+      ${edit ? html`<div class="grid grid-cols-2 gap-2">
+          ${[['deposit', 'เงินในบัญชี'], ['loaned', 'เงินลูกหนี้'], ['problem', 'เงินมีปัญหา'], ['damaged', 'เงินเสียหาย']].map(([k, l]) => html`<div class="field" key=${k}><label for=${'f-' + k}>${l}</label><input id=${'f-' + k} inputmode="decimal" value=${form[k]} onInput=${(e) => setForm(Object.assign({}, form, { [k]: e.target.value }))} /></div>`)}
+          <div class="small muted" style=${{ gridColumn: '1 / -1' }}>รวมสุทธิใหม่ = <b class="num" style=${{ color: 'var(--fg)' }}>${baht(num(form.deposit) + num(form.loaned) - num(form.problem) - num(form.damaged))}</b> บาท</div>
+          <button class="btn btn-ghost" type="button" onClick=${() => setEdit(false)}>ยกเลิก</button><button class="btn btn-gold" type="button" onClick=${save}>บันทึก${mcpOk && v.district === 'โนนสัง' ? ' + ส่งขึ้นชีต' : ''}</button>
+        </div>` : html`<button class="btn btn-ghost" type="button" onClick=${startEdit}>✏️ แก้ตัวเลขของหมู่บ้านนี้</button>`}
+      ${pushMsg ? html`<div class="small" style=${{ color: pushing ? 'var(--muted)' : 'var(--ok)' }}>${pushMsg}</div>` : null}
+    </section>
+    <section class="card grid gap-2"><div class="font-semibold">🩺 ผลวินิจฉัย</div><ul class="grid gap-1 pl-5 list-disc">${dx.map((d, i) => html`<li key=${i}>${d}</li>`)}</ul></section>
+    <section class="card grid gap-2"><div class="font-semibold">💊 ใบสั่งการรักษา</div><ol class="grid gap-1 pl-5 list-decimal">${rx.map((d, i) => html`<li key=${i}>${d}</li>`)}</ol>
+      <div class="grid grid-cols-2 gap-2 mt-2">
+        <button class="btn btn-gold" type="button" disabled=${checked} onClick=${() => checkVillage(v)}>${checked ? '✓ ตรวจแล้ว' : '✓ บันทึกการตรวจ'}</button>
+        <button class="btn btn-navy" type="button" disabled=${!next} onClick=${() => { if (!checked) checkVillage(v); openVillage(next); }}>${next ? 'คนไข้ถัดไป ›' : 'ตรวจครบวอร์ด'}</button>
+      </div>
+      ${next ? html`<div class="muted small">ถัดไป: ${next.name} (${next.statusLabel})</div>` : null}
+    </section>`;
+}
+
+/* ================= patients ================= */
+function Patients(ctx) {
+  const { villages, openVillage, game } = ctx;
+  const [q, setQ] = useState(''); const [f, setF] = useState('all'); const [d, setD] = useState('');
+  const districts = districtsOf(villages);
+  const base = villages.filter((v) => !d || v.district === d);
+  const list = base.filter((v) => (f === 'all' || (f === 'good' ? v.good : f === 'sick' ? !v.good : v.status === f)) && (!q || (v.name + ' ' + v.tambon + ' ' + v.chair + ' ' + v.district).includes(q.trim()))).sort((a, b) => a.net - b.net);
+  const a = agg(base);
+  return html`<section class="grid gap-3">
+    <div class="text-xl font-semibold">🩺 คนไข้ทั้งหมด</div>
+    <input class="search" type="search" id="pq" placeholder="ค้นหา หมู่บ้าน ตำบล ประธาน" aria-label="ค้นหา" value=${q} onInput=${(e) => setQ(e.target.value)} />
+    ${districts.length > 1 ? html`<div class="crumbs"><button class=${'chip' + (!d ? ' on' : '')} type="button" onClick=${() => setD('')}>ทุกอำเภอ</button>${districts.map((x) => html`<button key=${x} class=${'chip' + (d === x ? ' on' : '')} type="button" onClick=${() => setD(x)}>อ.${x}</button>`)}</div>` : null}
+    <div class="crumbs">${[['all', 'ทั้งหมด ' + a.n], ['good', 'เงินครบ ' + a.good], ['sick', 'ป่วย ' + a.sick], ['ดีมาก', '😊 ' + a.dm], ['ดี', '🙂 ' + a.d], ['เริ่มป่วย', '🤒 ' + a.ss], ['ป่วยหนัก', '🚑 ' + a.sh]].map(([k, l]) => html`<button key=${k} class=${'chip' + (f === k ? ' on' : '')} type="button" aria-pressed=${f === k} onClick=${() => setF(k)}>${l}</button>`)}</div>
+    <div class="muted small">แสดง ${list.length} หมู่บ้าน · เรียงจากรวมสุทธิน้อยไปมาก</div>
+    <div class="grid gap-2">${list.map((v) => html`<${VRow} key=${v.id} v=${v} checked=${!!game.checked[v.id]} onOpen=${openVillage} />`)}</div>
+  </section>`;
+}
+
+/* ================= report ================= */
+function Report(ctx) {
+  const { villages, exportExcel, exportCSV, say, award, openVillage, meta } = ctx;
+  const districts = districtsOf(villages);
+  const [d, setD] = useState(districts[0] || '');
+  const list = villages.filter((v) => !d || v.district === d);
+  const a = agg(list);
+  const prov = list[0] ? list[0].province : '';
+  const tambons = uniq(list.map((v) => v.tambon)).map((t) => ({ t, a: agg(list.filter((v) => v.tambon === t)) })).sort((x, y) => y.a.sick - x.a.sick || x.t.localeCompare(y.t, 'th'));
+  const sick = list.filter((v) => !v.good).sort((x, y) => x.net - y.net);
+  const today = thDate(new Date());
+  const text = [
+    'รายงานสรุปสถานะกองทุน กข.คจ. (เข็มทิศแก้หนี้ กข.คจ.)',
+    'อ.' + d + ' จ.' + prov + ' · ข้อมูล ณ ' + today,
+    '',
+    '1. ภาพรวม: ' + a.n + ' หมู่บ้าน เงินครบ 280,000 บาท ' + a.good + ' หมู่บ้าน (ดีมาก ' + a.dm + ', ดี ' + a.d + ') ป่วย ' + a.sick + ' หมู่บ้าน (เริ่มป่วย ' + a.ss + ', ป่วยหนัก ' + a.sh + ')',
+    '2. เงินทุน: เงินในบัญชี ' + baht(a.deposit) + ' บาท + เงินลูกหนี้ ' + baht(a.loaned) + ' บาท = หมุนเวียน ' + baht(a.circ) + ' บาท',
+    '   เงินเสี่ยง (มีปัญหา + เสียหาย) ' + baht(a.risk) + ' บาท · รวมสุทธิ ' + baht(a.net) + ' บาท',
+    '3. หมู่บ้านที่ต้องเร่งแก้ไข:',
+    ...(sick.length ? sick.map((v, i) => '   ' + (i + 1) + ') ' + v.name + ' หมู่ที่ ' + v.moo + ' ต.' + v.tambon + ' รวมสุทธิ ' + baht(v.net) + ' บาท ขาด ' + baht(v.gap) + ' บาท' + (v.problemCause ? ' (' + v.problemCause + ')' : '')) : ['   ไม่มี']),
+    '4. ข้อเสนอ: ติดตามทวงถามครัวเรือนที่ค้างชำระ ทำหนังสือรับสภาพหนี้ และรายงานผลทุกเดือน',
+    '',
+    'สูตร: รวมสุทธิ = เงินในบัญชี + เงินลูกหนี้ − เงินเสี่ยง (เงินมีปัญหา + เงินเสียหาย) · ≥ 280,000 = เงินครบ',
+    'จัดทำโดย หมอแก้หนี้ by Olifsuriya',
+  ].join('\n');
+  const copy = () => { try { navigator.clipboard.writeText(text).then(() => { say('คัดลอกรายงานแล้ว'); award(10, 0, 'ทำรายงาน'); }, () => say('คัดลอกไม่ได้ กดค้างที่ข้อความเพื่อเลือก')); } catch (e) { say('คัดลอกไม่ได้ กดค้างที่ข้อความเพื่อเลือก'); } };
+  return html`<section class="grid gap-3">
+    <div class="flex items-center justify-between gap-2"><div class="text-xl font-semibold">📋 รายงานเสนอผู้บังคับบัญชา</div></div>
+    ${districts.length > 1 ? html`<div class="crumbs">${districts.map((x) => html`<button key=${x} class=${'chip' + (d === x ? ' on' : '')} type="button" onClick=${() => setD(x)}>อ.${x}</button>`)}</div>` : null}
+    <article class="card grid gap-3" style=${{ background: 'var(--cream)', color: '#1b2a40', borderColor: '#d9cfb6' }}>
+      <div class="flex items-center gap-3"><${Logo} size=${56} /><div><div class="font-bold" style=${{ color: 'var(--navy)', fontSize: '1.1rem' }}>รายงานสรุปกองทุน กข.คจ.</div><div class="small">อ.${d} จ.${prov} · ข้อมูล ณ ${today}</div><div class="small" style=${{ opacity: .7 }}>แหล่งข้อมูล: ${meta.source}</div></div></div>
+      <div class="grid grid-cols-3 gap-2 text-center">
+        ${[['หมู่บ้าน', a.n, '#1E3A5F'], ['เงินครบ', a.good, '#1b7a52'], ['ป่วย', a.sick, '#b4332f']].map(([k, n, c]) => html`<div key=${k} style=${{ border: '1.5px solid #d9cfb6', borderRadius: 14, padding: 8 }}><div class="small">${k}</div><div class="text-2xl font-bold num" style=${{ color: c }}>${n}</div></div>`)}
+      </div>
+      <p class="small">เงินในบัญชี <b class="num">${baht(a.deposit)}</b> + เงินลูกหนี้ <b class="num">${baht(a.loaned)}</b> − เงินเสี่ยง <b class="num" style=${{ color: '#b4332f' }}>${baht(a.risk)}</b> = รวมสุทธิ <b class="num">${baht(a.net)}</b> บาท</p>
+      <div class="scroll-x"><table class="rep" style=${{ color: '#1b2a40' }}>
+        <thead><tr><th style=${{ color: '#5b6b80' }}>ตำบล</th><th class="r" style=${{ color: '#5b6b80' }}>หมู่</th><th class="r" style=${{ color: '#5b6b80' }}>ครบ</th><th class="r" style=${{ color: '#5b6b80' }}>ป่วย</th><th class="r" style=${{ color: '#5b6b80' }}>เสี่ยง</th><th class="r" style=${{ color: '#5b6b80' }}>สุทธิ</th></tr></thead>
+        <tbody>${tambons.map(({ t, a }) => html`<tr key=${t}><td>${t}</td><td class="r">${a.n}</td><td class="r">${a.good}</td><td class="r" style=${{ color: a.sick ? '#b4332f' : 'inherit', fontWeight: a.sick ? 600 : 400 }}>${a.sick}</td><td class="r">${b0(a.risk)}</td><td class="r">${b0(a.net)}</td></tr>`)}</tbody>
+      </table></div>
+      <div class="font-semibold" style=${{ color: 'var(--navy)' }}>หมู่บ้านที่ต้องเร่งแก้ไข (${sick.length})</div>
+      ${sick.length ? html`<ol class="grid gap-1 pl-5 list-decimal small">${sick.map((v) => html`<li key=${v.id}><button type="button" style=${{ background: 'none', border: 0, padding: 0, textAlign: 'left', color: 'inherit', textDecoration: 'underline' }} onClick=${() => openVillage(v)}>${v.name} หมู่ที่ ${v.moo} ต.${v.tambon}</button> · สุทธิ <b class="num">${baht(v.net)}</b> ขาด <b class="num" style=${{ color: '#b4332f' }}>${baht(v.gap)}</b>${v.problemCause ? ' · ' + v.problemCause : ''}</li>`)}</ol>` : html`<p class="small">ไม่มีหมู่บ้านป่วย</p>`}
+      <p class="small" style=${{ opacity: .75 }}>สูตร: รวมสุทธิ = เงินในบัญชี + เงินลูกหนี้ − เงินเสี่ยง (มีปัญหา + เสียหาย) · ≥ 280,000 = เงินครบ</p>
+    </article>
+    <div class="grid grid-cols-3 gap-2">
+      <button class="btn btn-gold" type="button" onClick=${copy}>📋 คัดลอก</button>
+      <button class="btn btn-navy" type="button" onClick=${() => exportExcel(list)}>📊 Excel</button>
+      <button class="btn btn-ghost" type="button" onClick=${() => exportCSV(list)}>📄 CSV</button>
+    </div>
+    <details class="card"><summary class="cursor-pointer muted">ข้อความรายงาน (สำหรับวางใน LINE หรือหนังสือ)</summary><pre class="small mt-2" style=${{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', userSelect: 'all' }}>${text}</pre></details>
+  </section>`;
+}
+
+/* ================= data / sync ================= */
+function DataTab(ctx) {
+  const { villages, meta, mcpOk, sync, pullSheet, readOldXlsx, setModal, pickFile, exportExcel, exportCSV, setVillages, setMeta } = ctx;
+  const at = meta.at ? new Date(meta.at).toLocaleString('th-TH') : '—';
+  return html`<section class="grid gap-3">
+    <div class="text-xl font-semibold">📥 ข้อมูล นำเข้า ส่งออก ซิงค์</div>
+    <div class="card grid gap-2 small"><div class="row"><span class="muted">แหล่งข้อมูลตอนนี้</span><b>${meta.source}</b></div><div class="row"><span class="muted">อัปเดตล่าสุด</span><span>${at}</span></div><div class="row"><span class="muted">จำนวน</span><span>${villages.length} หมู่บ้าน · ${uniq(villages.map((v) => v.district)).length} อำเภอ</span></div></div>
+
+    <section class="card grid gap-3">
+      <div class="font-semibold">นำเข้าไฟล์ Excel / CSV</div>
+      <button class="btn btn-gold" type="button" onClick=${pickFile}>📥 เลือกไฟล์ Excel/CSV</button>
+      <label for="fileInput" class="btn btn-ghost small" style=${{ minHeight: 40 }}>ถ้าปุ่มบนไม่เปิด แตะที่นี่แทน</label>
+      <div class="small muted grid gap-1">
+        <p>• ชีต "(กข.คจ.) แยกตามจังหวัด": แถว 0 หัวเรื่อง แถว 1 หัวหลัก แถว 2 หัวรอง แถว 3 เป็นต้นไปคือข้อมูล แอปหาแถวที่มีช่อง "จังหวัด" และ "อำเภอ" ใน 20 แถวแรกเอง</p>
+        <p>• คอลัมน์: 1 จังหวัด · 2 อำเภอ · 3 ตำบล · 4 หมู่ที่ · 5 หมู่บ้าน · 6 ประธาน · 7 เบอร์ · 11 ลูกหนี้ · 12 บัญชี · 23 เงินมีปัญหา · 27 เงินเสียหาย</p>
+        <p>• CSV แบบง่าย หัวตาราง: จังหวัด,อำเภอ,ตำบล,หมู่,หมู่บ้าน,บัญชี,ลูกหนี้,เสี่ยง,ประธาน,เบอร์,full_address</p>
+        <p>• นำเข้าอำเภอใหม่จะเพิ่มเข้าไป ส่วนอำเภอที่มีอยู่แล้วจะถูกแทนที่ด้วยไฟล์ใหม่</p>
+      </div>
+    </section>
+
+    <section class="card grid gap-3">
+      <div class="font-semibold">🔄 Google Sheets ซิงค์ 2 ทาง</div>
+      <p class="small muted">ชีต "คลินิกแก้หนี้ NBL 280K - โนนสัง" · ใช้บัญชี Google ของคนที่เปิดแอป ต้องมีสิทธิ์แก้ชีตนี้</p>
+      ${mcpOk === false ? html`<p class="small" style=${{ color: 'var(--warn)' }}>หน้านี้เชื่อม Google ไม่ได้ (เปิดนอก claude.ai หรือยังไม่ได้เชื่อม Connector) ใช้การนำเข้าไฟล์แทนได้</p>` : null}
+      <div class="grid grid-cols-2 gap-2">
+        <button class="btn btn-navy" type="button" disabled=${!mcpOk || sync.busy} onClick=${pullSheet}>⬇️ ดึงจากชีต</button>
+        <button class="btn btn-ghost" type="button" disabled=${!mcpOk || sync.busy} onClick=${() => setModal({ type: 'confirmPush', run: ctx.pushAll })}>⬆️ ส่งขึ้นชีตทั้งหมด</button>
+      </div>
+      <button class="btn btn-ghost" type="button" disabled=${!mcpOk || sync.busy} onClick=${readOldXlsx}>📂 อ่านไฟล์ Excel เดิมจาก Drive</button>
+      <p class="small muted">แก้ตัวเลขในหน้าหมู่บ้านแล้วกดบันทึก แอปจะอัปเดตแถวนั้นในชีตให้ทันที ส่วนคนที่แก้ในชีต ให้กด "ดึงจากชีต" เพื่อเอาค่าล่าสุดมา</p>
+      ${sync.busy ? html`<div class="flex items-center gap-2 small"><div class="spin" style=${{ width: 20, height: 20, borderWidth: 3 }}></div>${sync.msg}</div>` : null}
+      ${!sync.busy && sync.msg ? html`<div class="small" style=${{ color: 'var(--good)' }}>✓ ${sync.msg}</div>` : null}
+      ${sync.err ? html`<div class="small" style=${{ color: 'var(--bad)' }}>${sync.err}</div>` : null}
+    </section>
+
+    <section class="card grid gap-3">
+      <div class="font-semibold">📤 ส่งออก</div>
+      <div class="grid grid-cols-2 gap-2"><button class="btn btn-navy" type="button" onClick=${() => exportExcel(villages)}>📊 Excel (.xlsx)</button><button class="btn btn-ghost" type="button" onClick=${() => exportCSV(villages)}>📄 CSV</button></div>
+    </section>
+
+    <button class="btn btn-danger" type="button" onClick=${() => setModal({ type: 'confirmReset', title: 'กลับไปใช้ข้อมูลตั้งต้น?', body: 'ข้อมูลที่นำเข้าหรือแก้ในเครื่องนี้จะหาย และกลับไปใช้ข้อมูลชีต 57 หมู่บ้านของ อ.โนนสัง', run: () => { setVillages(seed()); setMeta({ source: 'ข้อมูลชีต ปีงบประมาณ 2569', at: new Date().toISOString(), sheetRows: null }); } })}>กลับไปใช้ข้อมูลตั้งต้น</button>
+  </section>`;
+}
+
+/* ================= me (game) ================= */
+function Me(ctx) {
+  const { game, villages, setModal, setGame } = ctx;
+  const lv = levelOf(game.xp), into = game.xp % 400;
+  const checked = villages.filter((v) => game.checked[v.id]).length;
+  const sickAll = villages.filter((v) => !v.good); const sickDone = sickAll.filter((v) => game.checked[v.id]).length;
+  const tambons = uniq(villages.map((v) => v.district + '|' + v.tambon));
+  const fullWards = tambons.filter((k) => villages.filter((v) => v.district + '|' + v.tambon === k).every((v) => game.checked[v.id])).length;
+  const badges = [
+    ['🩺', 'ตรวจคนไข้รายแรก', checked >= 1], ['🏥', 'ตรวจครบ 1 วอร์ด', fullWards >= 1], ['🚑', 'ดูแลเคสป่วยครบ', sickAll.length > 0 && sickDone === sickAll.length],
+    ['🧭', 'ตรวจครบทุกหมู่บ้าน', checked === villages.length && villages.length > 0], ['⭐', 'ถึง Lv3', lv >= 3], ['👑', 'หมอใหญ่ กข.คจ.', lv >= 5],
+  ];
+  return html`<section class="grid gap-3">
+    <section class="hero grid gap-3 justify-items-center text-center">
+      <${Logo} size=${110} /><span class="chip on" style=${{ fontWeight: 600 }}>Lv${lv}</span>
+      <div class="text-2xl font-bold">${rankOf(game.xp)}</div>
+      <div class="w-full max-w-xs"><div class="xpbar" style=${{ height: 10 }}><i style=${{ width: (into / 4) + '%' }}></i></div><div class="small mt-1 num">${into}/400 XP · รวม ${b0(game.xp)} XP · ${b0(game.coins)} <i class="coin"></i></div></div>
+    </section>
+    <div class="grid grid-cols-3 gap-2 text-center">
+      <div class="card" style=${{ padding: 12 }}><div class="text-2xl font-semibold num">${checked}</div><div class="small muted">ตรวจแล้ว/${villages.length}</div></div>
+      <div class="card" style=${{ padding: 12 }}><div class="text-2xl font-semibold num">${sickDone}</div><div class="small muted">เคสป่วย/${sickAll.length}</div></div>
+      <div class="card" style=${{ padding: 12 }}><div class="text-2xl font-semibold num">${fullWards}</div><div class="small muted">วอร์ดครบ/${tambons.length}</div></div>
+    </div>
+    <section class="card grid gap-2"><div class="font-semibold">🏅 เหรียญตรา</div><div class="grid grid-cols-3 gap-2">${badges.map(([i, l, ok]) => html`<div key=${l} class="text-center" style=${{ opacity: ok ? 1 : .35, border: '1.5px solid var(--line)', borderRadius: 14, padding: 8 }}><div class="text-2xl">${i}</div><div class="small">${l}</div></div>`)}</div></section>
+    <section class="card grid gap-1 small muted"><div class="font-semibold" style=${{ color: 'var(--fg)' }}>วิธีเก็บ XP</div><p>ตรวจหมู่บ้านที่เงินครบ +20 XP · ดูแลเคสป่วย +40 XP · เปิดวอร์ดใหม่ +5 · นำเข้าไฟล์ +50 · ซิงค์ชีต +30 · ส่งออก +15 · ทุก 400 XP เลื่อน 1 ขั้น</p><p>คะแนนเก็บในเครื่องนี้เท่านั้น</p></section>
+    <button class="btn btn-danger" type="button" onClick=${() => setModal({ type: 'confirmReset', title: 'เริ่มเกมใหม่?', body: 'XP เหรียญ และสถานะตรวจแล้วทั้งหมดในเครื่องนี้จะถูกล้าง', run: () => setGame({ xp: 0, coins: 0, checked: {}, wards: {}, badges: {} }) })}>เริ่มเกมใหม่</button>
+  </section>`;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(html`<${App} />`);
+})();
+</script>
