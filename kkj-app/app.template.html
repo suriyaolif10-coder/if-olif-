@@ -371,11 +371,11 @@ const csvCell = (x) => { const s = String(x == null ? '' : x); return /[",\n]/.t
 function toCSV(rows) { return '﻿' + rows.map((r) => r.map(csvCell).join(',')).join('\r\n'); }
 
 /* ================= game ================= */
-// ตำแหน่งตามเลเวล: Lv1 พัฒนากร (เสื้อหม้อฮ้อม) · Lv2 พัฒนาการอำเภอ (ผ้าไทยชมพู) · Lv3 พัฒนาการจังหวัด (ชุดกากี)
+// ตำแหน่งตามเลเวล: Lv1 พัฒนากร · Lv2 พัฒนาการอำเภอ · Lv3 พัฒนาการจังหวัด
 const RANKS = [
-  { name: 'พัฒนากร', outfit: 'เสื้อหม้อฮ้อม', xp: 0, img: '__LV1__' },
-  { name: 'พัฒนาการอำเภอ', outfit: 'ผ้าไทยสีชมพู', xp: 400, img: '__LV2__' },
-  { name: 'พัฒนาการจังหวัด', outfit: 'ชุดข้าราชการสีกากี', xp: 800, img: '__LV3__' },
+  { name: 'พัฒนากร', xp: 0, img: '__LV1__' },
+  { name: 'พัฒนาการอำเภอ', xp: 400, img: '__LV2__' },
+  { name: 'พัฒนาการจังหวัด', xp: 800, img: '__LV3__' },
 ];
 const levelOf = (xp) => 1 + Math.floor(xp / 400);
 const rankIdx = (xp) => Math.min(RANKS.length - 1, levelOf(xp) - 1);
@@ -461,7 +461,7 @@ function App() {
 
   const say = useCallback((m) => { setToast(m); clearTimeout(toastT.current); toastT.current = setTimeout(() => setToast(null), 2600); }, []);
   const award = useCallback((xp, coins, msg) => {
-    setGame((g) => { const before = levelOf(g.xp); const n = Object.assign({}, g, { xp: g.xp + xp, coins: g.coins + coins }); if (levelOf(n.xp) > before) setTimeout(() => say(rankIdx(n.xp) > rankIdx(g.xp) ? '🎉 เลื่อนตำแหน่งเป็น ' + rankOf(n.xp) + ' (' + RANKS[rankIdx(n.xp)].outfit + ')' : '🎉 ขึ้น Lv' + levelOf(n.xp)), 900); return n; });
+    setGame((g) => { const before = levelOf(g.xp); const n = Object.assign({}, g, { xp: g.xp + xp, coins: g.coins + coins }); if (levelOf(n.xp) > before) setTimeout(() => say(rankIdx(n.xp) > rankIdx(g.xp) ? '🎉 เลื่อนตำแหน่งเป็น ' + rankOf(n.xp) : '🎉 ขึ้น Lv' + levelOf(n.xp)), 900); return n; });
     say(msg + ' +' + xp + ' XP' + (coins ? ' +' + coins + ' เหรียญ' : ''));
   }, [say]);
 
@@ -906,7 +906,7 @@ function Me(ctx) {
   ];
   return html`<section class="grid gap-3">
     <section class="hero grid gap-3 justify-items-center text-center">
-      <${Logo} size=${120} src=${mascotOf(game.xp)} /><span class="chip on" style=${{ fontWeight: 600 }}>Lv${lv} · ${RANKS[rankIdx(game.xp)].outfit}</span>
+      <${Logo} size=${120} src=${mascotOf(game.xp)} /><span class="chip on" style=${{ fontWeight: 600 }}>Lv${lv}</span>
       <div class="text-2xl font-bold">${rankOf(game.xp)}</div>
       <div class="w-full max-w-xs"><div class="xpbar" style=${{ height: 10 }}><i style=${{ width: (into / 4) + '%' }}></i></div><div class="small mt-1 num">${into}/400 XP · รวม ${b0(game.xp)} XP · ${b0(game.coins)} <i class="coin"></i></div></div>
     </section>
@@ -918,7 +918,7 @@ function Me(ctx) {
     <section class="card grid gap-3"><div class="font-semibold">🧭 เส้นทางตำแหน่ง</div>
       <div class="grid grid-cols-3 gap-2 text-center">${RANKS.map((r, i) => { const on = rankIdx(game.xp) >= i, cur = rankIdx(game.xp) === i;
         return html`<div key=${r.name} class="grid justify-items-center gap-1" style=${{ border: '1.5px solid ' + (cur ? 'var(--gold)' : 'var(--line)'), borderRadius: 16, padding: '10px 6px', opacity: on ? 1 : .45, filter: on ? 'none' : 'grayscale(1)' }}>
-          <${Logo} size=${64} src=${r.img} /><div class="small font-semibold">Lv${i + 1} ${r.name}</div><div class="muted" style=${{ fontSize: '.72rem' }}>${r.outfit}</div>
+          <${Logo} size=${64} src=${r.img} /><div class="small font-semibold">Lv${i + 1} ${r.name}</div>
           <div style=${{ fontSize: '.72rem', color: cur ? 'var(--gold)' : 'var(--muted)' }}>${cur ? 'ตำแหน่งปัจจุบัน' : on ? 'ผ่านแล้ว' : 'ปลดล็อกที่ ' + r.xp + ' XP'}</div></div>`; })}</div>
     </section>
     <section class="card grid gap-2"><div class="font-semibold">🏅 เหรียญตรา</div><div class="grid grid-cols-3 gap-2">${badges.map(([i, l, ok]) => html`<div key=${l} class="text-center" style=${{ opacity: ok ? 1 : .35, border: '1.5px solid var(--line)', borderRadius: 14, padding: 8 }}><div class="text-2xl">${i}</div><div class="small">${l}</div></div>`)}</div></section>
