@@ -169,6 +169,7 @@ const SHEET_ID = '11aTk309P3EOuQMM5_mjRi5TDjV8h-cRlCj7I0F95i3I';
 const XLSX_FILE_ID = '1cV0t9yFH3oNWcZb8QqmNhxIlpEDPRzRC';
 // รายงาน (กข.คจ.) แยกตามจังหวัด แปลงเป็น Google Sheets: แถว 1-3 หัวตาราง, 4-60 หมู่บ้าน, 61 รวม (สูตร SUM)
 const REPORT_ID = '1PTag5sttxbMwKNyW0I8imipH489J9D1SQbfMwQAxdS4';
+const CLAUDE_APP_URL = 'https://claude.ai/code/artifact/e002fe8b-154f-4077-810b-7b7d7d8d7b46';
 const sheetUrl = (id) => 'https://docs.google.com/spreadsheets/d/' + id + '/edit';
 const vKey = (tambon, moo, name) => key(tambon) + '|' + key(moo) + '|' + key(normName(name));
 const SHEETS = 'Google Sheets', DRIVE = 'Google Drive';
@@ -940,7 +941,7 @@ function DataTab(ctx) {
     <section class="card grid gap-3">
       <div class="font-semibold">🔄 Google Sheets ซิงค์ 2 ทาง</div>
       <p class="small muted">ใช้บัญชี Google ของคนที่เปิดแอป ต้องมีสิทธิ์แก้ชีต · แก้ตัวเลขในหน้าหมู่บ้านแล้วกดบันทึก แอปจะเขียนลงทั้ง 2 ชีตให้</p>
-      ${mcpOk === false ? html`<p class="small" style=${{ color: 'var(--warn)' }}>หน้านี้เชื่อม Google ไม่ได้ (เปิดนอก claude.ai หรือยังไม่ได้เชื่อม Connector) ใช้การนำเข้าไฟล์แทนได้</p>` : null}
+      ${mcpOk === false ? html`<p class="small" style=${{ color: 'var(--warn)' }}>หน้านี้เชื่อม Google Sheets ไม่ได้ เพราะเปิดนอก claude.ai ใช้การนำเข้าไฟล์และส่งออกได้ตามปกติ ถ้าต้องการซิงค์ชีต <a href=${CLAUDE_APP_URL} target="_blank" rel="noopener" style=${{ color: 'var(--navy-hi)', textDecoration: 'underline' }}>เปิดแอปใน claude.ai</a> (ต้องล็อกอิน)</p>` : null}
       <div class="small font-semibold">1. รายงาน (กข.คจ.) แยกตามจังหวัด <a href=${sheetUrl(REPORT_ID)} target="_blank" rel="noopener" style=${{ color: 'var(--navy-hi)' }}>เปิดชีต ↗</a></div>
       <p class="small muted">แอปเขียนเฉพาะช่อง L ลูกหนี้ · M บัญชี · X เงินมีปัญหา · AB เงินเสียหาย แถวรวมด้านล่างคำนวณเอง</p>
       <div class="grid grid-cols-2 gap-2">
