@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="th" data-composition-variables='[
+  {"id":"title","type":"string","label":"ชื่อแอป","default":"เข็มทิศแก้หนี้ กข.คจ."},
+  {"id":"url","type":"string","label":"ลิงก์ที่แสดง","default":"suriyaolif10-coder.github.io/if-olif-/kkj-app"},
+  {"id":"navy","type":"color","label":"กรมท่า","default":"#0f1b2d","group":"สี"},
+  {"id":"yellow","type":"color","label":"เหลือง","default":"#facc15","group":"สี"},
+  {"id":"cream","type":"color","label":"ครีม","default":"#f6f0e4","group":"สี"},
+  {"id":"endHold","type":"number","label":"ค้างท้าย (วินาที)","default":1.0,"min":0.3,"max":5,"step":0.1,"group":"จังหวะ"}
+]'>
+<head>
+<meta charset="utf-8">
+<title>เข็มทิศแก้หนี้ · แนะนำแอป</title>
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/om.js"></script>
+<style>
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Light.ttf);font-weight:300}
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Medium.ttf);font-weight:500}
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Bold.ttf);font-weight:700}
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Black.ttf);font-weight:900}
+:root{--blue:#1e3a5f;--green:#34d399;--red:#f87171;--violet:#8b5cf6}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+#film{position:relative;width:1080px;height:1920px;overflow:hidden;background:radial-gradient(1000px 1300px at 50% 45%,#1d3456,var(--navy) 70%);font-family:Kanit,sans-serif;color:#fff}
+.layer{position:absolute;inset:0}
+.ctr{position:absolute;left:0;right:0;text-align:center;white-space:nowrap}
+/* captions */
+.cap{position:absolute;left:0;right:0;top:90px;text-align:center}
+.cap .k{font:500 40px Kanit;color:var(--yellow);letter-spacing:3px}
+.cap .t{font:700 84px/1.2 Kanit;margin-top:6px}
+.cap .t b{color:var(--yellow);font-weight:700}
+.capB{position:absolute;left:0;right:0;top:1765px;text-align:center;font:500 46px Kanit;color:#cfe0f5}
+/* phone */
+#phone{position:absolute;left:220px;top:350px;width:640px;height:1385px;border-radius:72px;background:#05080f;padding:16px;box-sizing:content-box;box-shadow:0 50px 120px #0009,0 0 0 3px #2b3d57;transform-origin:50% 40%}
+#screen{position:relative;width:640px;height:1385px;border-radius:58px;overflow:hidden;background:#0f172a}
+#screen img{position:absolute;left:0;top:0;width:640px;height:1385px;opacity:0}
+.ring{position:absolute;border:7px solid var(--yellow);border-radius:28px;box-shadow:0 0 0 2000px #0006;opacity:0}
+/* hook */
+#hookL{background:var(--cream)}
+.hLogo{position:absolute;left:190px;top:470px;width:700px}
+.hT{top:200px;font:900 104px/1.2 Kanit;color:#1e3a5f}
+.hK{top:1300px;font:500 54px/1.5 Kanit;color:#1e3a5f}
+.hK b{background:#1e3a5f;color:var(--cream);border-radius:16px;padding:0 22px}
+/* game */
+.gRow{position:absolute;left:0;right:0;top:470px;display:flex;justify-content:center;gap:40px}
+.gCard{width:440px;text-align:center}
+.gCard img{width:400px}
+.gCard .n{font:700 64px Kanit;margin-top:10px}
+.gCard .s{font:300 42px Kanit;color:#cfe0f5}
+.fund{width:400px;height:400px;border-radius:50%;margin:0 auto;background:radial-gradient(circle at 40% 35%,#2c5282,#152a47);display:flex;align-items:center;justify-content:center;font:900 96px Kanit;color:var(--yellow);box-shadow:inset 0 0 0 8px #7f9cc2}
+.gXP{top:1240px;font:700 70px Kanit}
+.gXP span{color:var(--yellow)}
+/* formula */
+.fBox{position:absolute;left:70px;right:70px;top:380px;background:#132744;border-radius:40px;padding:50px 40px;box-shadow:inset 0 0 0 3px #2f4d78}
+.fLine{font:700 64px/1.35 Kanit;text-align:center}
+.fLine i{font-style:normal;color:var(--yellow)}
+.fSub{font:300 40px Kanit;color:#cfe0f5;text-align:center;margin-top:16px}
+.stat{position:absolute;left:70px;right:70px;display:flex;align-items:center;gap:26px;background:#132744;border-radius:30px;padding:22px 36px;font:500 50px Kanit}
+.stat .e{font-size:72px}
+.stat .r{margin-left:auto;font:700 46px Kanit;color:#cfe0f5}
+/* doctor */
+.dRow{position:absolute;left:0;right:0;top:520px;display:flex;justify-content:center;gap:24px}
+.dC{width:330px;text-align:center}
+.dC img{width:320px}
+.dC .lv{display:inline-block;background:var(--yellow);color:#111;font:700 40px Kanit;border-radius:30px;padding:0 24px;margin-top:10px}
+.dC .r{font:700 46px/1.25 Kanit;margin-top:12px}
+.dC .x{font:300 38px Kanit;color:#cfe0f5}
+/* end */
+#endL{background:var(--cream);color:#1e3a5f}
+.eLogo{position:absolute;left:270px;top:120px;width:540px}
+.eT{top:840px;font:900 92px/1.2 Kanit}
+.eS{top:970px;font:500 50px Kanit}
+.qr{position:absolute;left:390px;top:1090px;width:300px;border-radius:24px;box-shadow:0 20px 50px #1e3a5f33}
+.eU{top:1420px;font:500 40px Kanit}
+.eN{top:1500px;font:300 40px/1.5 Kanit;color:#3c5677}
+</style>
+</head>
+<body>
+<div id="film" data-composition-id="film" data-width="1080" data-height="1920" data-om-signature="top-right">
+  <audio id="om-sound" src="assets/sound.wav" data-start="0" data-duration="47" data-track-index="8" data-volume="1"></audio>
+
+  <section id="phoneL" class="layer" data-om-id="phone-scenes" style="visibility:hidden">
+    <div class="cap" data-om-id="caption"><div class="k" id="capK">ตรวจทีละระดับ</div><div class="t" id="capT">คลินิก</div></div>
+    <div id="phone" data-om-id="phone"><div id="screen">
+      <img id="s02" src="assets/02-district.jpg"><img id="s04" src="assets/04-sick-modal.jpg">
+      <img id="s05" src="assets/05-tambon.jpg"><img id="s06" src="assets/06-ward.jpg">
+      <img id="s07" src="assets/07-exam.jpg"><img id="s09" src="assets/09-exam-scroll2.jpg"><img id="s10" src="assets/10-recorded.jpg">
+      <img id="s11" src="assets/11-patients.jpg"><img id="s13" src="assets/13-report.jpg"><img id="s14" src="assets/14-report-scroll.jpg">
+      <div class="ring" id="ring"></div>
+    </div></div>
+    <div class="capB" id="capB" data-om-id="caption-bottom"></div>
+  </section>
+
+  <section id="hookL" class="layer" data-om-id="hook">
+    <div class="ctr hT" data-om-id="hook-title" data-var-text="title">เข็มทิศแก้หนี้ กข.คจ.</div>
+    <img class="hLogo" src="assets/mascot-lv1.png" data-om-id="hook-mascot">
+    <div class="ctr hK" data-om-id="hook-kicker">ตรวจสุขภาพเงินกองทุน<br><b>หมู่บ้านละ 280,000 บาท</b></div>
+  </section>
+
+  <section id="gameL" class="layer" data-om-id="game" style="visibility:hidden">
+    <div class="cap"><div class="k">เล่นแบบเกมคลินิก</div><div class="t">ตรวจครบ ได้ <b>XP</b></div></div>
+    <div class="gRow">
+      <div class="gCard" id="gDoc"><img src="assets/mascot-lv1.png"><div class="n">เจ้าหน้าที่ = หมอ</div></div>
+      <div class="gCard" id="gFund"><div class="fund">280K</div><div class="n">กองทุน = คนไข้</div><div class="s">57 หมู่บ้าน · 10 ตำบล</div></div>
+    </div>
+    <div class="ctr gXP" id="gXP">ตรวจเคสป่วย <span>+40 XP</span></div>
+  </section>
+
+  <section id="formL" class="layer" data-om-id="formula" style="visibility:hidden">
+    <div class="cap"><div class="k">สูตรของแอป</div><div class="t">เงินครบ หรือ <b>ป่วย</b>?</div></div>
+    <div class="fBox"><div class="fLine">รวมสุทธิ = <i>บัญชี</i> + <i>ลูกหนี้</i> − <i>เสียหาย</i></div><div class="fSub">ตั้งแต่ 280,000 บาท = เงินครบ · ต่ำกว่า = ป่วย</div></div>
+    <div class="stat" style="top:820px"><span class="e">😊</span>ดีมาก เกิน<span class="r">285,000+</span></div>
+    <div class="stat" style="top:990px"><span class="e">🙂</span>ดี<span class="r">280,000+</span></div>
+    <div class="stat" style="top:1160px"><span class="e">🤒</span>เริ่มป่วย<span class="r">252,000+</span></div>
+    <div class="stat" style="top:1330px"><span class="e">🚑</span>ป่วยหนัก<span class="r">&lt; 252,000</span></div>
+  </section>
+
+  <section id="docL" class="layer" data-om-id="doctor" style="visibility:hidden">
+    <div class="cap"><div class="k">ทุก 400 XP ขึ้น 1 เลเวล</div><div class="t">เลื่อน<b>ตำแหน่ง</b>หมอ</div></div>
+    <div class="dRow">
+      <div class="dC"><img src="assets/mascot-lv1.png"><div class="lv">Lv1</div><div class="r">พัฒนากร</div><div class="x">0 XP</div></div>
+      <div class="dC"><img src="assets/mascot-lv2.png"><div class="lv">Lv2</div><div class="r">พัฒนาการ<br>อำเภอ</div><div class="x">400 XP</div></div>
+      <div class="dC"><img src="assets/mascot-lv3.png"><div class="lv">Lv3</div><div class="r">พัฒนาการ<br>จังหวัด</div><div class="x">800 XP</div></div>
+    </div>
+  </section>
+
+  <section id="endL" class="layer" data-om-id="end" style="visibility:hidden">
+    <img class="eLogo" src="assets/logo-transparent.png" data-om-id="end-logo">
+    <div class="ctr eT" data-om-id="end-title" data-var-text="title">เข็มทิศแก้หนี้ กข.คจ.</div>
+    <div class="ctr eS" data-om-id="end-sub">เปิดบนมือถือ ไม่ต้องติดตั้ง</div>
+    <img class="qr" src="assets/qr.png" data-om-id="end-qr">
+    <div class="ctr eU" data-om-id="end-url" data-var-text="url">suriyaolif10-coder.github.io/if-olif-/kkj-app</div>
+    <div class="ctr eN" data-om-id="end-credit">หมอแก้หนี้ by Olifsuriya</div>
+  </section>
+</div>
+
+<script type="text/vnd.abc" id="om-score">
+X:1
+T:เข็มทิศแก้หนี้ · เกมคลินิก (chiptune, C major)
+M:4/4
+L:1/8
+Q:1/4=120
+K:C
+V:LD inst=chip role=melody gain=0.4
+!mark:hook! !mp! c2 e g c'4 | z8 | !mark:game! !mp! f2 a c' a4 | g2 b d' g4 | !mark:clinic! !mf! c/e/g/c'/ e'2 d'/c'/a/g/ e2 | a/c'/e'/a'/ e'2 c'/a/e/c/ e2 | f/a/c'/f'/ e'2 c'/a/f/c/ a2 | !mark:formula! !mp! z8 | c2 e g c'4 | !mark:drill! !mf! a/c'/e'/a'/ e'2 c'/a/e/c/ e2 | f/a/c'/f'/ e'2 c'/a/f/c/ a2 | g/b/d'/g'/ f'2 d'/b/g/d/ g2 | c/e/g/c'/ e'2 d'/c'/a/g/ e2 | !mark:exam! !f! a/c'/e'/a'/ e'2 c'/a/e/c/ e2 | f/a/c'/f'/ e'2 c'/a/f/c/ a2 | g/b/d'/g'/ f'2 d'/b/g/d/ g2 | !mark:report! !mf! c/e/g/c'/ e'2 d'/c'/a/g/ e2 | a/c'/e'/a'/ e'2 c'/a/e/c/ e2 | !mark:doctor! !mf! f/a/c'/f'/ e'2 c'/a/f/c/ a2 | g/b/d'/g'/ f'2 d'/b/g/d/ g2 | !mark:end! !mp! c2 e g c'4 | a2 g e c4 | [ce'g']2 z6 |
+V:TB inst=tri gain=0.7
+C,2 z2 C,2 z2 | A,,2 z2 A,,2 z2 | F,,2 z2 F,,2 z2 | G,,2 z2 G,,2 z2 | C,C C,C C,C C,C | A,,A, A,,A, A,,A, A,,A, | F,,F, F,,F, F,,F, F,,F, | G,,2 z2 G,,2 z2 | C,2 z2 C,2 z2 | A,,A, A,,A, A,,A, A,,A, | F,,F, F,,F, F,,F, F,,F, | G,,G, G,,G, G,,G, G,,G, | C,C C,C C,C C,C | A,,A, A,,A, A,,A, A,,A, | F,,F, F,,F, F,,F, F,,F, | G,,G, G,,G, G,,G, G,,G, | C,C C,C C,C C,C | A,,A, A,,A, A,,A, A,,A, | F,,F, F,,F, F,,F, F,,F, | G,,G, G,,G, G,,G, G,,G, | C,2 z2 C,2 z2 | A,,2 z2 A,,2 z2 | C,2 z6 |
+V:PD inst=warmpad gain=0.3
+[CEG]8 | [A,CE]8 | [A,CF]8 | [B,DG]8 | [CEG]8 | [A,CE]8 | [A,CF]8 | [B,DG]8 | [CEG]8 | [A,CE]8 | [A,CF]8 | [B,DG]8 | [CEG]8 | [A,CE]8 | [A,CF]8 | [B,DG]8 | [CEG]8 | [A,CE]8 | [A,CF]8 | [B,DG]8 | [CEG]8 | [A,CE]8 | [CEG]2 z6 |
+V:DR inst=drums kit=chip gain=0.7
+z8 | z8 | C,,2 z2 D,,2 z2 | C,, ^F,, D,, ^F,, D,,/D,,/D,,/D,,/ A,,A,, | C,, ^F,, D,, ^F,, C,, C,, D,, ^F,, | C,, ^F,, D,, ^F,, C,, C,, D,, ^F,, | C,, ^F,, D,, ^F,, C,, C,, D,, ^F,, | C,,2 z2 D,,2 z2 | C,, ^F,, D,, ^F,, D,,/D,,/D,,/D,,/ A,,A,, | !hit! [C,,^C,] ^F,, D,, ^F,, C,, C,, D,, ^F,, | C,, ^F,, D,, ^F,, C,, C,, D,, ^F,, | C,, ^F,, D,, ^F,, C,, C,, D,, ^F,, | C,, ^F,, D,, ^F,, D,,/D,,/D,,/D,,/ A,,A,, | !hit! [C,,^C,] ^F,, D,, ^F,, C,, C,, D,, ^F,, | C,, ^F,, D,, ^F,, C,, C,, D,, ^F,, | C,, ^F,, D,, ^F,, D,,/D,,/D,,/D,,/ A,,A,, | C,, ^F,, D,, ^F,, C,, C,, D,, ^F,, | C,, ^F,, D,, ^F,, C,, C,, D,, ^F,, | C,, ^F,, D,, ^F,, C,, C,, D,, ^F,, | C,, ^F,, D,, ^F,, D,,/D,,/D,,/D,,/ A,,A,, | C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | [C,,^C,]2 z6 |
+</script>
+<script>
+const V = OM.vars();
+OM.music({ bpm: 120 });
+const B = (n) => OM.beat(n);
+const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+const show = (el, t) => tl.set(el, { visibility: 'visible' }, t);
+const hide = (el, t) => tl.set(el, { visibility: 'hidden' }, t);
+const fadeOut = (el, t, d = .35) => { tl.fromTo(el, { opacity: 1 }, { opacity: 0, duration: d, ease: 'power2.in', immediateRender: false }, t - d); hide(el, t); };
+const fadeIn = (el, t, d = .4) => { show(el, t - .05); tl.fromTo(el, { opacity: 0 }, { opacity: 1, duration: d, immediateRender: false }, t - .05); };
+let cur = null;
+const screen = (id, t, from = 'right') => {
+  const el = '#' + id; const prev = cur; cur = el;
+  tl.fromTo(el, { opacity: 1, xPercent: from === 'right' ? 100 : 0, yPercent: from === 'up' ? 100 : 0 }, { xPercent: 0, yPercent: 0, duration: .45, ease: 'power3.inOut', immediateRender: false }, t);
+  if (prev && from !== 'none') tl.fromTo(prev, { xPercent: 0 }, { xPercent: from === 'right' ? -35 : 0, opacity: from === 'fade' ? 0 : 1, duration: .45, ease: 'power3.inOut', immediateRender: false }, t);
+  if (prev) tl.set(prev, { opacity: 0 }, from === 'none' ? t : t + .46);
+  tl.fromTo(el, { scale: 1 }, { scale: 1.05, duration: 4, ease: 'none', transformOrigin: '50% 20%', immediateRender: false }, t);
+};
+const caption = (k, t, at, bottom = '') => {
+  tl.to('.cap', { opacity: 0, y: -14, duration: .15, ease: 'power1.in' }, at - .15);
+  tl.call(() => {}, null, at);
+  tl.set('#capK', { textContent: k }, at); tl.set('#capT', { innerHTML: t }, at); tl.set('#capB', { textContent: bottom }, at);
+  tl.fromTo('.cap', { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .35, immediateRender: false }, at);
+  tl.fromTo('#capB', { opacity: 0 }, { opacity: 1, duration: .35, immediateRender: false }, at + .1);
+};
+const ring = (at, box, dur) => { // box in screen px (640 wide)
+  tl.set('#ring', { left: box[0], top: box[1], width: box[2], height: box[3] }, at);
+  tl.fromTo('#ring', { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: .35, ease: 'back.out(1.6)', immediateRender: false }, at);
+  tl.to('#ring', { opacity: 0, duration: .25 }, at + dur);
+  OM.sfx('pop', at + .1, { gain: .35, note: 4 });
+};
+
+/* 1 · hook (0–4 s): the mascot is there at frame 0 */
+tl.addLabel('scene:hook', 0);
+tl.fromTo('.hLogo', { scale: 1.45, rotation: -10, y: 120 }, { scale: 1, rotation: 0, y: 0, duration: B(3), ease: 'expo.out' }, 0);
+tl.fromTo('.hT', { scale: 1.3, opacity: .4 }, { scale: 1, opacity: 1, duration: B(2), ease: 'expo.out' }, 0);
+OM.sfx('whoosh', .05, { gain: .4 });
+tl.fromTo('#hookL', { scale: 1 }, { scale: 1.06, duration: B(8), ease: 'none' }, 0);
+tl.fromTo('.hK', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: B(1.5) }, B(2));
+OM.sfx('pop', B(2.2), { gain: .4, note: 3 });
+tl.fromTo('.hLogo', { y: 0 }, { y: -20, duration: B(3), ease: 'sine.inOut' }, B(4));
+fadeOut('#hookL', B(8));
+
+/* 2 · game (4–8 s): officer = doctor, fund = patient */
+tl.addLabel('scene:game', B(8));
+fadeIn('#gameL', B(8));
+tl.fromTo('#gDoc', { x: -500, opacity: 0 }, { x: 0, opacity: 1, duration: B(1.5), ease: 'back.out(1.3)' }, B(8.5));
+tl.fromTo('#gFund', { x: 500, opacity: 0 }, { x: 0, opacity: 1, duration: B(1.5), ease: 'back.out(1.3)' }, B(10));
+OM.sfx('whoosh', B(8.6), { gain: .35, pan: -.4 }); OM.sfx('whoosh', B(10.1), { gain: .35, pan: .4 });
+tl.fromTo('#gXP', { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, duration: B(1), ease: 'back.out(2)' }, B(12.5));
+OM.sfx('chime', B(12.7), { gain: .35 });
+fadeOut('#gameL', B(16));
+
+/* 3 · clinic (8–14 s): the real app, district card, 57 / 53 / 4 */
+tl.addLabel('scene:clinic', B(16));
+fadeIn('#phoneL', B(16));
+tl.set('#capK', { textContent: 'แท็บคลินิก' }, 0); tl.set('#capT', { innerHTML: 'เห็นทั้ง<b>อำเภอ</b>ในจอเดียว' }, 0);
+tl.fromTo('#phone', { y: 900, rotation: 6 }, { y: 0, rotation: 0, duration: B(2), ease: 'power4.out' }, B(16));
+screen('s02', B(16) - .01, 'none');
+OM.sfx('thud', B(16.8), { gain: .45 });
+ring(B(19), [30, 255, 570, 240], B(3));
+tl.set('#capB', { textContent: '57 หมู่บ้าน · เงินครบ 53 · ป่วย 4' }, B(19));
+tl.fromTo('#capB', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .35, immediateRender: false }, B(19));
+screen('s04', B(23), 'up');
+caption('กดตัวเลข', 'เห็นรายชื่อ<b>หมู่บ้านป่วย</b>ทันที', B(23), '');
+OM.sfx('whoosh', B(23.1), { gain: .3 });
+
+/* 4 · formula (14–18 s) */
+tl.addLabel('scene:formula', B(28));
+fadeOut('#phoneL', B(28));
+fadeIn('#formL', B(28));
+tl.fromTo('.fBox', { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: B(1.5) }, B(28));
+gsap.utils.toArray('#formL .stat').forEach((s, i) => {
+  tl.fromTo(s, { opacity: 0, x: i % 2 ? 300 : -300 }, { opacity: 1, x: 0, duration: B(.9), ease: 'back.out(1.4)' }, B(30 + i));
+  OM.sfx('pop', B(30 + i) + .1, { gain: .35, note: 6 - i, pan: i % 2 ? .3 : -.3 });
+});
+fadeOut('#formL', B(36));
+
+/* 5 · drill down (18–26 s): district › tambon › ward › exam room */
+tl.addLabel('scene:drill', B(36));
+fadeIn('#phoneL', B(36));
+screen('s02', B(36), 'none');
+caption('ตรวจทีละระดับ', 'อำเภอ › ตำบล › <b>หมู่บ้าน</b>', B(36), 'ตำบลที่ป่วยมากสุดขึ้นก่อน');
+screen('s05', B(40)); OM.sfx('whoosh', B(40.1), { gain: .3 });
+tl.set('#capB', { textContent: 'ตำบลที่ป่วยมากสุดขึ้นก่อน' }, B(40));
+screen('s06', B(44)); OM.sfx('whoosh', B(44.1), { gain: .3 });
+caption('วอร์ดตำบล', 'เรียงจาก<b>เงินน้อยสุด</b>', B(44), 'กดหมู่บ้าน เข้าห้องตรวจ');
+screen('s07', B(48)); OM.sfx('whoosh', B(48.1), { gain: .3 });
+caption('ห้องตรวจหมู่บ้าน', 'จอ<b>สัญญาณชีพ</b>', B(48), 'บัญชี · ลูกหนี้ · เสี่ยง · รวมสุทธิ');
+ring(B(49), [30, 840, 580, 450], B(2.6));
+
+/* 6 · diagnosis + XP (26–32 s) */
+tl.addLabel('scene:exam', B(52));
+screen('s09', B(52), 'up'); OM.sfx('whoosh', B(52.1), { gain: .3 });
+caption('ผลวินิจฉัย', 'พร้อม<b>ใบสั่งการรักษา</b>', B(52), 'ขาด 60,000 บาท → แผนติดตามหนี้');
+ring(B(56.5), [30, 1130, 290, 110], B(1.5));
+screen('s10', B(58), 'fade');
+caption('บันทึกการตรวจ', 'ได้ <b>+40 XP</b> +30 เหรียญ', B(58), 'ปุ่ม "คนไข้ถัดไป" ไปเคสต่อไป');
+OM.sfx('sparkle', B(58.3), { gain: .45 }); OM.sfx('chime', B(58.6), { gain: .35 });
+tl.fromTo('#phone', { scale: 1 }, { scale: 1.06, duration: B(6), ease: 'none', immediateRender: false }, B(58));
+
+/* 7 · report (32–36 s) */
+tl.addLabel('scene:report', B(64));
+tl.to('#phone', { scale: 1, duration: .3 }, B(64) - .3);
+screen('s13', B(64)); OM.sfx('whoosh', B(64.1), { gain: .3 });
+caption('แท็บรายงาน', 'สรุปเสนอ<b>ผู้บังคับบัญชา</b>', B(64), '');
+screen('s14', B(68), 'up');
+ring(B(68.6), [12, 1012, 616, 98], B(2.6));
+tl.set('#capB', { textContent: 'คัดลอกไป LINE · Excel · CSV' }, B(68.6));
+tl.fromTo('#capB', { opacity: 0 }, { opacity: 1, duration: .3, immediateRender: false }, B(68.6));
+
+/* 8 · doctor ranks (36–40 s) */
+tl.addLabel('scene:doctor', B(72));
+fadeOut('#phoneL', B(72));
+fadeIn('#docL', B(72));
+gsap.utils.toArray('#docL .dC').forEach((c, i) => {
+  tl.fromTo(c, { opacity: 0, y: 160, scale: .8 }, { opacity: 1, y: 0, scale: 1, duration: B(1.2), ease: 'back.out(1.5)' }, B(72.5 + i * 1.5));
+  OM.sfx('pop', B(72.6 + i * 1.5), { gain: .4, note: 2 + i * 2 });
+});
+fadeOut('#docL', B(80));
+
+/* 9 · end (40–46 s) */
+tl.addLabel('scene:end', B(80));
+fadeIn('#endL', B(80));
+tl.fromTo('.eLogo', { scale: .7, opacity: 0 }, { scale: 1, opacity: 1, duration: B(2), ease: 'back.out(1.5)' }, B(80));
+OM.sfx('chime', B(80.4), { gain: .4 });
+tl.fromTo('.eT', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: B(1.5) }, B(81.5));
+tl.fromTo('.eS', { opacity: 0 }, { opacity: 1, duration: B(1) }, B(83));
+tl.fromTo('.qr', { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, duration: B(1), ease: 'back.out(1.8)' }, B(84));
+OM.sfx('pop', B(84.2), { gain: .4, note: 5 });
+tl.fromTo(['.eU', '.eN'], { opacity: 0 }, { opacity: 1, duration: B(1), stagger: B(.5) }, B(85));
+tl.to({}, { duration: B(92) - B(87) + V.endHold }, B(87));
+
+window.__timelines['film'] = tl;
+</script>
+</body>
+</html>
