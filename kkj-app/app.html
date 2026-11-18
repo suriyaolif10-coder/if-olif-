@@ -451,7 +451,7 @@ function Splash({ onDone }) {
 /* ================= app ================= */
 function App() {
   const [splash, setSplash] = useState(true);
-  const [villages, setVillages] = useState(() => { const s = store.get(K.data, null); return Array.isArray(s) && s.length ? s.map(finish) : seed(); });
+  const [villages, setVillages] = useState(() => { const s = store.get(K.data, null); return Array.isArray(s) ? s.map(finish) : seed(); });
   const [meta, setMeta] = useState(() => store.get(K.meta, { source: 'ข้อมูลชีต ปีงบประมาณ 2569', at: null, sheetRows: null }));
   const [game, setGame] = useState(() => Object.assign({ xp: 0, coins: 0, checked: {}, wards: {}, badges: {} }, store.get(K.game, {})));
   const [tab, setTab] = useState('clinic');
@@ -480,21 +480,23 @@ function App() {
     setModal({ type: 'list', title, sub: scope, items: sel.slice().sort((a, b) => a.net - b.net) });
   };
 
-  function replaceVillages(rows, label) {
+  function replaceVillages(rows, label, fresh) {
     const districts = new Set(rows.map((v) => v.district));
-    setVillages((cur) => cur.filter((v) => !districts.has(v.district)).concat(rows));
+    setVillages((cur) => (fresh ? rows : cur.filter((v) => !districts.has(v.district)).concat(rows)));
     setMeta((m) => Object.assign({}, m, { source: label, at: new Date().toISOString() }));
     return [...districts];
   }
 
   /* ---------- import ---------- */
-  async function importFile(file) {
+  async function importFile(file, mode) {
+    const fresh = mode !== 'add';
     setModal({ type: 'import', stage: 'reading', name: file.name });
     try {
       const rows = await readAnyFile(file);
       if (!rows.length) throw new Error('ไม่พบแถวข้อมูลหมู่บ้าน ตรวจว่าเป็นชีต (กข.คจ.) แยกตามจังหวัด หรือ CSV ที่มีหัว หมู่บ้าน, บัญชี, ลูกหนี้');
-      const ds = replaceVillages(rows, 'ไฟล์ ' + file.name);
-      setModal({ type: 'import', stage: 'done', name: file.name, rows, districts: ds });
+      const ds = replaceVillages(rows, 'ไฟล์ ' + file.name, fresh);
+      if (fresh) setPath({});
+      setModal({ type: 'import', stage: 'done', name: file.name, rows, districts: ds, fresh });
       award(50, 20, 'นำเข้า ' + rows.length + ' หมู่บ้าน');
     } catch (e) { setModal({ type: 'import', stage: 'error', name: file.name, error: e.message || String(e) }); }
   }
@@ -656,11 +658,13 @@ function App() {
   }
 
   const fileRef = useRef();
-  const pickFile = () => { if (fileRef.current) fileRef.current.click(); };
-  const onFile = (e) => { const f = e.target.files && e.target.files[0]; if (f) importFile(f); e.target.value = ''; };
+  const importMode = useRef('fresh');
+  const pickFile = (mode) => { importMode.current = mode === 'add' ? 'add' : 'fresh'; if (fileRef.current) fileRef.current.click(); };
+  const onFile = (e) => { const f = e.target.files && e.target.files[0]; if (f) importFile(f, importMode.current); e.target.value = ''; importMode.current = 'fresh'; };
+  const clearAll = () => { setVillages([]); setPath({}); setMeta({ source: 'ยังไม่มีข้อมูล', at: new Date().toISOString(), sheetRows: null }); say('ล้างข้อมูลแล้ว เหลือ 0 หมู่บ้าน'); };
 
   const lv = levelOf(game.xp), into = game.xp % 400;
-  const ctx = { villages, meta, game, path, go, openVillage, openList, enterWard, checkVillage, updateVillage, pushOne, setModal, say, award, pickFile, mcpOk, sync, pullSheet, readOldXlsx, exportExcel, exportCSV, setTab, setVillages, setMeta, setGame, pushAll: pushSheet, pullReport, pushReport };
+  const ctx = { villages, meta, game, path, go, openVillage, openList, enterWard, checkVillage, updateVillage, pushOne, setModal, say, award, pickFile, clearAll, mcpOk, sync, pullSheet, readOldXlsx, exportExcel, exportCSV, setTab, setVillages, setMeta, setGame, pushAll: pushSheet, pullReport, pushReport };
 
   return html`<${React.Fragment}>
     ${splash ? html`<${Splash} onDone=${() => setSplash(false)} />` : null}
@@ -674,7 +678,7 @@ function App() {
             <div class="muted small truncate">หมอแก้หนี้ by Olifsuriya · ${rankOf(game.xp)}</div>
             <div class="flex items-center gap-2 small mt-1"><span class="xpbar flex-1" style=${{ maxWidth: 140 }}><i style=${{ width: (into / 4) + '%' }}></i></span><span class="num muted">${into}/400 XP</span><span class="num">${b0(game.coins)} <i class="coin" aria-label="เหรียญ"></i></span></div>
           </div>
-          <button class="btn btn-gold" type="button" style=${{ minHeight: 40, padding: '8px 12px' }} onClick=${pickFile}>📥 นำเข้า</button>
+          <button class="btn btn-gold" type="button" style=${{ minHeight: 40, padding: '8px 12px' }} onClick=${() => pickFile('fresh')}>📥 นำเข้า</button>
         </div>
       </header>
       <main class="screen gut">
@@ -703,11 +707,11 @@ function ModalHost({ modal, ctx, close }) {
   }
   if (modal.type === 'import') {
     if (modal.stage === 'reading') return html`<${Modal} title="กำลังอ่านไฟล์..." sub=${modal.name} onClose=${close}><div class="grid justify-items-center gap-3 py-6"><div class="spin"></div><p class="muted">กำลังอ่านและคำนวณ รวมสุทธิ = บัญชี + ลูกหนี้ − เสียหาย</p></div></${Modal}>`;
-    if (modal.stage === 'error') return html`<${Modal} title="นำเข้าไม่สำเร็จ" sub=${modal.name} onClose=${close} footer=${html`<button class="btn btn-gold flex-1" type="button" onClick=${() => { close(); ctx.pickFile(); }}>เลือกไฟล์ใหม่</button>`}><p style=${{ color: 'var(--bad)' }}>${modal.error}</p></${Modal}>`;
+    if (modal.stage === 'error') return html`<${Modal} title="นำเข้าไม่สำเร็จ" sub=${modal.name} onClose=${close} footer=${html`<button class="btn btn-gold flex-1" type="button" onClick=${() => { close(); ctx.pickFile('fresh'); }}>เลือกไฟล์ใหม่</button>`}><p style=${{ color: 'var(--bad)' }}>${modal.error}</p></${Modal}>`;
     const a = agg(modal.rows);
     return html`<${Modal} title=${'นำเข้าสำเร็จ ' + modal.rows.length + ' หมู่บ้าน'} sub=${modal.name + ' · อ.' + modal.districts.join(', อ.')} onClose=${close}
       footer=${html`<button class="btn btn-navy flex-1" type="button" onClick=${() => ctx.go({}, 'clinic')}>ไปหน้า อำเภอ ›</button>`}>
-      <p class="small muted">เงินครบ ${a.good} · ป่วย ${a.sick} · ข้อมูลอำเภอเดิมที่ชื่อซ้ำถูกแทนที่ด้วยไฟล์นี้</p>
+      <p class="small muted">เงินครบ ${a.good} · ป่วย ${a.sick} · ${modal.fresh ? 'เริ่มใหม่: ล้างข้อมูลเดิมทั้งหมด ใช้ไฟล์นี้อย่างเดียว' : 'เพิ่มอำเภอ: เก็บข้อมูลเดิมไว้ อำเภอที่ชื่อซ้ำถูกแทนที่ด้วยไฟล์นี้'}</p>
       <p class="small font-semibold">5 รายการแรก</p>
       ${modal.rows.slice(0, 5).map((v) => html`<div key=${v.id} class="card" style=${{ padding: 12 }}><div class="row"><b>${v.name}</b><${Status} v=${v} /></div><div class="muted small">${v.address}</div><div class="small num">${baht(v.deposit)} + ${baht(v.loaned)} − ${baht(v.damaged)} = <b>${baht(v.net)}</b></div></div>`)}
     </${Modal}>`;
@@ -768,6 +772,15 @@ function Clinic(ctx) {
   }
   const districts = districtsOf(villages);
   const provs = uniq(villages.map((v) => v.province));
+  if (!villages.length) return html`
+    <section class="hero grid gap-4 justify-items-center text-center">
+      <${Logo} size=${110} />
+      <div class="text-2xl font-bold">ยังไม่มีข้อมูล · 0 หมู่บ้าน</div>
+      <div class="grid grid-cols-3 gap-2 w-full">${[['ทั้งหมด', ''], ['เงินครบ ≥280K', ' good'], ['ป่วย', ' sick']].map(([k, c]) => html`<div key=${k} class=${'tile' + c}><span class="k">${k}</span><span class="v">0</span></div>`)}</div>
+      <div class="small" style=${{ color: '#cfdaea' }}>เลือกไฟล์ Excel ชีต (กข.คจ.) แยกตามจังหวัด หรือ CSV เพื่อเริ่มตรวจ</div>
+      <button class="btn btn-gold w-full" type="button" onClick=${() => ctx.pickFile('fresh')}>📥 เลือกไฟล์ Excel/CSV</button>
+      <label for="fileInput" class="small" style=${{ color: '#cfdaea', textDecoration: 'underline' }}>ถ้าปุ่มไม่เปิด แตะที่นี่</label>
+    </section>`;
   return html`
     <section class="hero grid gap-4">
       <div class="flex items-start justify-between gap-3"><div class="min-w-0"><div class="small font-semibold" style=${{ letterSpacing: '.12em', color: '#c9d7ec' }}>NBL 280K · หมอแก้หนี้ BY OLIFSURIYA</div><div class="text-3xl font-bold mt-1">คลินิกหนี้ 280K</div><div class="small mt-1" style=${{ color: '#cfdaea' }}>จ.${provs.join(', จ.')} · ${districts.length} อำเภอ · ${villages.length} หมู่บ้าน · ${ctx.meta.source}</div></div><div style=${{ borderRadius: '50%', border: '3px solid var(--navy-2)', flex: 'none' }}><${Logo} size=${60} /></div></div>
@@ -777,7 +790,7 @@ function Clinic(ctx) {
     ${districts.map((d) => { const list = villages.filter((v) => v.district === d); const t = uniq(list.map((v) => v.tambon)).length;
       return html`<${UnitCard} key=${d} title=${'อำเภอ ' + d} badge=${'จ.' + list[0].province} sub=${'อ.' + d + ' จ.' + list[0].province + ' ' + (POSTAL[d] || '') + ' · ' + list.length + ' หมู่บ้าน'} list=${list}
         primary=${'ดูตำบล › ' + t + ' ตำบล'} onPrimary=${() => go({ district: d })} secondary=${'ดู ' + list.length + ' หมู่บ้าน ›'} onSecondary=${() => openList(list, 'all', 'อ.' + d)} />`; })}
-    <button class="btn btn-gold" type="button" onClick=${ctx.pickFile}>📥 เลือกไฟล์ Excel/CSV เพิ่มอำเภอ</button>`;
+    <div class="grid grid-cols-2 gap-2"><button class="btn btn-gold" type="button" onClick=${() => ctx.pickFile('fresh')}>📥 นำเข้าใหม่ (เริ่มใหม่)</button><button class="btn btn-navy" type="button" onClick=${() => ctx.pickFile('add')}>➕ เพิ่มอำเภอ</button></div>`;
 }
 
 /* ================= village (exam room) ================= */
@@ -924,8 +937,12 @@ function DataTab(ctx) {
 
     <section class="card grid gap-3">
       <div class="font-semibold">นำเข้าไฟล์ Excel / CSV</div>
-      <button class="btn btn-gold" type="button" onClick=${pickFile}>📥 เลือกไฟล์ Excel/CSV</button>
-      <label for="fileInput" class="btn btn-ghost small" style=${{ minHeight: 40 }}>ถ้าปุ่มบนไม่เปิด แตะที่นี่แทน</label>
+      <div class="grid grid-cols-2 gap-2">
+        <button class="btn btn-gold" type="button" onClick=${() => pickFile('fresh')}>📥 นำเข้าใหม่</button>
+        <button class="btn btn-navy" type="button" onClick=${() => pickFile('add')}>➕ เพิ่มอำเภอ</button>
+      </div>
+      <p class="small muted">นำเข้าใหม่ = ล้างข้อมูลเดิมทั้งหมดแล้วใช้ไฟล์นี้ · เพิ่มอำเภอ = เก็บของเดิม แทนเฉพาะอำเภอที่ชื่อซ้ำ</p>
+      <label for="fileInput" class="btn btn-ghost small" style=${{ minHeight: 40 }}>ถ้าปุ่มบนไม่เปิด แตะที่นี่แทน (นำเข้าใหม่)</label>
       <div class="small muted grid gap-1">
         <p>• ชีต "(กข.คจ.) แยกตามจังหวัด": แถว 0 หัวเรื่อง แถว 1 หัวหลัก แถว 2 หัวรอง แถว 3 เป็นต้นไปคือข้อมูล แอปหาแถวที่มีช่อง "จังหวัด" และ "อำเภอ" ใน 20 แถวแรกเอง</p>
         <p>• คอลัมน์: 1 จังหวัด · 2 อำเภอ · 3 ตำบล · 4 หมู่ที่ · 5 หมู่บ้าน · 6 ประธาน · 7 เบอร์ · 11 ลูกหนี้ · 12 บัญชี · 23 เงินมีปัญหา · 27 เงินเสียหาย</p>
@@ -961,7 +978,8 @@ function DataTab(ctx) {
       <div class="grid grid-cols-2 gap-2"><button class="btn btn-navy" type="button" onClick=${() => exportExcel(villages)}>📊 Excel (.xlsx)</button><button class="btn btn-ghost" type="button" onClick=${() => exportCSV(villages)}>📄 CSV</button></div>
     </section>
 
-    <button class="btn btn-danger" type="button" onClick=${() => setModal({ type: 'confirmReset', title: 'กลับไปใช้ข้อมูลตั้งต้น?', body: 'ข้อมูลที่นำเข้าหรือแก้ในเครื่องนี้จะหาย และกลับไปใช้ข้อมูลชีต 57 หมู่บ้านของ อ.โนนสัง', run: () => { setVillages(seed()); setMeta({ source: 'ข้อมูลชีต ปีงบประมาณ 2569', at: new Date().toISOString(), sheetRows: null }); } })}>กลับไปใช้ข้อมูลตั้งต้น</button>
+    <button class="btn btn-danger" type="button" onClick=${() => setModal({ type: 'confirmReset', title: 'ล้างข้อมูลทั้งหมด?', body: 'ข้อมูลหมู่บ้านในเครื่องนี้จะถูกลบจนเหลือ 0 แล้วเลือกไฟล์ใหม่เพื่อเริ่มต้น ข้อมูลใน Google Sheets ไม่ถูกลบ XP และตำแหน่งยังอยู่', run: ctx.clearAll })}>🗑️ ล้างข้อมูล (เริ่มจาก 0)</button>
+    <button class="btn btn-ghost" type="button" onClick=${() => setModal({ type: 'confirmReset', title: 'กลับไปใช้ข้อมูลตั้งต้น?', body: 'ข้อมูลที่นำเข้าหรือแก้ในเครื่องนี้จะหาย และกลับไปใช้ข้อมูลชีต 57 หมู่บ้านของ อ.โนนสัง', run: () => { setVillages(seed()); setMeta({ source: 'ข้อมูลชีต ปีงบประมาณ 2569', at: new Date().toISOString(), sheetRows: null }); } })}>กลับไปใช้ข้อมูลตั้งต้น (57 หมู่บ้าน)</button>
   </section>`;
 }
 
