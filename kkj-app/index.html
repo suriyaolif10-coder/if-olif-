@@ -187,6 +187,7 @@ const store = {
 const num = (v) => { if (typeof v === 'number') return Number.isFinite(v) ? v : 0; const s = String(v == null ? '' : v).replace(/[^0-9.\-]/g, ''); const x = parseFloat(s); return Number.isFinite(x) ? x : 0; };
 const txt = (v) => String(v == null ? '' : v).replace(/\s+/g, ' ').trim();
 const baht = (n) => (Math.round((+n || 0) * 100) / 100).toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const signed = (n) => (n > 0 ? '+' : n < 0 ? '−' : '') + baht(Math.abs(n));
 const b0 = (n) => Math.round(+n || 0).toLocaleString('th-TH');
 const normName = (s) => { s = txt(s).replace(/^บ้าน\s*/, ''); return s ? 'บ้าน ' + s : ''; };
 const key = (s) => txt(s).replace(/\s+/g, '');
@@ -200,7 +201,8 @@ const STATUS = [
 ];
 const statusOf = (net) => STATUS.find((s) => net >= s.min - 0.004);
 
-/* The one formula: รวมสุทธิ = บัญชี + ลูกหนี้ − เสี่ยง, เสี่ยง = มีปัญหา + เสียหาย */
+/* สูตร: รวมสุทธิ (รวมเสี่ยง) = บัญชี + (ลูกหนี้ + เสี่ยง) − เสี่ยง − เสียหาย = บัญชี + ลูกหนี้ − เสียหาย
+   เงินเสี่ยง = เงินมีปัญหา + เงินเสียหาย (แสดงเพื่อติดตาม) · ขาด/เกิน = รวมสุทธิ − 280,000 (ติดลบ = ขาด, บวก = เกิน) */
 function finish(v) {
   v.district = txt(v.district) || 'โนนสัง';
   v.province = txt(v.province) || 'หนองบัวลำภู';
@@ -210,8 +212,8 @@ function finish(v) {
   ['deposit', 'loaned', 'problem', 'damaged', 'fund', 'hh', 'problemHH', 'damagedHH', 'savers', 'savings'].forEach((k) => { v[k] = num(v[k]); });
   v.risk = Math.round((v.problem + v.damaged) * 100) / 100;
   v.circ = Math.round((v.deposit + v.loaned) * 100) / 100;
-  v.net = Math.round((v.deposit + v.loaned - v.risk) * 100) / 100;
-  v.gap = Math.round((STD - v.net) * 100) / 100;
+  v.net = Math.round((v.deposit + v.loaned - v.damaged) * 100) / 100;
+  v.gap = Math.round((v.net - STD) * 100) / 100;
   const s = statusOf(v.net); v.status = s.id; v.statusLabel = s.label;
   v.good = v.net >= STD - 0.004;
   const pc = POSTAL[v.district] || txt(v.postal);
@@ -227,7 +229,7 @@ function seed() {
 function agg(list) {
   const s = (k) => list.reduce((a, v) => a + v[k], 0);
   const by = (id) => list.filter((v) => v.status === id).length;
-  return { n: list.length, deposit: s('deposit'), loaned: s('loaned'), risk: s('risk'), circ: s('circ'), net: s('net'),
+  return { n: list.length, deposit: s('deposit'), loaned: s('loaned'), risk: s('risk'), damaged: s('damaged'), circ: s('circ'), net: s('net'),
     good: list.filter((v) => v.good).length, sick: list.filter((v) => !v.good).length,
     dm: by('ดีมาก'), d: by('ดี'), ss: by('เริ่มป่วย'), sh: by('ป่วยหนัก') };
 }
@@ -367,7 +369,7 @@ async function saveFile(filename, data, mime) {
 }
 
 /* ================= export ================= */
-const SHEET_HEAD = ['ลำดับ', 'หมู่', 'ตำบล', 'ชื่อหมู่บ้าน กขคจ.', 'ประธาน', 'เบอร์โทร', 'เงินในบัญชี', 'เงินลูกหนี้', 'เงินเสี่ยง (ลบออก)', 'รวมสุทธิ = บัญชี+ลูกหนี้-เสี่ยง', '280K - สุทธิ (ขาด/เกิน)', 'สถานะสุขภาพ', 'ที่อยู่เต็ม', 'ตำบล'];
+const SHEET_HEAD = ['ลำดับ', 'หมู่', 'ตำบล', 'ชื่อหมู่บ้าน กขคจ.', 'ประธาน', 'เบอร์โทร', 'เงินในบัญชี', 'เงินลูกหนี้', 'เงินเสี่ยง (ลบออก)', 'รวมสุทธิ = บัญชี+ลูกหนี้-เสี่ยง', 'ขาด/เกิน = รวมสุทธิ - 280,000', 'สถานะสุขภาพ', 'ที่อยู่เต็ม', 'ตำบล'];
 function villageRows(list) {
   return list.map((v, i) => [i + 1, v.moo, v.tambon, v.name, v.chair, v.phone, v.deposit, v.loaned, v.risk, v.net, v.gap, v.statusLabel, v.address, v.tambon]);
 }
@@ -421,7 +423,7 @@ function VRow({ v, onOpen, checked }) {
   return html`<button class="vrow" type="button" onClick=${() => onOpen(v)}>
     <div class="row items-start"><div class="min-w-0"><div class="font-semibold">${v.name} <span class="muted small">หมู่ ${v.moo}</span></div><div class="muted small">ต.${v.tambon} อ.${v.district}</div></div><${Status} v=${v} /></div>
     <div class="row small"><span class="muted">สุทธิ</span><b class="num" style=${{ color: v.good ? 'var(--fg)' : 'var(--bad)' }}>${baht(v.net)} ฿</b></div>
-    <div class="row small"><span class="muted">${v.gap > 0 ? 'ขาดจาก 280K' : 'เกิน 280K'}</span><span class="num">${baht(Math.abs(v.gap))} ฿</span></div>
+    <div class="row small"><span class="muted">ขาด/เกิน</span><span class="num" style=${{ color: v.gap < 0 ? 'var(--bad)' : 'var(--good)' }}>${signed(v.gap)} ฿</span></div>
     ${checked ? html`<div><span class="stamp">ตรวจแล้ว</span></div>` : null}
   </button>`;
 }
@@ -707,14 +709,14 @@ function ModalHost({ modal, ctx, close }) {
     </${Modal}>`;
   }
   if (modal.type === 'import') {
-    if (modal.stage === 'reading') return html`<${Modal} title="กำลังอ่านไฟล์..." sub=${modal.name} onClose=${close}><div class="grid justify-items-center gap-3 py-6"><div class="spin"></div><p class="muted">กำลังอ่านและคำนวณ รวมสุทธิ = บัญชี + ลูกหนี้ − เสี่ยง</p></div></${Modal}>`;
+    if (modal.stage === 'reading') return html`<${Modal} title="กำลังอ่านไฟล์..." sub=${modal.name} onClose=${close}><div class="grid justify-items-center gap-3 py-6"><div class="spin"></div><p class="muted">กำลังอ่านและคำนวณ รวมสุทธิ = บัญชี + ลูกหนี้ − เสียหาย</p></div></${Modal}>`;
     if (modal.stage === 'error') return html`<${Modal} title="นำเข้าไม่สำเร็จ" sub=${modal.name} onClose=${close} footer=${html`<button class="btn btn-gold flex-1" type="button" onClick=${() => { close(); ctx.pickFile(); }}>เลือกไฟล์ใหม่</button>`}><p style=${{ color: 'var(--bad)' }}>${modal.error}</p></${Modal}>`;
     const a = agg(modal.rows);
     return html`<${Modal} title=${'นำเข้าสำเร็จ ' + modal.rows.length + ' หมู่บ้าน'} sub=${modal.name + ' · อ.' + modal.districts.join(', อ.')} onClose=${close}
       footer=${html`<button class="btn btn-navy flex-1" type="button" onClick=${() => ctx.go({}, 'clinic')}>ไปหน้า อำเภอ ›</button>`}>
       <p class="small muted">เงินครบ ${a.good} · ป่วย ${a.sick} · ข้อมูลอำเภอเดิมที่ชื่อซ้ำถูกแทนที่ด้วยไฟล์นี้</p>
       <p class="small font-semibold">5 รายการแรก</p>
-      ${modal.rows.slice(0, 5).map((v) => html`<div key=${v.id} class="card" style=${{ padding: 12 }}><div class="row"><b>${v.name}</b><${Status} v=${v} /></div><div class="muted small">${v.address}</div><div class="small num">${baht(v.deposit)} + ${baht(v.loaned)} − ${baht(v.risk)} = <b>${baht(v.net)}</b></div></div>`)}
+      ${modal.rows.slice(0, 5).map((v) => html`<div key=${v.id} class="card" style=${{ padding: 12 }}><div class="row"><b>${v.name}</b><${Status} v=${v} /></div><div class="muted small">${v.address}</div><div class="small num">${baht(v.deposit)} + ${baht(v.loaned)} − ${baht(v.damaged)} = <b>${baht(v.net)}</b></div></div>`)}
     </${Modal}>`;
   }
   if (modal.type === 'confirmPush') {
@@ -777,7 +779,7 @@ function Clinic(ctx) {
     <section class="hero grid gap-4">
       <div class="flex items-start justify-between gap-3"><div class="min-w-0"><div class="small font-semibold" style=${{ letterSpacing: '.12em', color: '#c9d7ec' }}>NBL 280K · หมอแก้หนี้ BY OLIFSURIYA</div><div class="text-3xl font-bold mt-1">คลินิกหนี้ 280K</div><div class="small mt-1" style=${{ color: '#cfdaea' }}>จ.${provs.join(', จ.')} · ${districts.length} อำเภอ · ${villages.length} หมู่บ้าน · ${ctx.meta.source}</div></div><div style=${{ borderRadius: '50%', border: '3px solid var(--navy-2)', flex: 'none' }}><${Logo} size=${60} /></div></div>
       <${Tiles} list=${villages} onOpen=${(k) => openList(villages, k, 'ทุกอำเภอ')} />
-      <div class="small" style=${{ color: '#cfdaea' }}>รวมสุทธิ = บัญชี + ลูกหนี้ − เสี่ยง (มีปัญหา + เสียหาย) · ≥ 280,000 = เงินครบ</div>
+      <div class="small" style=${{ color: '#cfdaea' }}>รวมสุทธิ = บัญชี + ลูกหนี้ − เสียหาย · ขาด/เกิน = รวมสุทธิ − 280,000 · ≥ 280,000 = เงินครบ</div>
     </section>
     ${districts.map((d) => { const list = villages.filter((v) => v.district === d); const t = uniq(list.map((v) => v.tambon)).length;
       return html`<${UnitCard} key=${d} title=${'อำเภอ ' + d} badge=${'จ.' + list[0].province} sub=${'อ.' + d + ' จ.' + list[0].province + ' ' + (POSTAL[d] || '') + ' · ' + list.length + ' หมู่บ้าน'} list=${list}
@@ -797,7 +799,7 @@ function Village(ctx) {
   const ward = villages.filter((x) => x.district === v.district && x.tambon === v.tambon && x.id !== v.id && !game.checked[x.id]).sort((a, b) => a.net - b.net);
   const next = ward[0];
   const dx = [], rx = [];
-  if (!v.good) { dx.push('รวมสุทธิ ' + baht(v.net) + ' บาท ขาดจาก 280,000 อยู่ ' + baht(v.gap) + ' บาท'); rx.push('ตรวจยอดเงินฝากกับสมุดบัญชี และทะเบียนลูกหนี้ ให้ครบ 280,000'); }
+  if (!v.good) { dx.push('รวมสุทธิ ' + baht(v.net) + ' บาท ขาด/เกิน = ' + signed(v.gap) + ' บาท (ขาดจาก 280,000)'); rx.push('ตรวจยอดเงินฝากกับสมุดบัญชี และทะเบียนลูกหนี้ ให้ครบ 280,000'); }
   if (v.problem > 0) { dx.push('เงินมีปัญหา ' + baht(v.problem) + ' บาท' + (v.problemHH ? ' (' + v.problemHH + ' ครัวเรือน)' : '') + (v.problemCause ? ' สาเหตุ: ' + v.problemCause : '')); rx.push('ประชุมคณะกรรมการ ติดตามทวงถาม ทำหนังสือรับสภาพหนี้กับครัวเรือนที่ค้างชำระ'); if (v.problemAction) rx.push('ติดตามผลที่รายงานไว้: ' + v.problemAction); }
   if (v.damaged > 0) { dx.push('เงินเสียหาย ' + baht(v.damaged) + ' บาท' + (v.damagedCause ? ' สาเหตุ: ' + v.damagedCause : '')); rx.push('ตั้งคณะกรรมการตรวจสอบข้อเท็จจริง และรายงานอำเภอ'); }
   if (v.circ && v.deposit / v.circ >= 0.4) { dx.push('เงินค้างในบัญชี ' + Math.round(v.deposit / v.circ * 100) + '% ครัวเรือนยืมน้อย'); rx.push('ประชาสัมพันธ์ให้ครัวเรือนยากจนยื่นยืมเงินประกอบอาชีพตามระเบียบ'); }
@@ -826,14 +828,14 @@ function Village(ctx) {
       <div class="grid grid-cols-2 gap-2">
         <div class="money"><div class="k">เงินในบัญชี</div><div class="v">${baht(v.deposit)}</div></div>
         <div class="money"><div class="k">เงินลูกหนี้</div><div class="v">${baht(v.loaned)}</div></div>
-        <div class="money risk"><div class="k">เงินเสี่ยง (มีปัญหา ${b0(v.problem)} + เสียหาย ${b0(v.damaged)})</div><div class="v">${baht(v.risk)}</div></div>
+        <div class="money risk"><div class="k">เงินเสี่ยง ติดตาม (มีปัญหา ${b0(v.problem)} + เสียหาย ${b0(v.damaged)}) · หักเฉพาะเสียหาย</div><div class="v">${baht(v.risk)}</div></div>
         <div class="money net"><div class="k">รวมสุทธิ</div><div class="v" style=${{ color: v.good ? 'var(--good)' : 'var(--bad)' }}>${baht(v.net)}</div></div>
       </div>
-      <div class="small num muted">${baht(v.deposit)} + ${baht(v.loaned)} − ${baht(v.risk)} = <b style=${{ color: 'var(--fg)' }}>${baht(v.net)}</b> · ${v.gap > 0 ? 'ขาด ' + baht(v.gap) : 'เกิน ' + baht(-v.gap)} จาก 280,000</div>
+      <div class="small num muted">รวมสุทธิ = ${baht(v.deposit)} + ${baht(v.loaned)} − ${baht(v.damaged)} = <b style=${{ color: 'var(--fg)' }}>${baht(v.net)}</b> · ขาด/เกิน = ${baht(v.net)} − 280,000 = <b style=${{ color: v.gap < 0 ? 'var(--bad)' : 'var(--good)' }}>${signed(v.gap)}</b></div>
       <div><div class="row small"><span>รวมสุทธิ เทียบ 280K</span><span class="num">${Math.round(v.net / STD * 100)}%</span></div><div class="gauge"><i style=${{ width: pct(v.net / STD * 100), background: v.good ? 'var(--good)' : 'var(--bad)' }}></i></div></div>
       ${edit ? html`<div class="grid grid-cols-2 gap-2">
           ${[['deposit', 'เงินในบัญชี'], ['loaned', 'เงินลูกหนี้'], ['problem', 'เงินมีปัญหา'], ['damaged', 'เงินเสียหาย']].map(([k, l]) => html`<div class="field" key=${k}><label for=${'f-' + k}>${l}</label><input id=${'f-' + k} inputmode="decimal" value=${form[k]} onInput=${(e) => setForm(Object.assign({}, form, { [k]: e.target.value }))} /></div>`)}
-          <div class="small muted" style=${{ gridColumn: '1 / -1' }}>รวมสุทธิใหม่ = <b class="num" style=${{ color: 'var(--fg)' }}>${baht(num(form.deposit) + num(form.loaned) - num(form.problem) - num(form.damaged))}</b> บาท</div>
+          <div class="small muted" style=${{ gridColumn: '1 / -1' }}>รวมสุทธิใหม่ = <b class="num" style=${{ color: 'var(--fg)' }}>${baht(num(form.deposit) + num(form.loaned) - num(form.damaged))}</b> บาท</div>
           <button class="btn btn-ghost" type="button" onClick=${() => setEdit(false)}>ยกเลิก</button><button class="btn btn-gold" type="button" onClick=${save}>บันทึก${mcpOk ? ' + ส่งขึ้นชีต' : ''}</button>
         </div>` : html`<button class="btn btn-ghost" type="button" onClick=${startEdit}>✏️ แก้ตัวเลขของหมู่บ้านนี้</button>`}
       ${pushMsg ? html`<div class="small" style=${{ color: pushing ? 'var(--muted)' : 'var(--ok)' }}>${pushMsg}</div>` : null}
@@ -883,12 +885,13 @@ function Report(ctx) {
     '',
     '1. ภาพรวม: ' + a.n + ' หมู่บ้าน เงินครบ 280,000 บาท ' + a.good + ' หมู่บ้าน (ดีมาก ' + a.dm + ', ดี ' + a.d + ') ป่วย ' + a.sick + ' หมู่บ้าน (เริ่มป่วย ' + a.ss + ', ป่วยหนัก ' + a.sh + ')',
     '2. เงินทุน: เงินในบัญชี ' + baht(a.deposit) + ' บาท + เงินลูกหนี้ ' + baht(a.loaned) + ' บาท = หมุนเวียน ' + baht(a.circ) + ' บาท',
-    '   เงินเสี่ยง (มีปัญหา + เสียหาย) ' + baht(a.risk) + ' บาท · รวมสุทธิ ' + baht(a.net) + ' บาท',
+    '   เงินเสียหาย ' + baht(a.damaged) + ' บาท · รวมสุทธิ = บัญชี + ลูกหนี้ − เสียหาย = ' + baht(a.net) + ' บาท',
+    '   เงินเสี่ยงที่ต้องติดตาม (มีปัญหา + เสียหาย) ' + baht(a.risk) + ' บาท',
     '3. หมู่บ้านที่ต้องเร่งแก้ไข:',
-    ...(sick.length ? sick.map((v, i) => '   ' + (i + 1) + ') ' + v.name + ' หมู่ที่ ' + v.moo + ' ต.' + v.tambon + ' รวมสุทธิ ' + baht(v.net) + ' บาท ขาด ' + baht(v.gap) + ' บาท' + (v.problemCause ? ' (' + v.problemCause + ')' : '')) : ['   ไม่มี']),
+    ...(sick.length ? sick.map((v, i) => '   ' + (i + 1) + ') ' + v.name + ' หมู่ที่ ' + v.moo + ' ต.' + v.tambon + ' รวมสุทธิ ' + baht(v.net) + ' บาท ขาด/เกิน ' + signed(v.gap) + ' บาท' + (v.problemCause ? ' (' + v.problemCause + ')' : '')) : ['   ไม่มี']),
     '4. ข้อเสนอ: ติดตามทวงถามครัวเรือนที่ค้างชำระ ทำหนังสือรับสภาพหนี้ และรายงานผลทุกเดือน',
     '',
-    'สูตร: รวมสุทธิ = เงินในบัญชี + เงินลูกหนี้ − เงินเสี่ยง (เงินมีปัญหา + เงินเสียหาย) · ≥ 280,000 = เงินครบ',
+    'สูตร: รวมสุทธิ = เงินในบัญชี + เงินลูกหนี้ − เงินเสียหาย · ขาด/เกิน = รวมสุทธิ − 280,000',
     'จัดทำโดย หมอแก้หนี้ by Olifsuriya',
   ].join('\n');
   const copy = () => { try { navigator.clipboard.writeText(text).then(() => { say('คัดลอกรายงานแล้ว'); award(10, 0, 'ทำรายงาน'); }, () => say('คัดลอกไม่ได้ กดค้างที่ข้อความเพื่อเลือก')); } catch (e) { say('คัดลอกไม่ได้ กดค้างที่ข้อความเพื่อเลือก'); } };
@@ -900,14 +903,14 @@ function Report(ctx) {
       <div class="grid grid-cols-3 gap-2 text-center">
         ${[['หมู่บ้าน', a.n, '#1E3A5F'], ['เงินครบ', a.good, '#1b7a52'], ['ป่วย', a.sick, '#b4332f']].map(([k, n, c]) => html`<div key=${k} style=${{ border: '1.5px solid #d9cfb6', borderRadius: 14, padding: 8 }}><div class="small">${k}</div><div class="text-2xl font-bold num" style=${{ color: c }}>${n}</div></div>`)}
       </div>
-      <p class="small">เงินในบัญชี <b class="num">${baht(a.deposit)}</b> + เงินลูกหนี้ <b class="num">${baht(a.loaned)}</b> − เงินเสี่ยง <b class="num" style=${{ color: '#b4332f' }}>${baht(a.risk)}</b> = รวมสุทธิ <b class="num">${baht(a.net)}</b> บาท</p>
+      <p class="small">เงินในบัญชี <b class="num">${baht(a.deposit)}</b> + เงินลูกหนี้ <b class="num">${baht(a.loaned)}</b> − เงินเสียหาย <b class="num" style=${{ color: '#b4332f' }}>${baht(a.damaged)}</b> = รวมสุทธิ <b class="num">${baht(a.net)}</b> บาท · เงินเสี่ยงที่ต้องติดตาม (มีปัญหา + เสียหาย) <b class="num">${baht(a.risk)}</b></p>
       <div class="scroll-x"><table class="rep" style=${{ color: '#1b2a40' }}>
         <thead><tr><th style=${{ color: '#5b6b80' }}>ตำบล</th><th class="r" style=${{ color: '#5b6b80' }}>หมู่</th><th class="r" style=${{ color: '#5b6b80' }}>ครบ</th><th class="r" style=${{ color: '#5b6b80' }}>ป่วย</th><th class="r" style=${{ color: '#5b6b80' }}>เสี่ยง</th><th class="r" style=${{ color: '#5b6b80' }}>สุทธิ</th></tr></thead>
         <tbody>${tambons.map(({ t, a }) => html`<tr key=${t}><td>${t}</td><td class="r">${a.n}</td><td class="r">${a.good}</td><td class="r" style=${{ color: a.sick ? '#b4332f' : 'inherit', fontWeight: a.sick ? 600 : 400 }}>${a.sick}</td><td class="r">${b0(a.risk)}</td><td class="r">${b0(a.net)}</td></tr>`)}</tbody>
       </table></div>
       <div class="font-semibold" style=${{ color: 'var(--navy)' }}>หมู่บ้านที่ต้องเร่งแก้ไข (${sick.length})</div>
-      ${sick.length ? html`<ol class="grid gap-1 pl-5 list-decimal small">${sick.map((v) => html`<li key=${v.id}><button type="button" style=${{ background: 'none', border: 0, padding: 0, textAlign: 'left', color: 'inherit', textDecoration: 'underline' }} onClick=${() => openVillage(v)}>${v.name} หมู่ที่ ${v.moo} ต.${v.tambon}</button> · สุทธิ <b class="num">${baht(v.net)}</b> ขาด <b class="num" style=${{ color: '#b4332f' }}>${baht(v.gap)}</b>${v.problemCause ? ' · ' + v.problemCause : ''}</li>`)}</ol>` : html`<p class="small">ไม่มีหมู่บ้านป่วย</p>`}
-      <p class="small" style=${{ opacity: .75 }}>สูตร: รวมสุทธิ = เงินในบัญชี + เงินลูกหนี้ − เงินเสี่ยง (มีปัญหา + เสียหาย) · ≥ 280,000 = เงินครบ</p>
+      ${sick.length ? html`<ol class="grid gap-1 pl-5 list-decimal small">${sick.map((v) => html`<li key=${v.id}><button type="button" style=${{ background: 'none', border: 0, padding: 0, textAlign: 'left', color: 'inherit', textDecoration: 'underline' }} onClick=${() => openVillage(v)}>${v.name} หมู่ที่ ${v.moo} ต.${v.tambon}</button> · สุทธิ <b class="num">${baht(v.net)}</b> ขาด/เกิน <b class="num" style=${{ color: '#b4332f' }}>${signed(v.gap)}</b>${v.problemCause ? ' · ' + v.problemCause : ''}</li>`)}</ol>` : html`<p class="small">ไม่มีหมู่บ้านป่วย</p>`}
+      <p class="small" style=${{ opacity: .75 }}>สูตร: รวมสุทธิ = เงินในบัญชี + เงินลูกหนี้ − เงินเสียหาย · ขาด/เกิน = รวมสุทธิ − 280,000</p>
     </article>
     <div class="grid grid-cols-3 gap-2">
       <button class="btn btn-gold" type="button" onClick=${copy}>📋 คัดลอก</button>
