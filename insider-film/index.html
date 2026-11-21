@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="th" data-composition-variables='[
+  {"id":"name","type":"string","label":"ชื่อเพจ","default":"หนองบัว INSIDER"},
+  {"id":"tagline","type":"string","label":"สโลแกน","default":"รู้ลึก รู้จริง เรื่องหนองบัวลำภู"},
+  {"id":"cats","type":"string","label":"หมวดข่าว (คั่นด้วย |)","default":"ข่าวในพื้นที่|ข่าวราชการ · ประกาศ|เหตุด่วน · จราจร|งานบุญ · ประเพณี|เกษตร · ราคาพืชผล|ท่องเที่ยว · ของดี"},
+  {"id":"cta","type":"string","label":"คำชวนท้าย","default":"กดติดตามเพจ"},
+  {"id":"navy","type":"color","label":"กรมท่า","default":"#0f2347","group":"สี"},
+  {"id":"orange","type":"color","label":"ส้ม","default":"#f26a1f","group":"สี"},
+  {"id":"paper","type":"color","label":"กระดาษ","default":"#efe8da","group":"สี"},
+  {"id":"endHold","type":"number","label":"ค้างท้าย (วินาที)","default":1.0,"min":0.3,"max":5,"step":0.1,"group":"จังหวะ"}
+]'>
+<head>
+<meta charset="utf-8">
+<title>หนองบัว INSIDER · เปิดตัวเพจ</title>
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/om.js"></script>
+<style>
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Light.ttf);font-weight:300}
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Medium.ttf);font-weight:500}
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Bold.ttf);font-weight:700}
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Black.ttf);font-weight:900}
+@font-face{font-family:Taviraj;src:url(assets/fonts/Taviraj-Bold.ttf);font-weight:700}
+@font-face{font-family:Sarabun;src:url(assets/fonts/Sarabun-Regular.ttf);font-weight:400}
+@font-face{font-family:Sarabun;src:url(assets/fonts/Sarabun-SemiBold.ttf);font-weight:600}
+:root{--ink:#1b1a17;--red:#d7262e}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+#film{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--paper);font-family:Kanit,sans-serif;color:var(--ink)}
+#world{position:absolute;left:0;top:0;width:1080px;height:11520px;transform-origin:540px 960px;
+  background:
+    repeating-linear-gradient(0deg,transparent 0 46px,#0000000a 46px 47px),
+    radial-gradient(circle at 20% 30%,#ffffff55,transparent 40%),
+    var(--paper)}
+.sec{position:absolute;left:0;width:1080px;height:1920px}
+.clip{position:absolute;background:#fbf8f1;box-shadow:0 14px 30px #0003;padding:22px 30px;box-sizing:border-box}
+.photo{position:absolute;box-shadow:0 18px 40px #0004;background:#fff;padding:14px}
+.photo img{display:block;width:100%;height:100%;object-fit:cover}
+.tape{position:absolute;width:190px;height:54px;background:#f6e7a8b8;box-shadow:0 2px 4px #0002;mix-blend-mode:multiply}
+.news{font:700 40px Taviraj;color:var(--ink)}
+.kick{font:500 34px/1.6 Kanit;letter-spacing:4px;color:#c2490c;margin-bottom:10px}
+.big{font:900 150px/1.3 Kanit;color:var(--navy)}
+.mark{position:absolute;border:8px solid var(--red);border-radius:50%;opacity:.9}
+.hl{position:absolute;height:70px;background:#ffd23f99;mix-blend-mode:multiply;transform-origin:0 50%}
+.pin{position:absolute;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff8a80,var(--red) 60%,#7a0e12);box-shadow:0 4px 6px #0005}
+svg.string{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:visible}
+.cat{position:absolute;left:90px;right:90px;height:190px;display:flex;align-items:center;gap:28px;padding:0 40px;font:700 58px Kanit;color:var(--navy);white-space:nowrap}
+.cat i{font-style:normal;font-size:84px}
+.cat .n{margin-left:auto;font:700 44px Taviraj;color:var(--orange)}
+.stamp{position:absolute;border:8px solid var(--orange);color:var(--orange);font:900 70px Kanit;padding:6px 40px;border-radius:16px;letter-spacing:4px}
+</style>
+</head>
+<body>
+<div id="film" data-composition-id="film" data-width="1080" data-height="1920" data-om-signature="top-right">
+  <audio id="om-sound" src="assets/sound.wav" data-start="0" data-duration="61" data-track-index="8" data-volume="1"></audio>
+<div id="world">
+
+  <!-- S1 · hook: the cover, torn into the desk -->
+  <section class="sec" id="s1" style="top:0" data-om-id="hook">
+    <div class="photo" id="p1" style="left:40px;top:300px;width:1000px;height:680px;transform:rotate(-3deg)" data-om-id="cover"><img src="assets/cover.jpg"></div>
+    <div class="tape" style="left:120px;top:270px;transform:rotate(-20deg)"></div>
+    <div class="tape" style="left:820px;top:280px;transform:rotate(18deg)"></div>
+    <div class="clip" id="c1" style="left:70px;top:1080px;width:940px;transform:rotate(1.5deg)" data-om-id="hook-clip">
+      <div class="kick">เปิดตัวเพจข่าวใหม่</div><div class="big" data-var-text="name">หนองบัว INSIDER</div>
+    </div>
+    <img id="logo1" src="assets/logo.png" style="position:absolute;left:660px;top:1480px;width:360px;transform:rotate(8deg);filter:drop-shadow(0 16px 24px #0005)" data-om-id="logo-stamp">
+    <div class="clip" id="c1b" style="left:70px;top:1600px;width:520px;transform:rotate(-2deg)"><div class="news">LOCAL NEWS</div><div style="font:500 34px Kanit">NONG BUA LAMPHU · ISAN</div></div>
+  </section>
+
+  <!-- S2 · the line: รู้ลึก / รู้จริง / เรื่องหนองบัวลำภู -->
+  <section class="sec" id="s2" style="top:1920px" data-om-id="tagline">
+    <div class="photo" style="left:-60px;top:120px;width:700px;height:420px;transform:rotate(4deg)"><img src="assets/cover.jpg" style="object-position:0% 0%"></div>
+    <div class="clip" id="t1" style="left:360px;top:500px;width:680px;transform:rotate(-3deg)"><div class="big" style="font-size:190px">รู้ลึก</div></div>
+    <div class="clip" id="t2" style="left:40px;top:860px;width:700px;transform:rotate(2deg)"><div class="big" style="font-size:190px;color:#c2490c">รู้จริง</div></div>
+    <div class="clip" id="t3" style="left:80px;top:1230px;width:920px;transform:rotate(-1deg)"><div style="font:700 92px Kanit;color:var(--navy)">เรื่องหนองบัวลำภู</div></div>
+    <div class="hl" id="hl2" data-layout-allow-occlusion style="left:120px;top:1300px;width:820px"></div>
+    <div class="mark" id="m2" style="left:400px;top:480px;width:640px;height:330px;transform:rotate(-4deg)"></div>
+  </section>
+
+  <!-- S3 · six districts on a pin board -->
+  <section class="sec" id="s3" style="top:3840px" data-om-id="districts">
+    <div class="clip" style="left:140px;top:110px;width:800px;text-align:center;transform:rotate(-1deg)"><div class="kick">ข่าวครอบคลุม</div><div class="big" style="font-size:120px">6 อำเภอ</div></div>
+    <svg class="string" id="str3"></svg>
+    <img id="logo3" src="assets/logo.png" style="position:absolute;left:390px;top:860px;width:300px;filter:drop-shadow(0 12px 20px #0005)">
+    <div class="clip dist" style="left:60px;top:520px;width:430px"><div class="news">เมืองหนองบัวลำภู</div></div>
+    <div class="clip dist" style="left:620px;top:560px;width:330px"><div class="news">นากลาง</div></div>
+    <div class="clip dist" style="left:40px;top:1260px;width:330px"><div class="news">โนนสัง</div></div>
+    <div class="clip dist" style="left:650px;top:1250px;width:390px"><div class="news">ศรีบุญเรือง</div></div>
+    <div class="clip dist" style="left:120px;top:1560px;width:390px"><div class="news">สุวรรณคูหา</div></div>
+    <div class="clip dist" style="left:640px;top:1580px;width:300px"><div class="news">นาวัง</div></div>
+  </section>
+
+  <!-- S4 · what the page reports -->
+  <section class="sec" id="s4" style="top:5760px" data-om-id="categories">
+    <div class="clip" style="left:120px;top:110px;width:840px;text-align:center;transform:rotate(1deg)"><div class="kick">เรื่องที่เราจะรายงาน</div><div class="big" style="font-size:110px">ทุกเรื่องใกล้ตัว</div></div>
+    <div id="cats"></div>
+  </section>
+
+  <!-- S5 · insider -->
+  <section class="sec" id="s5" style="top:7680px" data-om-id="insider">
+    <div class="photo" style="left:60px;top:220px;width:960px;height:560px;transform:rotate(2deg)"><img src="assets/cover.jpg" style="object-position:50% 80%"></div>
+    <div class="clip" id="i1" style="left:90px;top:860px;width:900px;transform:rotate(-1.5deg)"><div style="font:700 96px/1.2 Kanit;color:var(--navy)">ข่าวใกล้ตัว<br><span style="color:#c2490c">จากคนในพื้นที่</span></div></div>
+    <div class="clip" id="i2" style="left:110px;top:1560px;width:860px;text-align:center;transform:rotate(1deg)"><div style="font:600 40px Kanit;letter-spacing:2px;color:var(--navy)">LOCAL NEWS · NONG BUA LAMPHU · ISAN REGION</div></div>
+    <div class="stamp" id="st5" style="left:330px;top:1290px;transform:rotate(-8deg)">INSIDER</div>
+  </section>
+
+  <!-- S6 · end card -->
+  <section class="sec" id="s6" style="top:9600px" data-om-id="end">
+    <img id="logo6" src="assets/logo.png" style="position:absolute;left:240px;top:150px;width:600px;filter:drop-shadow(0 20px 30px #0004)" data-om-id="end-logo">
+    <div class="clip" id="e1" style="left:100px;top:820px;width:880px;text-align:center"><div class="kick" data-var-text="tagline">รู้ลึก รู้จริง เรื่องหนองบัวลำภู</div><div style="font:900 104px Kanit;color:var(--navy)" data-var-text="cta">กดติดตามเพจ</div></div>
+    <div class="photo" id="qr6" style="left:380px;top:1150px;width:320px;height:320px;transform:rotate(-2deg)"><img src="assets/qr.png"></div>
+    <div class="tape" style="left:440px;top:1125px;transform:rotate(-6deg)"></div>
+    <div style="position:absolute;left:0;right:0;top:1530px;text-align:center;font:500 42px Kanit;color:var(--navy)" data-om-id="end-fb">Facebook · หนองบัว INSIDER</div>
+  </section>
+</div>
+</div>
+
+<script type="text/vnd.abc" id="om-score">
+X:1
+T:หนองบัว INSIDER · news ident (E minor pulse)
+M:4/4
+L:1/8
+Q:1/4=120
+K:Em
+V:PL inst=pluck gain=0.4
+!mark:hook! !mp! E/B/e/B/ z2 E/B/e/B/ z2 | C/G/c/G/ z2 C/G/c/G/ z2 | G,/D/G/D/ z2 G,/D/G/D/ z2 | !mark:tagline! !mf! D/A/d/A/ D/A/d/A/ D/A/d/A/ D/A/d/A/ | E/B/e/B/ E/B/e/B/ E/B/e/B/ E/B/e/B/ | C/G/c/G/ C/G/c/G/ C/G/c/G/ C/G/c/G/ | G,/D/G/D/ G,/D/G/D/ G,/D/G/D/ G,/D/G/D/ | !mark:districts! !mf! D/A/d/A/ D/A/d/A/ D/A/d/A/ D/A/d/A/ | E/B/e/B/ E/B/e/B/ E/B/e/B/ E/B/e/B/ | C/G/c/G/ C/G/c/G/ C/G/c/G/ C/G/c/G/ | G,/D/G/D/ G,/D/G/D/ G,/D/G/D/ G,/D/G/D/ | D/A/d/A/ D/A/d/A/ D/A/d/A/ D/A/d/A/ | E/B/e/B/ E/B/e/B/ E/B/e/B/ E/B/e/B/ | !mark:categories! !f! C/G/c/G/ C/G/c/G/ C/G/c/G/ C/G/c/G/ | G,/D/G/D/ G,/D/G/D/ G,/D/G/D/ G,/D/G/D/ | D/A/d/A/ D/A/d/A/ D/A/d/A/ D/A/d/A/ | E/B/e/B/ E/B/e/B/ E/B/e/B/ E/B/e/B/ | C/G/c/G/ C/G/c/G/ C/G/c/G/ C/G/c/G/ | G,/D/G/D/ G,/D/G/D/ G,/D/G/D/ G,/D/G/D/ | z8 | !mark:insider! !mf! E/B/e/B/ E/B/e/B/ E/B/e/B/ E/B/e/B/ | C/G/c/G/ C/G/c/G/ C/G/c/G/ C/G/c/G/ | G,/D/G/D/ G,/D/G/D/ G,/D/G/D/ G,/D/G/D/ | D/A/d/A/ D/A/d/A/ D/A/d/A/ D/A/d/A/ | E/B/e/B/ E/B/e/B/ E/B/e/B/ E/B/e/B/ | !mark:end! !mp! C/G/c/G/ z2 C/G/c/G/ z2 | G,/D/G/D/ z2 G,/D/G/D/ z2 | D/A/d/A/ z2 D/A/d/A/ z2 | E/B/e/B/ z2 E/B/e/B/ z2 | [Eeb]2 z6 |
+V:ST inst=strings gain=0.35
+[E,G,B,]8 | [C,E,G,]8 | [G,B,D]8 | [D,F,A,]8 | [E,G,B,]8 | [C,E,G,]8 | [G,B,D]8 | [D,F,A,]8 | [E,G,B,]8 | [C,E,G,]8 | [G,B,D]8 | [D,F,A,]8 | [E,G,B,]8 | [C,E,G,]8 | [G,B,D]8 | [D,F,A,]8 | [E,G,B,]8 | [C,E,G,]8 | [G,B,D]8 | !p! [E,B,]8 | [E,G,B,]8 | [C,E,G,]8 | [G,B,D]8 | [D,F,A,]8 | [E,G,B,]8 | [C,E,G,]8 | [G,B,D]8 | [D,F,A,]8 | [E,G,B,]8 | [E,B,E]2 z6 |
+V:GL inst=glock role=melody gain=0.4
+e2 g b e'4 | e2 g c' e'4 | d2 g b d'4 | d2 f a d'4 | e2 g b e'4 | e2 g c' e'4 | d2 g b d'4 | z8 | z8 | z8 | z8 | z8 | z8 | z8 | z8 | z8 | z8 | z8 | z8 | z8 | e2 g b e'4 | z8 | d2 g b d'4 | z8 | e2 g b e'4 | e2 g c' e'4 | d2 g b d'4 | d2 f a d'4 | e2 g b e'4 | e'2 z6 |
+V:BS inst=sinebass gain=0.6
+E,,4 z4 | C,,4 z4 | G,,4 z4 | D,,2 z D,, D,,2 z D,, | E,,2 z E,, E,,2 z E,, | C,,2 z C,, C,,2 z C,, | G,,2 z G,, G,,2 z G,, | D,,2 z D,, D,,2 z D,, | E,,2 z E,, E,,2 z E,, | C,,2 z C,, C,,2 z C,, | G,,2 z G,, G,,2 z G,, | D,,2 z D,, D,,2 z D,, | E,,2 z E,, E,,2 z E,, | C,,2 z C,, C,,2 z C,, | G,,2 z G,, G,,2 z G,, | D,,2 z D,, D,,2 z D,, | E,,2 z E,, E,,2 z E,, | C,,2 z C,, C,,2 z C,, | G,,2 z G,, G,,2 z G,, | z8 | E,,2 z E,, E,,2 z E,, | C,,2 z C,, C,,2 z C,, | G,,2 z G,, G,,2 z G,, | D,,2 z D,, D,,2 z D,, | E,,2 z E,, E,,2 z E,, | C,,4 z4 | G,,4 z4 | D,,4 z4 | E,,4 z4 | E,,2 z6 |
+V:DR inst=drums kit=cinematic gain=0.7
+z8 | z8 | C,,2 z2 z4 | C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | C,,2 z2 D,,/D,,/D,,/D,,/ A,,A,, | C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | C,,2 z2 D,,/D,,/D,,/D,,/ A,,A,, | !hit! C,,2 C,,2 D,,2 C,,2 | C,,2 C,,2 D,,2 C,,2 | C,,2 C,,2 D,,2 C,,2 | C,,2 C,,2 D,,2 C,,2 | C,,2 C,,2 D,,2 C,,2 | C,,2 C,,2 D,,2 C,,2 | !rise(! z8 | !rise)! !hit! C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | C,,2 z2 D,,/D,,/D,,/D,,/ A,,A,, | C,,2 z2 z4 | C,,2 z2 z4 | C,,2 z2 z4 | C,,2 z2 z4 | [C,,^C,]2 z6 |
+V:HT inst=drums kit=pop gain=0.3
+z8 | z8 | z8 | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | z8 | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | ^F,,^F,, ^F,,^F,, ^F,,^F,, ^F,,^F,, | z8 | z8 | z8 | z8 | z8 |
+</script>
+<script>
+const V = OM.vars();
+OM.music({ bpm: 120 });
+const B = (n) => OM.beat(n);
+const R = OM.random(21);
+const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+
+/* torn edges: a jagged polygon per clipping, seeded */
+function torn(el) {
+  const pts = [], n = 18, j = () => (R() * 1.6).toFixed(2);
+  for (let i = 0; i <= n; i++) pts.push(`${(i / n * 100).toFixed(1)}% ${j()}%`);
+  for (let i = 0; i <= n; i++) pts.push(`${100 - j()}% ${(i / n * 100).toFixed(1)}%`);
+  for (let i = n; i >= 0; i--) pts.push(`${(i / n * 100).toFixed(1)}% ${100 - j()}%`);
+  for (let i = n; i >= 0; i--) pts.push(`${j()}% ${(i / n * 100).toFixed(1)}%`);
+  el.style.clipPath = `polygon(${pts.join(',')})`;
+}
+document.querySelectorAll('.clip').forEach(torn);
+
+/* categories from the variable */
+const icons = ['📰', '🏛️', '🚨', '🙏', '🌾', '🏞️'];
+const box = document.getElementById('cats');
+V.cats.split('|').forEach((c, i) => {
+  const d = document.createElement('div'); d.className = 'clip cat';
+  d.style.top = (420 + i * 225) + 'px'; d.style.transform = `rotate(${i % 2 ? 1.2 : -1.2}deg)`;
+  d.innerHTML = `<i>${icons[i % icons.length]}</i>${c.trim()}<span class="n">${String(i + 1).padStart(2, '0')}</span>`;
+  box.appendChild(d); torn(d);
+});
+
+/* red string from each district to the logo */
+const svg = document.getElementById('str3');
+const ctr = [540, 1010];
+const dists = [...document.querySelectorAll('#s3 .dist')];
+dists.forEach((d) => {
+  const x = parseFloat(d.style.left) + parseFloat(d.style.width) / 2, y = parseFloat(d.style.top) + 40;
+  const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  l.setAttribute('x1', x); l.setAttribute('y1', y); l.setAttribute('x2', ctr[0]); l.setAttribute('y2', ctr[1]);
+  l.setAttribute('stroke', '#d7262e'); l.setAttribute('stroke-width', 5); l.setAttribute('class', 'thread');
+  const len = Math.hypot(ctr[0] - x, ctr[1] - y); l.setAttribute('stroke-dasharray', len); l.setAttribute('stroke-dashoffset', len);
+  svg.appendChild(l);
+  const p = document.createElement('div'); p.className = 'pin'; p.style.left = (x - 15) + 'px'; p.style.top = (y - 30) + 'px'; d.parentNode.appendChild(p);
+});
+
+/* camera: one desk, the camera travels down it */
+const cam = (k, at, dur = B(2)) => {
+  tl.to('#world', { y: -k * 1920, duration: dur, ease: 'power3.inOut' }, at);
+  tl.fromTo('#world', { rotation: 0 }, { rotation: k % 2 ? 1.5 : -1.5, duration: dur / 2, ease: 'sine.inOut', yoyo: true, repeat: 1, immediateRender: false }, at);
+  OM.sfx('whoosh', at + dur * .35, { gain: .35 });
+};
+const slap = (el, at, from = {}) => {
+  tl.fromTo(el, Object.assign({ scale: 1.5, opacity: 0, y: -40 }, from), { scale: 1, opacity: 1, y: 0, x: 0, duration: B(.75), ease: 'back.out(1.6)' }, at);
+  OM.sfx('paper', at + .15, { gain: .4, pan: R() - .5 });
+};
+
+/* 1 · hook (0–6 s) */
+tl.addLabel('scene:hook', 0);
+tl.set('#world', { y: 0 }, 0);
+tl.fromTo('#world', { scale: 1.25 }, { scale: 1, duration: B(4), ease: 'expo.out' }, 0);
+tl.fromTo('#p1', { rotation: -9 }, { rotation: -3, duration: B(3), ease: 'back.out(1.4)' }, 0);
+slap('#c1', B(2));
+slap('#logo1', B(4), { rotation: 40 });
+OM.sfx('stamp', B(4.3), { gain: .5 });
+slap('#c1b', B(6));
+tl.fromTo('#world', { scale: 1 }, { scale: 1.03, duration: B(5), ease: 'none', immediateRender: false }, B(6));
+tl.to('#world', { scale: 1, duration: B(1), ease: 'power2.inOut' }, B(11));
+
+/* 2 · tagline (6–14 s) */
+tl.addLabel('scene:tagline', B(12));
+cam(1, B(11.5));
+slap('#t1', B(14)); slap('#t2', B(16)); slap('#t3', B(18));
+tl.fromTo('#hl2', { scaleX: 0 }, { scaleX: 1, duration: B(1), ease: 'power2.out' }, B(19));
+OM.sfx('draw', B(19.2), { gain: .35 });
+tl.fromTo('#m2', { opacity: 0, scale: 1.4 }, { opacity: .9, scale: 1, duration: B(.75), ease: 'back.out(2)' }, B(21));
+OM.sfx('draw', B(21.1), { gain: .3 });
+
+/* 3 · six districts (14–26 s) */
+tl.addLabel('scene:districts', B(28));
+cam(2, B(27.5));
+tl.fromTo('#logo3', { scale: 0, rotation: -60 }, { scale: 1, rotation: 0, duration: B(1.5), ease: 'back.out(1.6)' }, B(30));
+OM.sfx('stamp', B(30.5), { gain: .45 });
+dists.forEach((d, i) => slap(d, B(32 + i * 2), { rotation: (i % 2 ? 10 : -10) }));
+gsap.utils.toArray('#s3 .pin').forEach((p, i) => tl.fromTo(p, { scale: 0 }, { scale: 1, duration: B(.4), ease: 'back.out(3)' }, B(32.5 + i * 2)));
+gsap.utils.toArray('#s3 .thread').forEach((l, i) => {
+  const len = l.getAttribute('stroke-dasharray');
+  tl.fromTo(l, { attr: { 'stroke-dashoffset': len } }, { attr: { 'stroke-dashoffset': 0 }, duration: B(1), ease: 'power2.inOut' }, B(33 + i * 2));
+});
+
+/* 4 · categories (26–40 s) */
+tl.addLabel('scene:categories', B(52));
+cam(3, B(51.5));
+gsap.utils.toArray('#cats .cat').forEach((c, i) => {
+  slap(c, B(56 + i * 3), { x: i % 2 ? 400 : -400, scale: 1.1 });
+  OM.sfx('pop', B(56 + i * 3) + .2, { gain: .35, note: i + 1 });
+});
+
+/* 5 · insider (40–50 s) */
+tl.addLabel('scene:insider', B(80));
+cam(4, B(79.5));
+slap('#i1', B(84));
+slap('#i2', B(92));
+tl.fromTo('#st5', { scale: 3, opacity: 0, rotation: -30 }, { scale: 1, opacity: 1, rotation: -8, duration: B(.5), ease: 'power4.in' }, B(88));
+OM.sfx('stamp', B(89), { gain: .6 }); OM.sfx('impact', B(89), { gain: .4 });
+tl.fromTo('#s5', { x: 0 }, { x: 0, duration: .01 }, 0);
+
+
+/* 6 · end (50–60 s) */
+tl.addLabel('scene:end', B(100));
+
+cam(5, B(99.5));
+tl.fromTo('#logo6', { scale: .4, opacity: 0, rotation: -20 }, { scale: 1, opacity: 1, rotation: 0, duration: B(2), ease: 'back.out(1.5)' }, B(102));
+OM.sfx('chime', B(102.5), { gain: .45 });
+slap('#e1', B(106));
+slap('#qr6', B(110), { rotation: 15 });
+tl.fromTo('#logo6', { y: 0 }, { y: -16, duration: B(4), ease: 'sine.inOut', yoyo: true, repeat: 1, immediateRender: false }, B(104));
+tl.to({}, { duration: B(120) - B(112) + V.endHold }, B(112));
+
+window.__timelines['film'] = tl;
+</script>
+</body>
+</html>
