@@ -1,0 +1,3 @@
+const L='/tmp/claude-0/-home-user-if-olif-/776feeeb-a532-50a4-ac9a-9e9eff770538/scratchpad/npmlibs';
+const MAP={'react.production.min.js':L+'/react-18.3.1/package/umd/react.production.min.js','react-dom.production.min.js':L+'/react-dom-18.3.1/package/umd/react-dom.production.min.js','htm.umd.js':L+'/htm-3.1.1/package/dist/htm.umd.js','index.global.js':L+'/tailwindcss-browser-4.1.11/package/dist/index.global.js'};
+module.exports=async(p)=>{await p.route(/^https?:\/\//,async r=>{const u=r.request().url();const k=Object.keys(MAP).find(k=>u.includes(k));if(k)return r.fulfill({path:MAP[k],contentType:'application/javascript'});return r.abort();});};

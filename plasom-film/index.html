@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="th" data-composition-variables='[
+  {"id":"title","type":"string","label":"ชื่อสินค้า","default":"ปลาส้มสายเดี่ยว"},
+  {"id":"sub","type":"string","label":"คำรอง","default":"สมุนไพร"},
+  {"id":"makerKicker","type":"string","label":"หัวข้อผู้ผลิต","default":"ผลิตโดย"},
+  {"id":"maker","type":"string","label":"ผู้ผลิต","default":"กลุ่มแปรรูปปลาบ้านห้วยบง"},
+  {"id":"province","type":"string","label":"จังหวัด","default":"จ.หนองบัวลำภู"},
+  {"id":"phone","type":"string","label":"เบอร์โทร","default":"โทร. 061-120-6733"},
+  {"id":"green","type":"color","label":"เขียว","default":"#56693a","group":"สี"},
+  {"id":"yellow","type":"color","label":"เหลือง","default":"#f6d90f","group":"สี"},
+  {"id":"red","type":"color","label":"แดง","default":"#e0245e","group":"สี"},
+  {"id":"endHold","type":"number","label":"ค้างท้าย (วินาที)","default":0.6,"min":0.2,"max":5,"step":0.1,"group":"จังหวะ"}
+]'>
+<head>
+<meta charset="utf-8">
+<title>ปลาส้มสายเดี่ยว · ๑เดียว</title>
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/om.js"></script>
+<style>
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Light.ttf);font-weight:300}
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Medium.ttf);font-weight:500}
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Bold.ttf);font-weight:700}
+@font-face{font-family:Kanit;src:url(assets/fonts/Kanit-Black.ttf);font-weight:900}
+@font-face{font-family:Chonburi;src:url(assets/fonts/Chonburi-Regular.ttf)}
+:root{--ink:#141414;--cream:#fbf6e6;--deep:#3a4a26}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+#film{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--green);font-family:Kanit,sans-serif;color:var(--ink)}
+.layer{position:absolute;inset:0}
+.ctr{position:absolute;left:0;right:0;text-align:center;white-space:nowrap}
+.pat{position:absolute;top:-100px;bottom:-100px;width:150px;opacity:.55;background:
+  radial-gradient(circle at 50% 50%,#f6d90f55 0 9px,transparent 10px) 0 0/150px 110px,
+  radial-gradient(circle at 0 50%,#f6d90f33 0 22px,transparent 23px) 0 55px/150px 110px,
+  radial-gradient(circle at 100% 50%,#f6d90f33 0 22px,transparent 23px) 0 55px/150px 110px}
+#col{position:absolute;left:150px;width:780px;top:0;bottom:0;background:var(--yellow);transform-origin:50% 50%}
+.card{position:absolute;border-radius:26px;overflow:hidden;box-shadow:0 30px 70px #0006;background:#fff}
+.card img{width:100%;height:100%;object-fit:cover;display:block}
+.white{border:12px solid #fff}
+/* hook + product */
+#logo{position:absolute;left:340px;top:80px;width:400px}
+.t1{top:300px;font:400 98px/1.3 Chonburi}
+.t2{top:470px;font:400 150px/1.25 Chonburi;color:var(--red)}
+#bags{left:70px;top:860px;width:940px;height:493px}
+#plate{left:200px;top:1240px;width:820px;height:483px}
+/* herbs */
+.herb{position:absolute}
+.hBig{top:820px;font:400 190px/1.3 Chonburi;color:var(--yellow);text-shadow:0 12px 40px #0006}
+/* line */
+#lineL{visibility:hidden}
+#pan{left:-40px;top:520px;width:1900px;height:996px;border-radius:0;box-shadow:none}
+.kick{top:200px;font:700 54px Kanit;color:var(--cream);letter-spacing:10px}
+.kick2{top:1600px;font:400 110px/1.3 Chonburi;color:var(--yellow)}
+/* plate */
+#plateL{visibility:hidden}
+#plateHero{left:40px;top:560px;width:1000px;height:589px}
+.steam{position:absolute;width:240px;height:320px;border-radius:50%;background:radial-gradient(closest-side,#ffffffaa,transparent);filter:blur(24px)}
+.pT{top:200px;font:400 130px/1.3 Chonburi}
+.pS{top:1300px;font:400 150px/1.3 Chonburi;color:var(--red)}
+/* maker */
+#makerL{visibility:hidden}
+.mk{top:640px;font:500 56px Kanit;color:var(--yellow);letter-spacing:8px}
+.mName{top:760px;font:700 92px/1.4 Kanit;color:var(--cream)}
+.mProv{top:900px;font:400 120px/1.4 Chonburi;color:var(--yellow)}
+.mBags{position:absolute;left:140px;top:1180px;width:800px;height:419px}
+/* logo */
+#logoL{visibility:hidden}
+#bigLogo{position:absolute;left:190px;top:420px;width:700px}
+.lT{top:900px;font:400 108px/1.3 Chonburi}
+.lS{top:1050px;font:400 150px/1.3 Chonburi;color:var(--red)}
+.phone{top:1400px}
+.phone span{display:inline-block;background:var(--red);color:#fff;font:700 70px/1.4 Kanit;padding:6px 50px;border-radius:60px}
+.lMaker{top:1580px;font:500 44px Kanit;color:var(--ink)}
+</style>
+</head>
+<body>
+<div id="film" data-composition-id="film" data-width="1080" data-height="1920" data-fps="60" data-om-signature="top-right">
+  <audio id="om-sound" src="assets/sound.wav" data-start="0" data-duration="38" data-track-index="8" data-volume="1"></audio>
+  <div class="pat" id="patL" style="left:0"></div><div class="pat" id="patR" style="right:0"></div>
+  <div id="col" data-om-id="yellow-column"></div>
+
+  <!-- hook + product: the poster comes alive -->
+  <section id="posterL" class="layer" data-om-id="poster">
+    <img id="logo" src="assets/logo.png" data-om-id="logo">
+    <div class="ctr t1" data-om-id="title" data-var-text="title">ปลาส้มสายเดี่ยว</div>
+    <div class="ctr t2" data-om-id="sub" data-var-text="sub">สมุนไพร</div>
+    <div class="card" id="bags" data-om-id="bags"><img src="assets/bags.png"></div>
+    <div class="card white" id="plate" data-om-id="plate"><img src="assets/plate.png"></div>
+  </section>
+
+  <!-- herbs: the poster's own line drawings gather -->
+  <section id="herbsL" class="layer" data-om-id="herbs" style="visibility:hidden">
+    <img class="herb" id="h1" src="assets/herb-leaves.png" style="left:60px;top:300px;width:430px">
+    <img class="herb" id="h2" src="assets/herb-garlic.png" style="left:620px;top:280px;width:420px">
+    <img class="herb" id="h3" src="assets/herb-chili.png" style="left:40px;top:1240px;width:520px">
+    <img class="herb" id="h4" src="assets/herb-chili2.png" style="left:680px;top:1180px;width:360px">
+    <div class="ctr hBig" data-om-id="herbs-word" data-var-text="sub">สมุนไพร</div>
+  </section>
+
+  <!-- line: travel along the row of packs -->
+  <section id="lineL" class="layer" data-om-id="packs">
+    <div class="ctr kick" data-om-id="brand-kicker">๑เดียว · NUMBER ONE</div>
+    <div class="card" id="pan" data-om-id="packs-row"><img src="assets/bags.png"></div>
+    <div class="ctr kick2" data-om-id="packs-title" data-var-text="title">ปลาส้มสายเดี่ยว</div>
+  </section>
+
+  <!-- plate hero -->
+  <section id="plateL" class="layer" data-om-id="plate-hero">
+    <div class="ctr pT" data-om-id="plate-title" data-var-text="title">ปลาส้มสายเดี่ยว</div>
+    <div class="card white" id="plateHero" data-om-id="plate-photo"><img src="assets/plate.png"></div>
+    <div class="steam" id="st1" style="left:280px;top:640px"></div>
+    <div class="steam" id="st2" style="left:470px;top:600px"></div>
+    <div class="steam" id="st3" style="left:620px;top:660px"></div>
+    <div class="ctr pS" data-om-id="plate-sub" data-var-text="sub">สมุนไพร</div>
+  </section>
+
+  <!-- maker -->
+  <section id="makerL" class="layer" data-om-id="maker">
+    <div class="ctr mk" data-var-text="makerKicker">ผลิตโดย</div>
+    <div class="ctr mName" data-om-id="maker-name" data-var-text="maker">กลุ่มแปรรูปปลาบ้านห้วยบง</div>
+    <div class="ctr mProv" data-om-id="maker-province" data-var-text="province">จ.หนองบัวลำภู</div>
+    <div class="card white mBags" id="mBags"><img src="assets/bags.png"></div>
+  </section>
+
+  <!-- logo / end -->
+  <section id="logoL" class="layer" data-om-id="end">
+    <img id="bigLogo" src="assets/logo.png" data-om-id="end-logo">
+    <div class="ctr lT" data-om-id="end-title" data-var-text="title">ปลาส้มสายเดี่ยว</div>
+    <div class="ctr lS" data-om-id="end-sub" data-var-text="sub">สมุนไพร</div>
+    <div class="ctr phone" data-om-id="end-phone"><span data-var-text="phone">โทร. 061-120-6733</span></div>
+    <div class="ctr lMaker" data-om-id="end-maker">กลุ่มแปรรูปปลาบ้านห้วยบง · จ.หนองบัวลำภู</div>
+  </section>
+</div>
+
+<script type="text/vnd.abc" id="om-score">
+X:1
+T:ปลาส้มสายเดี่ยว · ลายอีสาน (A minor pentatonic, phin + khaen drone)
+M:4/4
+L:1/8
+Q:1/4=120
+K:Am
+V:GTR inst=guitar role=melody gain=0.45
+[M:4/4] !p! !mark:hook! A,2 CE A2 GE | D2 ED C2 A,C | A,2 CE A2 GE | D2 ED C2 A,C | !mp! !mark:herbs! A,2 CE A2 GE | D2 ED C2 A,C | A,2 CE A2 GE | D2 ED C2 A,C | A,2 CE A2 GE | !f! !mark:plate! D2 ED C2 A,C | A,2 CE A2 GE | D2 ED C2 A,C | !mf! !mark:duo! A,2 CE A2 GE | D2 ED C2 A,C | A,2 CE A2 GE | D2 ED C2 A,C | !mp! !mark:logo! A,2 CE A4 | G2 ED A,4 | [M:2/4] [A,EA]2 z2 |
+V:PAD inst=warmpad gain=0.28
+[M:4/4] !p! [A,E]8 | [D,A]8 | [A,E]8 | [D,A]8 | !mp! [A,E]8 | [D,A]8 | [A,E]8 | [D,A]8 | [A,E]8 | !f! [C,G]8 | [A,E]8 | [C,G]8 | !mf! [A,E]8 | [D,A]8 | [A,E]8 | [D,A]8 | !mp! [A,E]8 | [D,A]8 | [M:2/4] [A,E]2 z2 |
+V:BAS inst=sinebass gain=0.55
+[M:4/4] !p! A,,4 z4 | D,,4 z4 | A,,4 z4 | D,,4 z4 | !mp! A,,2 z2 A,,2 z2 | D,,2 z2 D,,2 z2 | A,,2 z2 A,,2 z2 | D,,2 z2 D,,2 z2 | A,,2 z2 A,,2 z2 | !f! D,,2 z2 D,,2 z2 | A,,2 z2 A,,2 z2 | D,,2 z2 D,,2 z2 | !mf! A,,2 z2 A,,2 z2 | D,,2 z2 D,,2 z2 | A,,2 z2 A,,2 z2 | D,,2 z2 D,,2 z2 | !mp! A,,2 z2 A,,2 z2 | D,,2 z2 D,,2 z2 | [M:2/4] A,,2 z2 |
+V:PC inst=drums kit=folk gain=0.5
+[M:4/4] !p! z8 | z8 | C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | !mp! C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,/D,,/D,,/D,,/ A,,A,, | !f! C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,/D,,/D,,/D,,/ A,,A,, | !mf! C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,/D,,/D,,/D,,/ A,,A,, | !mp! C,,2 z2 D,,2 z2 | C,,2 z2 z4 | [M:2/4] C,,2 z2 |
+V:MAR inst=marimba gain=0.4
+[M:4/4] !p! z8 | z8 | z8 | z8 | !mp! z8 | z8 | z8 | z8 | z8 | !f! d2 ed c2 Ac | e2 ce a2 ge | d2 ed c2 Ac | !mf! e2 ce a2 ge | d2 ed c2 Ac | e2 ce a2 ge | d2 ed c2 Ac | !mp! A2 cd e4 | g2 ed A4 | [M:2/4] [Ace]2 z2 |
+</script>
+<script>
+const V = OM.vars();
+OM.music({ bpm: 120 });
+const B = (n) => OM.beat(n);
+const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+const show = (el, t) => tl.set(el, { visibility: 'visible' }, t);
+const hide = (el, t) => tl.set(el, { visibility: 'hidden' }, t);
+const X = .4; // crossfade
+
+/* patterns drift the whole film */
+tl.fromTo('#patL', { y: 0 }, { y: 220, duration: B(76), ease: 'none' }, 0);
+tl.fromTo('#patR', { y: 0 }, { y: -220, duration: B(76), ease: 'none' }, 0);
+
+tl.set('#col', { scaleX: 1 }, 0);
+tl.set('#posterL', { opacity: 1, y: 0 }, 0);
+/* 1 · hook (0–3 s): the poster at frame 0, already moving */
+tl.addLabel('scene:hook', 0);
+tl.fromTo('#plate', { rotation: -14, scale: 1.3, x: 420, y: 260 }, { rotation: 3, scale: 1, x: 0, y: 0, duration: B(5), ease: 'expo.out' }, 0);
+tl.fromTo('#posterL', { scale: 1.18 }, { scale: 1, duration: B(6), ease: 'power2.out' }, 0);
+OM.sfx('whoosh', .15, { gain: .35 });
+tl.fromTo('#logo', { scale: 1.15, y: -10 }, { scale: 1, y: 0, duration: B(4) }, 0);
+tl.fromTo('.t1', { y: 30 }, { y: 0, duration: B(4) }, 0);
+tl.set('.t2', { opacity: 0 }, 0);
+tl.set('#bags', { opacity: 0 }, 0);
+OM.sfx('thud', B(1), { gain: .3 });
+
+/* 2 · product (3–8 s): สมุนไพร lands, the packs slide in behind the plate */
+tl.addLabel('scene:product', B(6));
+tl.fromTo('.t2', { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: B(1.5), ease: 'back.out(1.6)' }, B(6));
+OM.sfx('pop', B(6.3), { gain: .35, note: 5 });
+tl.fromTo('#bags', { opacity: 0, x: -700, rotation: -10 }, { opacity: 1, x: 0, rotation: -3, duration: B(2.5) }, B(8));
+OM.sfx('whoosh', B(8.4), { gain: .3, pan: -.4 });
+tl.fromTo('#plate', { x: 0, y: 0 }, { x: 60, y: 40, duration: B(6), ease: 'power1.inOut' , immediateRender: false }, B(10));
+tl.fromTo('#bags', { scale: 1 }, { scale: 1.05, duration: B(6), ease: 'none' , immediateRender: false }, B(10));
+
+/* 3 · herbs (8–13 s): the column opens away, the poster's herb drawings gather round the word */
+tl.addLabel('scene:herbs', B(16));
+tl.fromTo('#posterL', { opacity: 1, scale: 1 }, { opacity: 0, scale: 1.08, duration: X, ease: 'power2.in' }, B(16) - X);
+hide('#posterL', B(16));
+tl.fromTo('#col', { scaleX: 1 }, { scaleX: 0, duration: B(2), ease: 'power3.inOut' , immediateRender: false }, B(15.5));
+show('#herbsL', B(16) - X);
+tl.fromTo('.hBig', { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: B(2) }, B(16));
+['#h1', '#h2', '#h3', '#h4'].forEach((h, i) => {
+  const at = B(17 + i * 1.5);
+  tl.fromTo(h, { opacity: 0, scale: .5, rotation: i % 2 ? 25 : -25 }, { opacity: 1, scale: 1, rotation: 0, duration: B(1.5), ease: 'back.out(1.5)' }, at);
+  tl.fromTo(h, { y: 0 }, { y: i % 2 ? -30 : 30, duration: B(8), ease: 'sine.inOut' }, at);
+  OM.sfx('pop', at + .12, { gain: .3, note: i * 2 + 1, pan: i % 2 ? .3 : -.3 });
+});
+tl.to(['#h1', '#h2', '#h3', '#h4'], { x: (i) => [260, -260, 260, -200][i], y: (i) => [380, 400, -300, -260][i], scale: .3, opacity: 0, duration: B(1.5), ease: 'power3.in' }, B(24.5));
+tl.to('.hBig', { scale: .8, opacity: 0, duration: B(1.5), ease: 'power3.in' }, B(24.5));
+tl.fromTo('#herbsL', { scale: 1 }, { scale: 1.15, duration: B(10), ease: 'none' }, B(16));
+tl.fromTo('.hBig', { rotation: -3 }, { rotation: 3, duration: B(4), ease: 'sine.inOut', repeat: 1, yoyo: true }, B(17));
+hide('#herbsL', B(26));
+
+/* 4 · packs (13–18 s): travel along the row */
+tl.addLabel('scene:line', B(26));
+show('#lineL', B(26) - .2);
+tl.fromTo('#lineL', { opacity: 0 }, { opacity: 1, duration: .4, ease: 'power2.out' }, B(26) - .2);
+tl.fromTo('#pan', { x: 0, scale: 1.08 }, { x: -820, scale: 1, duration: B(10), ease: 'power1.inOut' }, B(26) - .2);
+tl.fromTo('.kick', { opacity: 0, letterSpacing: '30px' }, { opacity: 1, letterSpacing: '10px', duration: B(2) }, B(26.5));
+tl.fromTo('.kick2', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: B(1.5) }, B(29));
+OM.sfx('whoosh', B(26), { gain: .25 });
+
+/* 5 · plate (18–24 s): yellow floods back, the dish is the hero */
+tl.addLabel('scene:plate', B(36));
+tl.fromTo('#col', { scaleX: 0 }, { scaleX: 1.4, duration: B(1.5), ease: 'power3.inOut' , immediateRender: false }, B(35.5));
+tl.fromTo('#lineL', { opacity: 1 }, { opacity: 0, duration: X }, B(36) - X);
+hide('#lineL', B(36));
+show('#plateL', B(36) - .1);
+tl.fromTo('#plateHero', { y: 900, rotation: 8 }, { y: 0, rotation: -2, duration: B(2.5) }, B(36));
+OM.sfx('thud', B(36.8), { gain: .45 });
+tl.fromTo('#plateHero', { scale: 1 }, { scale: 1.32, duration: B(9), ease: 'power1.inOut', transformOrigin: '38% 62%' }, B(38.5));
+['#st1', '#st2', '#st3'].forEach((s, i) => tl.fromTo(s, { y: 120, opacity: 0, scale: .6 }, { y: -260, opacity: .9, scale: 1.4, duration: B(5), ease: 'sine.out', repeat: 1 }, B(37 + i)));
+tl.fromTo('.pT', { opacity: 0, y: -40 }, { opacity: 1, y: 0, duration: B(1.5) }, B(37));
+tl.fromTo('.pS', { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: B(1.5), ease: 'back.out(1.6)' }, B(40));
+OM.sfx('pop', B(40.3), { gain: .3, note: 5 });
+
+/* 6 · duo (24–28 s): the poster's composition again, packs and plate together */
+tl.addLabel('scene:duo', B(48));
+tl.fromTo('#col', { scaleX: 1.4 }, { scaleX: 1, duration: B(1.5), ease: 'power3.inOut' , immediateRender: false }, B(47.5));
+tl.fromTo('#plateL', { opacity: 1 }, { opacity: 0, duration: X }, B(48) - X);
+hide('#plateL', B(48));
+show('#posterL', B(48) - X);
+tl.fromTo('#posterL', { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: B(2) , immediateRender: false }, B(48) - X);
+tl.fromTo('#bags', { x: -300, opacity: 1, rotation: -3 }, { x: 0, opacity: 1, rotation: -3, duration: B(2) , immediateRender: false }, B(48));
+tl.fromTo('#plate', { x: 400, y: 40 }, { x: 0, y: 0, duration: B(2) , immediateRender: false }, B(48.5));
+tl.fromTo('#posterL', { y: 0 }, { y: -30, duration: B(8), ease: 'none' , immediateRender: false }, B(49));
+OM.sfx('whoosh', B(48), { gain: .25, pan: .3 });
+
+/* 7 · maker (28–32 s) */
+tl.addLabel('scene:maker', B(56));
+tl.fromTo('#col', { scaleX: 1 }, { scaleX: 0, duration: B(1.5), ease: 'power3.inOut' , immediateRender: false }, B(55.5));
+tl.fromTo('#posterL', { opacity: 1 }, { opacity: 0, duration: X , immediateRender: false }, B(56) - X);
+hide('#posterL', B(56));
+show('#makerL', B(56) - .1);
+tl.fromTo('.mk', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: B(1.5) }, B(56));
+tl.fromTo('.mName', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: B(1.5) }, B(56.8));
+tl.fromTo('.mProv', { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: B(1.5), ease: 'back.out(1.5)' }, B(58));
+tl.fromTo('#mBags', { y: 500, rotation: 6 }, { y: 0, rotation: -2, duration: B(2) }, B(57));
+tl.fromTo('#mBags', { scale: 1 }, { scale: 1.12, duration: B(6), ease: 'none' }, B(59));
+tl.fromTo('#makerL', { scale: 1.06 }, { scale: 1, duration: B(8), ease: 'power1.out' }, B(56));
+OM.sfx('pop', B(58.3), { gain: .3, note: 3 });
+
+/* 8 · logo (32–37 s) */
+tl.addLabel('scene:logo', B(64));
+tl.fromTo('#col', { scaleX: 0 }, { scaleX: 1.4, duration: B(1.5), ease: 'power3.inOut' , immediateRender: false }, B(63.5));
+tl.fromTo('#makerL', { opacity: 1 }, { opacity: 0, duration: X }, B(64) - X);
+hide('#makerL', B(64));
+show('#logoL', B(64) - .1);
+tl.fromTo('#bigLogo', { scale: .6, opacity: 0, rotation: -6 }, { scale: 1, opacity: 1, rotation: 0, duration: B(2), ease: 'back.out(1.4)' }, B(64));
+OM.sfx('chime', B(64.6), { gain: .4 });
+tl.fromTo('.lT', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: B(1.5) }, B(65.5));
+tl.fromTo('.lS', { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: B(1.5), ease: 'back.out(1.5)' }, B(66.5));
+tl.fromTo('.phone span', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: B(1.5), ease: 'back.out(1.5)' }, B(68));
+OM.sfx('pop', B(68.3), { gain: .35, note: 5 });
+tl.fromTo('.lMaker', { opacity: 0 }, { opacity: 1, duration: B(1.5) }, B(69));
+tl.fromTo('#logoL', { scale: 1 }, { scale: 1.04, duration: B(10), ease: 'none' }, B(66));
+tl.to({}, { duration: B(74) - B(70) + V.endHold }, B(70));
+
+window.__timelines['film'] = tl;
+</script>
+</body>
+</html>

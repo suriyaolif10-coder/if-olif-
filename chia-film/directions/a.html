@@ -1,0 +1,22 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="fonts.css"><script src="seeds.js"></script><style>
+.f{background:var(--paper)}
+.k{position:absolute;left:90px;top:150px;font:500 40px Prompt;color:var(--green);letter-spacing:2px}
+.t{position:absolute;left:90px;top:210px;font:700 120px/1.15 Prompt;color:var(--ink)}
+.t b{color:var(--green)}
+.glass{position:absolute;left:250px;top:700px;width:580px;height:760px;border:10px solid #cfd8dc;border-top:none;border-radius:0 0 90px 90px;background:linear-gradient(#e9f4f8aa,#d3e6ee)}
+.glass::before{content:'';position:absolute;left:-10px;right:-10px;top:-6px;height:12px;background:#dfe7ea;border-radius:8px}
+canvas{position:absolute;left:260px;top:900px}
+.step{position:absolute;left:90px;top:1600px;display:flex;gap:24px;font:500 46px Prompt;color:var(--ink);align-items:center}
+.step span{background:var(--green);color:#fff;border-radius:40px;padding:6px 30px}
+.jar{position:absolute;right:30px;top:1020px;height:500px;filter:drop-shadow(0 30px 30px #0003)}
+</style></head><body><div class="f" data-width="1080" data-height="1920">
+<div class="k">วิธีทาน · ไร่พระจันทร์</div>
+<div class="t">เมล็ดเจีย <b>1 ช้อน</b><br>+ น้ำเปล่า</div>
+<div class="glass"></div><canvas id="c" width="560" height="540"></canvas>
+<img class="jar" src="../assets/jar-black-400.png">
+<div class="step"><span>รอให้พองตัว</span> แล้วดื่มได้เลย</div>
+</div><script>
+const c=document.getElementById('c'),x=c.getContext('2d'),R=rng(3);
+for(let i=0;i<260;i++){const px=R()*540+10,py=60+Math.pow(R(),.7)*470;x.globalAlpha=.9;
+ x.fillStyle='rgba(255,255,255,.55)';x.beginPath();x.arc(px,py,17,0,7);x.fill();x.globalAlpha=1;seed(x,px,py,7,R()*6,R()<.15,R)}
+</script></body></html>

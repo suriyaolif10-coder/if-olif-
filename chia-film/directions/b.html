@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="fonts.css"><script src="seeds.js"></script><style>
+.f{background:radial-gradient(900px 1100px at 50% 55%,#4f6b45,#1d2a1b 80%)}
+canvas{position:absolute;inset:0}
+.floor{position:absolute;left:0;right:0;top:1420px;bottom:0;background:linear-gradient(#2a3a25,#121a10)}
+.j1{position:absolute;left:70px;top:560px;height:900px;filter:drop-shadow(0 40px 40px #000a);transform:rotate(-4deg)}
+.j2{position:absolute;left:520px;top:520px;height:960px;filter:drop-shadow(0 40px 40px #000a) brightness(1.03);transform:rotate(3deg)}
+.t{position:absolute;left:0;right:0;top:130px;text-align:center;font:700 112px/1.1 Prompt;color:#fff}
+.t small{display:block;font:500 46px Prompt;color:var(--orange);letter-spacing:6px;margin-top:20px}
+.badge{position:absolute;left:0;right:0;bottom:120px;text-align:center;font:500 40px Prompt;color:#dfe8d8}
+</style></head><body><div class="f" data-width="1080" data-height="1920">
+<div class="floor"></div><canvas id="c" width="1080" height="1920"></canvas>
+<img class="j1" src="../assets/jar-white-400.png"><img class="j2" src="../assets/jar-black-400.png">
+<div class="t">เมล็ดเจีย<small>WHITE · BLACK CHIA SEEDS</small></div>
+<div class="badge">100% Natural · ไม่ใส่น้ำตาล · มี อย.</div>
+</div><script>
+const x=document.getElementById('c').getContext('2d'),R=rng(11);
+for(let i=0;i<220;i++){const z=R();const px=R()*1080,py=R()*1500;x.globalAlpha=.4+z*.6;seed(x,px,py,4+z*14,R()*6,R()<.4,R)}
+</script></body></html>

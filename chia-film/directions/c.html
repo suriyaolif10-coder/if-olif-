@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="fonts.css"><script src="seeds.js"></script><style>
+.f{background:var(--paper)}
+canvas{position:absolute;left:0;top:380px}
+.k{position:absolute;left:0;right:0;top:220px;text-align:center;font:500 52px Prompt;color:var(--green);letter-spacing:4px}
+.sub{position:absolute;left:0;right:0;top:1060px;text-align:center;font:700 96px Prompt;color:var(--ink)}
+.sub small{display:block;font:300 48px Prompt;color:var(--brown)}
+.jar{position:absolute;left:50%;top:1320px;height:520px;transform:translateX(-50%);filter:drop-shadow(0 30px 30px #0003)}
+</style></head><body><div class="f" data-width="1080" data-height="1920">
+<div class="k">ส่วนประกอบ</div>
+<canvas id="c" width="1080" height="640"></canvas>
+<div class="sub">เมล็ดเจีย<small>ล้วน ๆ ไม่ผสม</small></div>
+<img class="jar" src="../assets/jar-white-400.png">
+</div><script>
+document.fonts.load('800 330px Prompt').then(()=>seedText(document.getElementById('c'),'100%','800 330px Prompt',{step:10,r:7,white:.18}));
+</script></body></html>

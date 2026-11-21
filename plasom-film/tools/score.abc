@@ -1,0 +1,16 @@
+X:1
+T:ปลาส้มสายเดี่ยว · ลายอีสาน (A minor pentatonic, phin + khaen drone)
+M:4/4
+L:1/8
+Q:1/4=120
+K:Am
+V:GTR inst=guitar role=melody gain=0.45
+!mp! !mark:hook! A,2 CE A2 GE | D2 ED C2 A,C | A,2 CE A2 GE | D2 ED C2 A,C | !mark:herbs! A,2 CE A2 GE | D2 ED C2 A,C | A,2 CE A2 GE | D2 ED C2 A,C | A,2 CE A2 GE | !mark:plate! D2 ED C2 A,C | A,2 CE A2 GE | D2 ED C2 A,C | !mark:duo! A,2 CE A2 GE | D2 ED C2 A,C | A,2 CE A2 GE | D2 ED C2 A,C | !mark:logo! A,2 CE A4 | G2 ED A,4 | [M:2/4] [A,EA]2 z2 |
+V:PAD inst=warmpad gain=0.28
+!p! [A,E]8 | [D,A]8 | [A,E]8 | [D,A]8 | [A,E]8 | [D,A]8 | [A,E]8 | [D,A]8 | [A,E]8 | [C,G]8 | [A,E]8 | [C,G]8 | [A,E]8 | [D,A]8 | [A,E]8 | [D,A]8 | [A,E]8 | [D,A]8 | [M:2/4] [A,E]2 z2 |
+V:BAS inst=sinebass gain=0.55
+A,,4 z4 | D,,4 z4 | A,,4 z4 | D,,4 z4 | A,,2 z2 A,,2 z2 | D,,2 z2 D,,2 z2 | A,,2 z2 A,,2 z2 | D,,2 z2 D,,2 z2 | A,,2 z2 A,,2 z2 | D,,2 z2 D,,2 z2 | A,,2 z2 A,,2 z2 | D,,2 z2 D,,2 z2 | A,,2 z2 A,,2 z2 | D,,2 z2 D,,2 z2 | A,,2 z2 A,,2 z2 | D,,2 z2 D,,2 z2 | A,,2 z2 A,,2 z2 | D,,2 z2 D,,2 z2 | [M:2/4] A,,2 z2 |
+V:PC inst=drums kit=folk gain=0.5
+!mp! C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | C,,2 z2 D,,2 z2 | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,/D,,/D,,/D,,/ A,,A,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,/D,,/D,,/D,,/ A,,A,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,2 ^F,,^F,, | C,,2 ^F,,^F,, D,,/D,,/D,,/D,,/ A,,A,, | C,,2 z2 D,,2 z2 | C,,2 z2 z4 | [M:2/4] C,,2 z2 |
+V:MAR inst=marimba gain=0.4
+z8 | z8 | z8 | z8 | z8 | z8 | z8 | z8 | z8 | d2 ed c2 Ac | e2 ce a2 ge | d2 ed c2 Ac | e2 ce a2 ge | d2 ed c2 Ac | e2 ce a2 ge | d2 ed c2 Ac | A2 cd e4 | g2 ed A4 | [M:2/4] [Ace]2 z2 |
