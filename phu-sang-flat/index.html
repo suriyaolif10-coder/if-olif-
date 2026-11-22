@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>ภูซาง หนองบัวลำภู (การ์ตูนไทย)</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="stage">
+  <div id="frame">
+    <canvas id="cv" width="1080" height="1920" aria-label="วิดีโอการ์ตูนประวัติศาสตร์: เขตงานภูซาง จังหวัดหนองบัวลำภู"></canvas>
+    <div id="hud">
+      <button id="bigplay" aria-label="เล่น">▶</button>
+      <div id="toast" role="status"></div>
+
+      <div id="timing" hidden>
+        <p id="timingNext"></p>
+        <button id="btnMark">● ทำเครื่องหมาย (Enter)</button>
+        <textarea id="timingOut" spellcheck="false" aria-label="เวลาของแต่ละบรรทัด"></textarea>
+        <button id="btnCopy">คัดลอกไปวางใน js/narration.js</button>
+      </div>
+
+      <div id="panel" hidden>
+        <h2>ตั้งค่า</h2>
+        <p id="voiceStatus"></p>
+        <label>เสียงบรรยาย <input id="vol_voice" type="range" min="0" max="1" step="0.01"></label>
+        <label>เพลงประกอบ <input id="vol_music" type="range" min="0" max="1" step="0.01"></label>
+        <label>เสียงบรรยากาศ / เอฟเฟกต์ <input id="vol_sfx" type="range" min="0" max="1" step="0.01"></label>
+        <label>การเปลี่ยนฉาก
+          <select id="transSel">
+            <option value="auto">ตามที่ตั้งในแต่ละฉาก</option><option value="fade">จางหาย (fade)</option><option value="slash">ปาดเฉียง (slash)</option>
+            <option value="iris">วงกลม (iris)</option><option value="ink">หมึกกระจาย (ink)</option><option value="panel">ช่องการ์ตูนเลื่อน (panel)</option><option value="none">ตัดทันที</option>
+          </select></label>
+        <label>ความยาวการเปลี่ยนฉาก <span id="transLenV">0.6 วิ</span><input id="transLen" type="range" min="0.2" max="1.5" step="0.1" value="0.6"></label>
+        <div class="files">
+          <label class="file">🎙 โหลดเสียงบรรยาย<input id="fileVoice" type="file" accept="audio/*"></label>
+          <label class="file">🎵 โหลดเพลงประกอบ<input id="fileMusic" type="file" accept="audio/*"></label>
+          <label class="file">📝 นำเข้าเวลาของคำ (JSON)<input id="fileWords" type="file" accept=".json,application/json"></label>
+          <button id="btnTiming">⏱ โหมดจับเวลาซับไตเติล (T)</button>
+          <button id="btnRec">⏺ บันทึกวิดีโอ (WebM)</button>
+        </div>
+        <p class="hint">ลากไฟล์เสียงหรือไฟล์ JSON มาวางบนวิดีโอได้ · Space เล่น/หยุด · ←/→ 5 วินาที · , . ทีละเฟรม · C ซับ · F เต็มจอ</p>
+      </div>
+
+      <div id="bar">
+        <div id="scrub"><div id="marks"></div><input id="seek" type="range" min="0" max="90" step="0.0333" value="0" aria-label="ตำแหน่งเวลา"></div>
+        <div id="row">
+          <button id="btnPlay" aria-label="เล่น/หยุด">▶</button>
+          <button id="btnPrev" aria-label="ฉากก่อนหน้า">⏮</button>
+          <button id="btnNext" aria-label="ฉากถัดไป">⏭</button>
+          <span id="time">0:00 / 1:30</span>
+          <span id="sceneName"></span>
+          <span class="sp"></span>
+          <button id="btnCC" class="on" aria-label="ซับไตเติล">CC</button>
+          <button id="btnMute" aria-label="ปิดเสียง">🔊</button>
+          <button id="btnSet" aria-label="ตั้งค่า">⚙</button>
+          <button id="btnFS" aria-label="เต็มจอ">⛶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<audio id="voice" preload="auto"></audio>
+<audio id="music" preload="auto" loop></audio>
+
+<script src="js/engine.js"></script>
+<script src="js/assets.js"></script>
+<script src="js/narration.js"></script>
+<script src="js/images.js"></script>
+<script src="js/scenes.js"></script>
+<script src="js/layers.js"></script>
+<script src="js/subtitles.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/player.js"></script>
+</body>
+</html>
