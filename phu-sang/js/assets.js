@@ -195,15 +195,25 @@ function hut(c, x, y, s) {   // simple forest shelter (thatch roof on poles)
   c.restore();
 }
 
-function stupa(c, x, y, s, glow = 0) {   // white memorial stupa (illustration)
+function stupa(c, x, y, s, glow = 0) {   // memorial stupa, drawn after its real shape: square base, tall white spire, finial
   c.save(); c.translate(x, y); c.scale(s, s);
-  if (glow > 0) { c.save(); c.globalAlpha = glow * 0.5; ink(c, P.ell(0, -260, 260, 300), '#fff3c4', null, { lw: 0 }); c.restore(); }
-  ink(c, P.rect(-200, -60, 400, 60), '#e8e4da', '#c6c0b2', { lw: 7 });
-  ink(c, P.rect(-160, -110, 320, 50), '#efebe2', '#cdc7b8', { lw: 7 });
-  ink(c, P.smooth([[-130, -110], [-120, -260], [0, -330], [120, -260], [130, -110]]), '#f6f3ec', '#d6d0c2', { lw: 8, dx: -18 });
-  ink(c, P.rect(-40, -370, 80, 40), '#efebe2', '#cdc7b8', { lw: 6 });
-  ink(c, P.poly([[-30, -370], [0, -520], [30, -370]]), '#f6f3ec', '#d6d0c2', { lw: 6 });
-  ink(c, P.ell(0, -530, 12, 12), '#e9c45a', null, { lw: 4 });
+  if (glow > 0) { c.save(); c.globalAlpha = glow * 0.5; ink(c, P.ell(0, -330, 280, 400), '#fff3c4', null, { lw: 0 }); c.restore(); }
+  const W_ = '#f4f2ec', WS = '#d4cfc4', G = '#d9a93a', GS = '#b38726';
+  ink(c, P.rect(-230, -40, 460, 40), W_, WS, { lw: 7 });                                   // plinth
+  ink(c, P.rect(-200, -200, 400, 160), W_, WS, { lw: 8, dx: -16 });                        // square base
+  for (const px of [-140, 0, 140]) ink(c, P.rect(px - 50, -170, 100, 40), '#2f2a24', null, { lw: 4 });   // plaques
+  ink(c, P.rr(-34, -140, 68, 100, 30), '#f7efd8', null, { lw: 5, stroke: G });           // arched niche
+  ink(c, P.rect(-230, -215, 460, 22), G, GS, { lw: 6 });                                   // gold cornice
+  ink(c, P.poly([[-210, -215], [-120, -470], [120, -470], [210, -215]]), W_, WS, { lw: 8, dx: -22 });   // lower pyramid
+  ink(c, P.rect(-128, -484, 256, 16), G, GS, { lw: 5 });
+  ink(c, P.poly([[-116, -484], [-60, -650], [60, -650], [116, -484]]), W_, WS, { lw: 7, dx: -16 });
+  ink(c, P.rect(-66, -662, 132, 14), G, GS, { lw: 5 });
+  ink(c, P.poly([[-56, -662], [-10, -900], [10, -900], [56, -662]]), W_, WS, { lw: 7, dx: -10 });     // slender spire
+  limb(c, [[0, -900], [0, -960]], '#8d8a84', 8, 4);
+  c.save(); c.translate(0, -965);                                                          // finial
+  c.beginPath(); c.moveTo(-70, 10); c.quadraticCurveTo(-30, -10, 0, 0); c.quadraticCurveTo(30, -10, 70, 10);
+  c.strokeStyle = INK; c.lineWidth = 16; c.lineCap = 'round'; c.stroke(); c.strokeStyle = '#8d8a84'; c.lineWidth = 8; c.stroke();
+  c.restore();
   c.restore();
 }
 

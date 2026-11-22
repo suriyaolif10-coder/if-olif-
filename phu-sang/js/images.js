@@ -18,7 +18,7 @@
 const IMAGE_SOURCES = {
   s3_archive:   { scene: 3, kind: 'archival', src: '', caption: 'ภาพหมู่บ้านชนบทอีสานในอดีต', credit: '' },
   s5_archive:   { scene: 5, kind: 'archival', src: '', caption: 'ภาพเอกสาร/หนังสือพิมพ์ในยุคนั้น', credit: '' },
-  s8_stupa:     { scene: 8, kind: 'photo',    src: '', caption: 'สถูปเขตงานภูซาง', credit: '' },
+  s8_stupa:     { scene: 8, kind: 'photo',    src: 'assets/images/phusang_stupa.jpg', caption: 'สถูปเขตงานภูซาง', credit: 'ภาพจากผู้จัดทำ (โปรดระบุชื่อผู้ถ่าย)' },
   s8_museum:    { scene: 8, kind: 'photo',    src: '', caption: 'พิพิธภัณฑ์เขตงานภูซาง', credit: '' },
 };
 

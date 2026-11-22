@@ -294,7 +294,7 @@ SC.memory = (c, t) => {
   ink(c, P.rect(-60, 1100, W + 120, 900), '#8fb06a', '#789655', { lw: 8, dx: 0, dy: -30 });
   c.save(); c.translate(-camX * 0.6, 0);
   museum(c, 1180, 1160, 0.75);
-  stupa(c, 420, 1240, 1.15, 0.5 + 0.3 * Math.sin(t * 1.5));
+  stupa(c, 430, 1250, 0.85, 0.5 + 0.3 * Math.sin(t * 1.5));
   c.restore();
   person(c, 'narrator', { x: E.lerp(1100, 760, E.seg(t, 0.5, 5)), y: 1500, s: 0.5, walk: t < 5, t, look: -1, flip: true, seed: 1 });
   const fl = [];   // flowers in the foreground
@@ -302,9 +302,10 @@ SC.memory = (c, t) => {
   ink(c, P.rect(-60, 1450, W + 120, 600), '#6f9a4f', '#5c8441', { lw: 8, dx: 0, dy: -20 });
   fl.forEach(([x, y, r], i) => blobs(c, [[x, y + Math.sin(t * 2 + i) * 4, r]], ['#f4d35e', '#ee964b', '#f95738', '#ffffff'][i % 4], null, { lw: 5 }));
   caption(c, 'สถูปและพิพิธภัณฑ์เขตงานภูซาง', 540, 230, { size: 42, k: E.outBack(E.seg(t, 1.0, 1.6)) });
-  txt(c, 'ภาพวาดจำลอง ไม่ใช่รูปลักษณ์จริงของสถานที่', 540, 330, 28, { alpha: E.seg(t, 1.4, 2.0) });
-  photoSlot(c, 's8_stupa', 540, 760, 720, -0.03, E.seg(t, 2.4, 2.9) * (1 - E.seg(t, 5.8, 6.1)));
-  photoSlot(c, 's8_museum', 540, 760, 720, 0.03, E.seg(t, 6.1, 6.6));
+  txt(c, 'ภาพวาดจำลองจากรูปทรงของสถานที่จริง', 540, 330, 28, { alpha: E.seg(t, 1.4, 2.0) });
+  const hasMuseum = !!PHOTOS.s8_museum;     // with no museum photo, the stupa photo stays to the end of the scene
+  photoSlot(c, 's8_stupa', 540, 830, 600, -0.03, E.seg(t, 2.4, 2.9) * (hasMuseum ? 1 - E.seg(t, 5.8, 6.1) : 1 - E.seg(t, 9.4, 9.8)));
+  photoSlot(c, 's8_museum', 540, 830, 600, 0.03, E.seg(t, 6.1, 6.6));
 };
 
 /* 9 ─ A lesson from the past + end card */
