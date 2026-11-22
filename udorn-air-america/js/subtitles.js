@@ -27,7 +27,7 @@ const Subs = (() => {
       const isKw = kw.some(([a, b]) => p.i >= a && p.i < b);
       const prev = out[out.length - 1];
       // glue repeat mark / punctuation / keyword pieces without spaces onto the previous token
-      if (prev && !prev.space && (/^[ๆฯ.,!?)”"'’:;\-]+$/.test(p.w) || (isKw && prev.kw && kw.some(([a, b]) => p.i > a && p.i < b && prev.i >= a)))) {
+      if (prev && !prev.space && (/^[ๆฯ.,!?)”"'’:;\-]+$/.test(p.w) || /^[\u0E30-\u0E3A\u0E45\u0E47-\u0E4E]/.test(p.w) || (isKw && prev.kw && kw.some(([a, b]) => p.i > a && p.i < b && prev.i >= a)))) {
         prev.w += p.w; continue;
       }
       out.push({ w: p.w, i: p.i, kw: isKw, space: false });
