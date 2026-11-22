@@ -16,7 +16,8 @@ const params = new URLSearchParams(location.search);
 function sceneIndex(t) { const i = SCENES.findIndex(s => t < s.start + s.dur); return i < 0 ? SCENES.length - 1 : i; }
 function drawScene(c, i, t) {
   c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, W, H);
-  SCENES[i].draw(c, t - SCENES[i].start); c.restore();
+  const sc = SCENES[i];   // scenes are authored in 'design' seconds and stretched to their real duration
+  sc.draw(c, (t - sc.start) * (sc.design || sc.dur) / sc.dur); c.restore();
 }
 
 function composite(c, k, type, t) {
@@ -119,7 +120,7 @@ const UI = (() => {
     if (document.activeElement !== seekEl) seekEl.value = T;
     seekEl.style.setProperty('--p', (T / DURATION * 100) + '%');
     $('time').textContent = `${fmt(T)} / ${fmt(DURATION)}`;
-    $('sceneName').textContent = `${sceneIndex(T) + 1}/9 · ${SCENES[sceneIndex(T)].title}`;
+    $('sceneName').textContent = `${sceneIndex(T) + 1}/${SCENES.length} · ${SCENES[sceneIndex(T)].title}`;
     $('btnPlay').textContent = playing ? '❚❚' : '▶';
     $('bigplay').hidden = playing;
   }
@@ -246,6 +247,7 @@ function record() {
   if (params.get('still') === '1') document.body.classList.add('still');
   $('voice').src = NARRATION.voiceSrc; $('music').src = NARRATION.musicSrc;
   try { await Promise.all([document.fonts.load(`700 64px Kanit`), document.fonts.load(`600 30px Kanit`)]); } catch (e) { /* fall back to system Thai font */ }
+  try { await LOGO.decode(); } catch (e) { /* logo optional */ }
   ready = true; dirty = true; Subs.rebuild(); UI.status(); UI.sync(true);
   if (params.get('autoplay') === '1') { AudioEng.ensure(); play(); }
   requestAnimationFrame(tick);

@@ -164,7 +164,7 @@ const AudioEng = (() => {
     if (!st.musicOK) synthSchedule(t);
     // scene sfx cues
     SCENES.forEach((sc, si) => sc.sfx.forEach((q, qi) => {
-      const key = si + ':' + qi, at = sc.start + q.at, dur = ONE_SHOT[q.type] || q.dur || 1;
+      const f = sc.dur / (sc.design || sc.dur), key = si + ':' + qi, at = sc.start + q.at * f, dur = ONE_SHOT[q.type] || (q.dur || 1) * f;
       if (st.fired.has(key) || t < at || t >= at + dur) return;
       const late = t - at;
       if (ONE_SHOT[q.type] && late > 0.12) { st.fired.add(key); return; }

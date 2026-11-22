@@ -9,6 +9,10 @@
    ============================================================ */
 'use strict';
 
+/* channel logo for the outro (assets/logo.png) */
+const LOGO = new Image();
+LOGO.src = 'assets/logo.png';
+
 /* ---------------- the cast ----------------
    crew   : USAF ground crew chief, olive-drab 1960s utility uniform + OD cap
    pilot  : Air America pilot — civilian short-sleeve shirt, khaki trousers, aviator sunglasses
