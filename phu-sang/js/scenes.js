@@ -344,6 +344,78 @@ SC.lesson = (c, t) => {
   }
 };
 
+/* 10 ─ Outro: channel logo + "กดไลก์ กดแชร์" */
+function thumbIcon(c, x, y, s) {
+  c.save(); c.translate(x, y); c.scale(s, s);
+  ink(c, P.rr(-46, -4, 22, 50, 6), '#ffffff', null, { lw: 6 });
+  ink(c, P.poly([[-18, -4], [-2, -8], [10, -46], [26, -44], [24, -12], [44, -12], [48, 0], [40, 46], [-18, 46]]), '#ffffff', null, { lw: 6 });
+  c.restore();
+}
+function shareIcon(c, x, y, s) {
+  c.save(); c.translate(x, y); c.scale(s, s);
+  limb(c, [[-40, 36], [-36, -14], [14, -14]], '#ffffff', 14, 6);
+  ink(c, P.poly([[10, -42], [46, -14], [10, 14]]), '#ffffff', null, { lw: 6 });
+  c.restore();
+}
+function bigButton(c, x, y, label, col, icon, k, press) {
+  if (k <= 0) return;
+  c.save(); c.translate(x, y); const s = E.outBack(E.clamp(k)) * (1 - 0.08 * press); c.scale(s, s);
+  ink(c, P.rr(-200 + 12, -78 + 16, 400, 156, 78), INK, null, { lw: 0 });
+  ink(c, P.rr(-200, -78, 400, 156, 78), press > 0.01 ? mix(col, '#ffffff', 0.25) : col, mix(col, '#000000', 0.25), { lw: 9, dx: -10, dy: -12 });
+  (icon === 'like' ? thumbIcon : shareIcon)(c, -110, 4, 1.05);
+  txt(c, label, 50, 4, 64, { col: '#ffffff', sw: 12 });
+  c.restore();
+}
+function burst(c, x, y, k, col) {
+  if (k <= 0 || k >= 1) return;
+  for (let i = 0; i < 12; i++) {
+    const a = i / 12 * Math.PI * 2, d = 60 + 220 * E.out(k);
+    c.save(); c.globalAlpha = 1 - k; c.translate(x + Math.cos(a) * d, y + Math.sin(a) * d * 0.8); c.rotate(a + k * 3);
+    const r = i % 2 ? 16 : 24, pts = []; for (let j = 0; j < 10; j++) { const rr = j % 2 ? r * 0.45 : r, aa = j * Math.PI / 5; pts.push([Math.cos(aa) * rr, Math.sin(aa) * rr]); }
+    ink(c, P.poly(pts), i % 3 ? col : '#ffd84a', null, { lw: 4 }); c.restore();
+  }
+  txt(c, '+1', x + 150, y - 120 - 80 * E.out(k), 70, { col: '#ffd84a', alpha: 1 - k });
+}
+function pointer(c, x, y, press) {
+  c.save(); c.translate(x, y); c.rotate(-0.4); const s = 1 - 0.12 * press; c.scale(s, s);
+  ink(c, P.rr(-16, -4, 32, 96, 16), '#ffe0c2', '#e8bb95', { lw: 7 });
+  ink(c, P.rr(-40, 60, 104, 104, 36), '#ffe0c2', '#e8bb95', { lw: 7 });
+  ink(c, P.rect(-46, 150, 116, 40), '#f07b1a', '#c55f0e', { lw: 7 });
+  c.restore();
+}
+SC.outro = (c, t) => {
+  const g = c.createRadialGradient(540, 760, 80, 540, 900, 1250);
+  g.addColorStop(0, '#1d2c58'); g.addColorStop(1, '#060a16'); c.fillStyle = g; c.fillRect(0, 0, W, H);
+  c.save(); c.translate(540, 740); c.rotate(t * 0.18);
+  for (let i = 0; i < 18; i++) { c.fillStyle = i % 2 ? 'rgba(240,123,26,0.07)' : 'rgba(255,255,255,0.035)';
+    c.beginPath(); c.moveTo(0, 0); c.arc(0, 0, 1500, i / 18 * Math.PI * 2, (i + 1) / 18 * Math.PI * 2); c.closePath(); c.fill(); }
+  c.restore();
+  txt(c, 'ขอบคุณที่รับชม', 540, 470, 66, { col: '#ffffff', sw: 12, alpha: E.seg(t, 0.6, 1.0) });
+  const lk = E.outBack(E.seg(t, 0.2, 0.8));
+  if (lk > 0 && LOGO.complete && LOGO.naturalWidth) {
+    c.save(); c.translate(540, 720 + Math.sin(t * 2) * 6); c.rotate(E.boil(t, 3, 0.012) - 0.02); c.scale(lk, lk);
+    const w = 960, h = w * LOGO.naturalHeight / LOGO.naturalWidth;
+    c.fillStyle = 'rgba(0,0,0,0.45)'; c.beginPath(); c.roundRect(-w / 2 + 14, -h / 2 + 18, w, h, 38); c.fill();
+    c.drawImage(LOGO, -w / 2, -h / 2, w, h); c.restore();
+  }
+  // cursor path: in → like (click 1.9) → share (click 3.0) → out
+  const L = [300, 1080], S = [780, 1080];
+  const pl = t < 1.9 ? 1 - E.seg(t, 1.88, 1.9) : 1 - E.seg(t, 1.9, 2.05);
+  const likePress = t >= 1.9 && t < 2.15 ? 1 : 0, sharePress = t >= 3.0 && t < 3.25 ? 1 : 0;
+  bigButton(c, L[0], L[1], 'กดไลก์', '#1f6fd6', 'like', E.seg(t, 0.9, 1.3), likePress);
+  bigButton(c, S[0], S[1], 'กดแชร์', '#f07b1a', 'share', E.seg(t, 1.1, 1.5), sharePress);
+  burst(c, L[0], L[1], E.seg(t, 1.9, 2.8), '#5aa2ff');
+  burst(c, S[0], S[1], E.seg(t, 3.0, 3.9), '#ff9a4a');
+  let hx, hy;
+  if (t < 1.9) { const k = E.inOut(E.seg(t, 1.2, 1.85)); hx = E.lerp(1000, L[0] + 20, k); hy = E.lerp(1700, L[1] + 10, k); }
+  else if (t < 3.0) { const k = E.inOut(E.seg(t, 2.2, 2.95)); hx = E.lerp(L[0] + 20, S[0] + 20, k); hy = L[1] + 10 - Math.sin(k * Math.PI) * 120; }
+  else { const k = E.inOut(E.seg(t, 3.4, 4.2)); hx = E.lerp(S[0] + 20, 1250, k); hy = E.lerp(S[1] + 10, 1750, k); }
+  if (t > 1.2) pointer(c, hx, hy, likePress || sharePress);
+  txt(c, 'แล้วพบกันใหม่ในเรื่องถัดไป', 540, 1300, 48, { col: '#ffd84a', sw: 10, alpha: E.seg(t, 3.6, 4.1) });
+  txt(c, 'ภาพทั้งหมดเป็นภาพวาดประกอบ ไม่ใช่ภาพหรือฟุตเทจจากเหตุการณ์จริง', 540, 1700, 28, { col: '#c9c2b4', stroke: false, alpha: E.seg(t, 0.8, 1.4) });
+  txt(c, 'เนื้อหาสรุปจากข้อมูลประวัติศาสตร์ที่เผยแพร่ทั่วไป โปรดตรวจสอบกับแหล่งอ้างอิง', 540, 1745, 28, { col: '#c9c2b4', stroke: false, alpha: E.seg(t, 0.8, 1.4) });
+};
+
 const SCENES = [
   { id: 'forest',     title: 'ป่าที่มีความลับ',              design: 10, transition: 'fade',  draw: SC.forest,
     sfx: [{ at: 0, type: 'wind', dur: 10, vol: 0.8 }, { at: 0, type: 'birds', dur: 10, vol: 0.8 }, { at: 0.8, type: 'stamp' }, { at: 3.2, type: 'footsteps', dur: 1.3, vol: 0.6 }] },
@@ -363,6 +435,8 @@ const SCENES = [
     sfx: [{ at: 0, type: 'birds', dur: 10, vol: 0.7 }, { at: 0, type: 'wind', dur: 10, vol: 0.35 }, { at: 0.5, type: 'footsteps', dur: 4.5, vol: 0.4 }] },
   { id: 'lesson',     title: 'บทเรียนจากอดีต',               design: 14, transition: 'fade',  draw: SC.lesson,
     sfx: [{ at: 0, type: 'wind', dur: 13, vol: 0.5 }, { at: 8.3, type: 'stamp', vol: 0.6 }, { at: 10.6, type: 'whoosh', dur: 0.9 }] },
+  { id: 'outro',      title: 'ลีฟไง จะใครเล่า',              design: 5.5, transition: 'iris', draw: SC.outro, fixed: 5.5,
+    sfx: [{ at: 0.0, type: 'whoosh', dur: 0.7 }, { at: 0.25, type: 'pop' }, { at: 1.9, type: 'pop' }, { at: 1.95, type: 'stamp' }, { at: 3.0, type: 'pop' }, { at: 3.05, type: 'stamp' }] },
 ];
 
 /* scene lengths follow the narration: each cut sits halfway between two paragraphs */
@@ -371,6 +445,7 @@ function syncScenesToNarration() {
   const L = NARRATION.lines;
   let s = 0;
   SCENES.forEach((sc, i) => {
+    if (sc.fixed) { sc.start = s; sc.dur = sc.fixed; s += sc.fixed; return; }
     const cur = L.find(l => l.scene === i + 1), next = L.find(l => l.scene === i + 2);
     const end = next ? (cur.end + next.start) / 2 : cur.end + 4.2;    // last scene keeps ~4 s for the end card
     sc.start = s; sc.dur = Math.max(2, end - s); s = end;

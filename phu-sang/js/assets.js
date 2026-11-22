@@ -10,6 +10,10 @@
    ============================================================ */
 'use strict';
 
+/* channel logo for the outro (assets/logo.png) */
+const LOGO = new Image();
+LOGO.src = 'assets/logo.png';
+
 /* ---------------- the cast ---------------- */
 const PAL = {
   narrator: { skin: '#e2a77c', skinS: '#c2875c', top: '#e9a23b', topS: '#c4801f', pants: '#3d5a80', pantsS: '#2c4462', hair: '#1c1410', shoe: '#f4f4f0', sleeve: 'skin' },
