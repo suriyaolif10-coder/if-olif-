@@ -92,7 +92,7 @@
     }, 0.25);
     pop(ctx, t, EV.question, CX, SF.y + 800, () => {
       txt(ctx, 'ต้องทำอย่างไร?', CX, SF.y + 820, 84, NAVY, { align: 'center' });
-      txt(ctx, 'ดูสรุปใน 1 นาที 👇'.replace(' 👇', ''), CX, SF.y + 910, 44, MUTED, { align: 'center', weight: 400 });
+      txt(ctx, 'ฟังสรุปสั้น ๆ ได้เลย', CX, SF.y + 910, 44, MUTED, { align: 'center', weight: 400 });
     });
   }
 
@@ -162,7 +162,7 @@
     if (cur >= 0) {
       const s = S.steps[cur];
       const k = popK(t, s.t, 0.3);
-      ctx.save(); ctx.globalAlpha *= clamp((t - s.t) / 0.15); ctx.translate(CX, SF.y + 370); ctx.scale(0.9 + 0.1 * k, 0.9 + 0.1 * k); ctx.translate(-CX, -(SF.y + 370));
+      ctx.save(); ctx.translate(CX, SF.y + 370); ctx.scale(0.9 + 0.1 * k, 0.9 + 0.1 * k); ctx.translate(-CX, -(SF.y + 370));
       stepScreen(ctx, cur, t);
       ctx.restore();
     }
