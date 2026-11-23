@@ -6,9 +6,11 @@ set -euo pipefail
 cd "$(dirname "$0")"
 WORK="$1"; IN="$2"; OUT="$3"
 read -r X Y W H <<<"$(node -e "const n=require('../score').NARR;console.log(n.x,n.y,n.w,n.h)")"
-# each take: 24 fps -> 30 fps, played forward then backward (16 s, seamless), scaled, with alpha (qtrle)
+# each take: 24 fps -> 30 fps, played forward then backward (seamless), scaled, with alpha (qtrle).
+# The first 1.25 s of every take is skipped: Flow starts each take from the still pose it was made from
+# (an angry, a crying, a startled face...), which flashed in at every cut.
 for i in 0 1 2 3 4 5; do
-  ffmpeg -v error -y -framerate 24 -i "$WORK/t$i/rgba/f%04d.png" -filter_complex \
+  ffmpeg -v error -y -framerate 24 -start_number 31 -i "$WORK/t$i/rgba/f%04d.png" -filter_complex \
     "[0]fps=30,scale=${W}:${H}:flags=lanczos,format=rgba,split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1[o]" \
     -map "[o]" -c:v qtrle "$WORK/take$i.mov"
 done
