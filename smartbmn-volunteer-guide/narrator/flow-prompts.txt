@@ -1,0 +1,35 @@
+พรอมต์ Google Flow (Veo) — ผู้บรรยายตุ๊กตา CDD ขยับปากพูด สำหรับวางที่ขอบคลิป
+ใช้โหมด Frames to Video, อัปโหลดรูป pose-X.png เป็นเฟรมแรก, คลิปละ 8 วินาที
+
+---------- ส่วนกลาง (ต่อท้ายทุกพรอมต์) ----------
+Keep the exact same character from the image: a small collectible vinyl figurine of a Thai man with a big head, navy "CDD" vest, white shirt, black trousers, black shoes, standing on the same wooden desk with the same warm blurred office background. Static locked-off camera, no zoom, no cuts. He talks directly to the camera like a friendly presenter: natural lip movement, mouth opening and closing with the words, small head nods, light hand gestures, blinking. Soft warm lighting, shallow depth of field, photoreal stop-motion figurine look. No text, no subtitles, no music.
+
+---------- 8 คลิป ----------
+
+คลิป 1 (0–8 วิ) — รูป pose-4.png (ตกใจ)
+He starts with hands on his cheeks in surprise, then lowers his hands and asks the viewer, speaking Thai with an excited tone: "อาสาสมัครต้องรู้! ถ้าเจอสถานะ ตรวจสอบเรียบร้อย สามารถดำเนินการแก้ไขได้ ต้องทำยังไง?"
+
+คลิป 2 (8–16 วิ) — รูป pose-5.png (คิด)
+He scratches his head thoughtfully, then smiles and points to the side as he explains, speaking Thai calmly: "ให้ดูที่ฝั่ง อัปโหลดแล้ว ในช่อง สมาชิกรอการตรวจสอบ ถ้าเป็นช่องว่าง แปลว่าปกติ ไม่ต้องทำอะไร"
+
+คลิป 3 (16–24 วิ) — รูป pose-2.png (จริงจัง)
+He becomes serious and firm, clenching his fists slightly for emphasis (not angry, just stressing a point), speaking Thai: "ถ้าขึ้นว่า ส่งตรวจสอบอีกครั้ง ให้รอก่อน แต่ถ้าขึ้นว่า ตรวจสอบเรียบร้อย พร้อมเลขบัตร แบบนี้ต้องแก้ไขครับ"
+
+คลิป 4 (24–32 วิ) — รูป pose-1.png (ยิ้ม)
+He smiles warmly and counts on his fingers, one then two, speaking Thai clearly: "ขั้นที่หนึ่ง ฝั่งอัปโหลดแล้ว กดปุ่มแก้ไข ขั้นที่สอง ไปที่ข้อมูลสมาชิก หาคนตามเลขบัตรที่แจ้งเตือน"
+
+คลิป 5 (32–40 วิ) — รูป pose-1.png (ยิ้ม)
+He keeps smiling and counts three then four on his fingers, then makes a pressing gesture with one finger, speaking Thai: "ขั้นที่สาม กดปุ่มตรวจสอบ หลังช่องเลขบัตร ขั้นที่สี่ บันทึกคำตอบใหม่ แล้วกดอัปโหลด"
+
+คลิป 6 (40–48 วิ) — รูป pose-3.png (เศร้า)
+He starts neutral, then turns sad and wipes his eye gently when mentioning death, speaking Thai softly: "ถ้าขึ้นว่า เช็คซ้ำเลขบัตร ให้ทำตามขั้นตอนปกติ ถ้าขึ้นว่า เสียชีวิต ต้องลบสมาชิกคนนี้ออก"
+
+คลิป 7 (48–56 วิ) — รูป pose-6.png (กังวล)
+He looks a little worried with hands near his chest, then relaxes and nods, speaking Thai: "ถ้าข้อมูลประชากรไม่ถูกต้อง ก็ลบออกเช่นกัน กรมฯ ตรวจทุกวันศุกร์ อาสาฯ แก้ไขได้วันเสาร์บ่ายสองโมง"
+
+คลิป 8 (56–64 วิ) — รูป pose-1.png (หัวเราะ)
+He laughs cheerfully with hands on his belly, then gives a thumbs-up to the camera, speaking Thai happily: "อย่าลืม กดเช็คซ้ำ แล้วบันทึก อัปโหลด ทุกครั้งนะครับ!"
+
+---------- ถ้าจะใช้เสียง MiniMax แทนเสียงจาก Veo ----------
+ลบประโยคภาษาไทยในเครื่องหมายคำพูดออก แล้วใช้ท่อนนี้แทน:
+He talks continuously to the camera with natural mouth movement as if explaining something, without audible speech (silent), mouth moving the whole 8 seconds.
