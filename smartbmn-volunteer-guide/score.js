@@ -14,7 +14,34 @@
   const STYLE = 'flat';
   const clock = makeClock({ bpm: 120, offset: 0 }); // 1 bar = 2 s
   const { T, BEAT } = clock;
-  const DURATION = T(30);
+  // ---------- the voiceover (assets/voice.mp3, MiniMax) drives the timeline ----------
+  // Line starts were found by matching the script's lines to the pauses in the recording
+  // (every chosen pause is 0.8-1.3 s, the length of the <#..#> breaks in the script).
+  const VO_AT = 0.5, VO_LEN = 113.53;
+  const VO = [
+    [0.0, 'อาสาสมัครต้องรู้! ถ้าเจอสถานะ มีประชากรใหม่ส่งกรมการปกครองตรวจสอบเรียบร้อย สามารถดำเนินการแก้ไขได้ ต้องทำยังไง?'],
+    [14.45, 'ให้ดูที่ฝั่ง อัปโหลดแล้ว ในช่อง สมาชิกรอการตรวจสอบ'],
+    [21.45, 'ในช่องนี้ อาจเจอข้อความสามแบบ'],
+    [24.94, 'ถ้าเป็นช่องว่าง แปลว่าปกติ ไม่ต้องทำอะไร'],
+    [30.13, 'ถ้าขึ้นว่า ส่งกรมการปกครองตรวจสอบอีกครั้ง ให้รอก่อน ยังไม่ต้องทำอะไร'],
+    [37.55, 'แต่ถ้าขึ้นว่า ตรวจสอบเรียบร้อย สามารถดำเนินการแก้ไขได้ พร้อมเลขบัตร แบบนี้ต้องแก้ไขครับ'],
+    [46.04, 'วิธีแก้มีสี่ขั้นตอน'],
+    [48.76, 'ขั้นที่หนึ่ง ฝั่งอัปโหลดแล้ว กดปุ่ม แก้ไข'],
+    [53.73, 'ขั้นที่สอง ไปที่ข้อมูลสมาชิก หาคนตามเลขบัตรที่แจ้งเตือน'],
+    [60.98, 'ขั้นที่สาม กดปุ่ม ตรวจสอบ หลังช่องเลขบัตร'],
+    [66.62, 'ขั้นที่สี่ บันทึกคำตอบใหม่ แล้วกด อัปโหลด'],
+    [71.80, 'เมื่อกดตรวจสอบ จะเจอผลสามแบบ'],
+    [75.01, 'ถ้าขึ้นว่า กรุณาเช็คซ้ำเลขบัตรประจำตัวประชาชน ให้ทำตามขั้นตอนปกติ'],
+    [82.53, 'ถ้าขึ้นว่า เสียชีวิต จะบันทึกไม่ได้ ต้องลบสมาชิกคนนี้ออก'],
+    [88.66, 'ถ้าขึ้นว่า ข้อมูลประชากรไม่ถูกต้อง ก็ต้องลบสมาชิกคนนี้ออกเช่นกัน'],
+    [95.73, 'กรมฯ จะตรวจข้อมูลที่บันทึกมา ทุกวันศุกร์ ก่อนหกโมงเย็น'],
+    [101.08, 'และอาสาสมัครกดแก้ไขได้ ทุกวันเสาร์ ตั้งแต่บ่ายสองโมงเป็นต้นไป'],
+    [107.66, 'อย่าลืม! กดปุ่มเช็คซ้ำข้อมูล แล้วบันทึก อัปโหลด ทุกครั้งนะครับ'],
+  ].map(([t, text], i, all) => ({ t: t + VO_AT, end: (i < all.length - 1 ? all[i + 1][0] - 0.6 : VO_LEN) + VO_AT, text }));
+  const L = VO.map((v) => v.t);
+  const DURATION = Math.ceil((VO_AT + VO_LEN + 1.6) * 10) / 10;
+  // the narrator (the user's Flow clip) sits in a frame at the bottom edge; film.js draws the frame, the clip is overlaid after rendering
+  const NARR = { x: 40, y: 1500, w: 440, h: 372, r: 30 };
 
   const STATUS = 'มีประชากรใหม่ส่งกรมการปกครองตรวจสอบเรียบร้อย (สามารถดำเนินการแก้ไขได้)';
 
@@ -28,27 +55,29 @@
     when: [26, 28], // Friday / Saturday schedule
     end: [28, 30],
   };
-  const S = {}; for (const k in SC) S[k] = [T(SC[k][0]), T(SC[k][1])];
+  const S = { hook: [0, L[1]], where: [L[1], L[2]], kinds: [L[2], L[6]], steps: [L[6], L[11]], results: [L[11], L[15]], when: [L[15], L[17]], end: [L[17], DURATION] };
+  // named moments inside scenes (words in the line, measured from the pauses inside it)
+  const EV = { title: 0.4, status: 2.45 + VO_AT, question: 12.6 + VO_AT, where: L[1], tab: 17.52 + VO_AT, col: 19.7 + VO_AT, kinds: L[2], steps: L[6], results: L[11], when: L[15], end: L[17], press: L[17] + 1.4, tag: L[17] + 3.2 };
 
   const kinds = [
-    { t: T(6, 1), icon: 'ok', color: '#2E9E5B', label: 'ช่องว่าง ไม่มีข้อความ', act: 'ปกติ ไม่ต้องทำอะไร' },
-    { t: T(8, 1), icon: 'wait', color: '#E0A21B', label: '“มีประชากรรายใหม่ส่งกรมการปกครอง\nตรวจสอบอีกครั้ง”', act: 'รอก่อน ยังไม่ต้องทำอะไร' },
-    { t: T(10, 1), icon: 'edit', color: '#E0453A', label: '“...ตรวจสอบเรียบร้อย\n(สามารถดำเนินการแก้ไขได้)” + เลขบัตร', act: 'ต้องแก้ไข!' },
+    { t: L[3], icon: 'ok', color: '#2E9E5B', label: 'ช่องว่าง ไม่มีข้อความ', act: 'ปกติ ไม่ต้องทำอะไร' },
+    { t: L[4], icon: 'wait', color: '#E0A21B', label: '“มีประชากรรายใหม่ส่งกรมการปกครอง\nตรวจสอบอีกครั้ง”', act: 'รอก่อน ยังไม่ต้องทำอะไร' },
+    { t: L[5], icon: 'edit', color: '#E0453A', label: '“...ตรวจสอบเรียบร้อย\n(สามารถดำเนินการแก้ไขได้)” + เลขบัตร', act: 'ต้องแก้ไข!' },
   ];
   const steps = [
-    { t: T(12, 1), tap: T(13, 0), text: 'ฝั่ง “อัปโหลดแล้ว” กดปุ่ม “แก้ไข”' },
-    { t: T(14, 1), tap: T(15, 0), text: 'ไปที่ “ข้อมูลสมาชิก” หาคนตามเลขบัตรที่แจ้งเตือน' },
-    { t: T(16, 1), tap: T(17, 0), text: 'กดปุ่ม “ตรวจสอบ” หลังช่องเลขบัตร' },
-    { t: T(18, 1), tap: T(19, 0), text: 'บันทึกคำตอบใหม่ แล้วกด “อัปโหลด”' },
+    { t: L[7], tap: L[7] + 2.6, text: 'ฝั่ง “อัปโหลดแล้ว” กดปุ่ม “แก้ไข”' },
+    { t: L[8], tap: L[8] + 2.4, text: 'ไปที่ “ข้อมูลสมาชิก” หาคนตามเลขบัตรที่แจ้งเตือน' },
+    { t: L[9], tap: L[9] + 1.7, text: 'กดปุ่ม “ตรวจสอบ” หลังช่องเลขบัตร' },
+    { t: L[10], tap: L[10] + 3.4, text: 'บันทึกคำตอบใหม่ แล้วกด “อัปโหลด”' },
   ];
   const results = [
-    { t: T(20, 1), n: 1, msg: '“กรุณาเช็คซ้ำเลขบัตรประจำตัวประชาชน”', act: 'ทำตามขั้นตอนปกติ', del: false },
-    { t: T(22, 1), n: 2, msg: '“เสียชีวิต”', act: 'บันทึกไม่ได้ → “ลบ” สมาชิกคนนี้ออก', del: true },
-    { t: T(24, 1), n: 3, msg: '“ข้อมูลประชากรไม่ถูกต้อง”', act: '“ลบ” สมาชิกคนนี้ออก', del: true },
+    { t: L[12], n: 1, msg: '“กรุณาเช็คซ้ำเลขบัตรประจำตัวประชาชน”', act: 'ทำตามขั้นตอนปกติ', del: false },
+    { t: L[13], n: 2, msg: '“เสียชีวิต”', act: 'บันทึกไม่ได้ → “ลบ” สมาชิกคนนี้ออก', del: true },
+    { t: L[14], n: 3, msg: '“ข้อมูลประชากรไม่ถูกต้อง”', act: '“ลบ” สมาชิกคนนี้ออก', del: true },
   ];
   const when = [
-    { t: T(26, 1), day: 'ทุกวันศุกร์', time: 'ก่อน 18.00 น.', text: 'กรมฯ ตรวจข้อมูลที่บันทึกมา' },
-    { t: T(27, 0), day: 'ทุกวันเสาร์', time: 'ตั้งแต่ 14.00 น.', text: 'อาสาฯ กดแก้ไขรายชื่อได้' },
+    { t: L[15], day: 'ทุกวันศุกร์', time: 'ก่อน 18.00 น.', text: 'กรมฯ ตรวจข้อมูลที่บันทึกมา' },
+    { t: L[16], day: 'ทุกวันเสาร์', time: 'ตั้งแต่ 14.00 น.', text: 'อาสาฯ กดแก้ไขรายชื่อได้' },
   ];
 
   // ---------- harmony: warm lo-fi, Fmaj7 Em7 Dm7 Cmaj7 ----------
@@ -58,28 +87,29 @@
     Em7: { notes: ['G3', 'B3', 'D4', 'E4'], bass: 'E1' },
     Dm7: { notes: ['F3', 'A3', 'C4', 'D4'], bass: 'D1' },
     Cmaj7: { notes: ['G3', 'B3', 'C4', 'E4'], bass: 'C2' },
-  }, Array.from({ length: 30 }, (_, b) => [b, 0, 4, PROG[b % 4]]));
+  }, Array.from({ length: Math.ceil(DURATION / 2) }, (_, b) => [b, 0, 4, PROG[b % 4]]));
 
   // the hits: every item popping on screen is a 'pop', every tap a 'click'
-  const pops = [T(0, 1), T(1, 0), T(3, 0), T(4, 2), ...kinds.map((k) => k.t), ...steps.map((s) => s.t), ...results.map((r) => r.t), ...when.map((w) => w.t), T(28, 0), T(28, 2)];
+  const pops = [EV.title, EV.status, EV.question, EV.where, EV.tab, EV.col, EV.kinds, EV.steps, EV.results, EV.when, ...kinds.map((k) => k.t), ...steps.map((s) => s.t), ...results.map((r) => r.t), ...when.map((w) => w.t), EV.end, EV.tag];
   const taps = steps.map((s) => s.tap);
 
   const markers = {
-    title: { t: T(0, 1), sync: 'av' },
-    status: { t: T(1, 0), sync: 'av' },
-    where: { t: T(3, 0), sync: 'av' },
+    title: { t: EV.title, sync: 'v' },
+    status: { t: EV.status, sync: 'v' },
+    where: { t: EV.where, sync: 'v' },
     kinds: { t: kinds[0].t, sync: 'av' }, wait: { t: kinds[1].t, sync: 'av' }, edit: { t: kinds[2].t, sync: 'av' },
     step1: { t: steps[0].t, sync: 'av' }, tap1: { t: steps[0].tap, sync: 'av' },
     step4: { t: steps[3].t, sync: 'av' },
     res1: { t: results[0].t, sync: 'av' }, res2: { t: results[1].t, sync: 'av' }, res3: { t: results[2].t, sync: 'av' },
     friday: { t: when[0].t, sync: 'av' }, saturday: { t: when[1].t, sync: 'av' },
-    end: { t: T(28, 0), sync: 'av' },
+    end: { t: EV.end, sync: 'v' },
   };
 
   // the lo-fi hats sit a 16th before many beats, so for list items only the picture is measured; the pops still land on the beat
-  for (const k of ['title', 'kinds', 'wait', 'edit', 'step1', 'step4', 'res1', 'res2', 'res3', 'friday']) markers[k].sync = 'v';
-  const subtitles = [];
+  for (const k of Object.keys(markers)) markers[k].sync = 'v';
+  for (const k of ['kinds', 'wait', 'edit', 'step1', 'step4', 'res1', 'res2', 'res3', 'friday']) markers[k].sync = 'v';
+  const subtitles = VO.map((v) => ({ t: v.t, end: v.end, text: v.text }));
 
-  const SCORE = { FPS, FORMAT, W, H, SAFE, WIDE, STYLE, DURATION, clock, T, BEAT, S, SC, m, chords, chordAt, STATUS, kinds, steps, results, when, pops, taps, markers, subtitles };
+  const SCORE = { VO_AT, VO_LEN, VO, L, EV, NARR, FPS, FORMAT, W, H, SAFE, WIDE, STYLE, DURATION, clock, T, BEAT, S, SC, m, chords, chordAt, STATUS, kinds, steps, results, when, pops, taps, markers, subtitles };
   if (node) module.exports = SCORE; else globalThis.SCORE = SCORE;
 })();

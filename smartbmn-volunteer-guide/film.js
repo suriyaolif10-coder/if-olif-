@@ -1,7 +1,7 @@
 // THE FILM — คู่มือสั้นสำหรับอาสาฯ. Flat infographic; every item pops on its beat (score.js), every tap is shown.
 (function () {
   const U = globalThis.U, G = globalThis.G, S = globalThis.SCORE, Studio = globalThis.Studio;
-  const { T, clock } = S;
+  const { T, clock, EV, NARR, VO } = S;
   const { clamp, lerp, ease } = U;
   const W = G.W, H = G.H, SF = G.SAFE;
   const X0 = SF.x, X1 = SF.x + SF.w, CW = SF.w, CX = SF.x + SF.w / 2;
@@ -79,35 +79,35 @@
 
   // ---------- scenes ----------
   function hook(ctx, t) {
-    pop(ctx, t, T(0, 1), CX, SF.y + 120, () => {
+    pop(ctx, t, EV.title, CX, SF.y + 120, () => {
       rr(ctx, CX - 260, SF.y + 40, 520, 130, 65, RED);
       txt(ctx, 'อาสาฯ ต้องรู้!', CX, SF.y + 128, 70, '#FFFFFF', { align: 'center' });
     });
-    pop(ctx, t, T(1, 0), CX, SF.y + 460, () => {
+    pop(ctx, t, EV.status, CX, SF.y + 460, () => {
       ctx.save(); ctx.translate(CX, SF.y + 460); ctx.rotate(-0.02 + 0.01 * Math.sin(t * 3)); ctx.translate(-CX, -(SF.y + 460));
       shadowCard(ctx, X0, SF.y + 250, CW, 420, 36, NAVY);
       txt(ctx, 'เจอสถานะนี้ในช่อง “สมาชิกรอการตรวจสอบ”', CX, SF.y + 320, 32, '#B9C4F0', { align: 'center', weight: 400, maxW: CW - 60 });
       ['มีประชากรใหม่ส่งกรมการปกครอง', 'ตรวจสอบเรียบร้อย', '(สามารถดำเนินการแก้ไขได้)'].forEach((l, i) => txt(ctx, l, CX, SF.y + 420 + i * 82, 60, '#7CF29B', { align: 'center', maxW: CW - 60 }));
       ctx.restore();
     }, 0.25);
-    pop(ctx, t, T(2, 0), CX, SF.y + 800, () => {
+    pop(ctx, t, EV.question, CX, SF.y + 800, () => {
       txt(ctx, 'ต้องทำอย่างไร?', CX, SF.y + 820, 84, NAVY, { align: 'center' });
       txt(ctx, 'ดูสรุปใน 1 นาที 👇'.replace(' 👇', ''), CX, SF.y + 910, 44, MUTED, { align: 'center', weight: 400 });
     });
   }
 
   function where(ctx, t) {
-    header(ctx, t, T(3, 0), 'ดูได้ที่ไหน?');
-    const hlTab = clamp((t - T(4, 0)) / 0.3), hlCol = clamp((t - T(4, 2)) / 0.3);
-    pop(ctx, t, T(3, 1), CX, SF.y + 500, () => tableMock(ctx, X0, SF.y + 170, CW, t, { hlTab, hlCol, rows: 5, flag: 3 }));
-    pop(ctx, t, T(4, 2), CX, SF.y + 1030, () => {
+    header(ctx, t, EV.where, 'ดูได้ที่ไหน?');
+    const hlTab = clamp((t - EV.tab) / 0.3), hlCol = clamp((t - EV.col) / 0.3);
+    pop(ctx, t, EV.where + 0.5, CX, SF.y + 500, () => tableMock(ctx, X0, SF.y + 170, CW, t, { hlTab, hlCol, rows: 5, flag: 3 }));
+    pop(ctx, t, EV.col, CX, SF.y + 1030, () => {
       txt(ctx, 'ฝั่ง “อัปโหลดแล้ว”', CX, SF.y + 1000, 50, PURP, { align: 'center' });
       txt(ctx, '→ ช่อง “สมาชิกรอการตรวจสอบ”', CX, SF.y + 1075, 50, INK, { align: 'center', maxW: CW });
     });
   }
 
   function kinds(ctx, t) {
-    header(ctx, t, T(6, 0), 'ข้อความที่อาจเจอ มี 3 แบบ');
+    header(ctx, t, EV.kinds, 'ข้อความที่อาจเจอ มี 3 แบบ');
     S.kinds.forEach((k, i) => {
       const y = SF.y + 170 + i * 340, h = 310;
       const focus = t >= k.t && (i === 2 || t < S.kinds[i + 1].t);
@@ -157,7 +157,7 @@
     }
   }
   function steps(ctx, t) {
-    header(ctx, t, T(12, 0), 'วิธีแก้ไข 4 ขั้นตอน');
+    header(ctx, t, EV.steps, 'วิธีแก้ไข 4 ขั้นตอน');
     const cur = S.steps.reduce((a, s, i) => (t >= s.t ? i : a), -1);
     if (cur >= 0) {
       const s = S.steps[cur];
@@ -179,7 +179,7 @@
   }
 
   function results(ctx, t) {
-    header(ctx, t, T(20, 0), 'กด “ตรวจสอบ” แล้วจะเจอ 3 แบบ');
+    header(ctx, t, EV.results, 'กด “ตรวจสอบ” แล้วจะเจอ 3 แบบ');
     S.results.forEach((r, i) => {
       const y = SF.y + 170 + i * 340, h = 310, color = r.del ? RED : GREEN;
       pop(ctx, t, r.t, CX, y + h / 2, () => {
@@ -194,7 +194,7 @@
   }
 
   function when(ctx, t) {
-    header(ctx, t, T(26, 0), 'รอบเวลาที่ต้องรู้');
+    header(ctx, t, EV.when, 'รอบเวลาที่ต้องรู้');
     S.when.forEach((w, i) => {
       const y = SF.y + 180 + i * 500, h = 450, color = i ? GREEN : PURP;
       pop(ctx, t, w.t, CX, y + h / 2, () => {
@@ -208,14 +208,14 @@
   }
 
   function end(ctx, t) {
-    pop(ctx, t, T(28, 0), CX, SF.y + 150, () => txt(ctx, 'อย่าลืม!', CX, SF.y + 180, 110, RED, { align: 'center' }));
-    pop(ctx, t, T(28, 0) + 0.1, CX, SF.y + 420, () => {
-      const pressed = t >= T(28, 1);
+    pop(ctx, t, EV.end, CX, SF.y + 150, () => txt(ctx, 'อย่าลืม!', CX, SF.y + 180, 110, RED, { align: 'center' }));
+    pop(ctx, t, EV.end + 0.1, CX, SF.y + 420, () => {
+      const pressed = t >= EV.press;
       shadowCard(ctx, CX - 330, SF.y + 300, 660, 220, 110, pressed ? GREEN : PURP);
       txt(ctx, 'กดปุ่ม “เช็คซ้ำ” ข้อมูล', CX, SF.y + 435, 60, '#FFFFFF', { align: 'center', maxW: 600 });
-      finger(ctx, CX + 200, SF.y + 470, t, T(28, 1));
+      finger(ctx, CX + 200, SF.y + 470, t, EV.press);
     });
-    pop(ctx, t, T(28, 2), CX, SF.y + 720, () => {
+    pop(ctx, t, EV.tag, CX, SF.y + 720, () => {
       txt(ctx, 'แก้ไข → บันทึก → อัปโหลด', CX, SF.y + 700, 58, NAVY, { align: 'center', maxW: CW });
       txt(ctx, 'ทุกครั้ง', CX, SF.y + 790, 58, NAVY, { align: 'center' });
     });
@@ -230,13 +230,48 @@
     ctx.restore();
     // progress bar along the bottom of the safe area: which part of the guide we are in
     const parts = ['hook', 'where', 'kinds', 'steps', 'results', 'when', 'end'];
-    const y = SF.y + SF.h + 40;
+    const y = SF.y - 46;
     parts.forEach((p, i) => {
       const [a, b] = S.S ? S.S[p] : S.S, x = X0 + i * (CW / parts.length);
       const k = clamp((t - S.S[p][0]) / (S.S[p][1] - S.S[p][0]));
       rr(ctx, x + 6, y, CW / parts.length - 12, 12, 6, 'rgba(31,47,107,0.15)');
       if (k > 0) rr(ctx, x + 6, y, (CW / parts.length - 12) * k, 12, 6, NAVY);
     });
+  }
+
+  // wrap Thai text by words (Intl.Segmenter knows Thai word breaks)
+  const seg = new Intl.Segmenter('th', { granularity: 'word' });
+  function wrap(ctx, str, size, maxW) {
+    const lines = []; let cur = '';
+    for (const { segment } of seg.segment(str)) {
+      const next = cur + segment;
+      if (cur && G.measure(ctx, next.trim(), size, THAI, 700) > maxW) { lines.push(cur.trim()); cur = segment.trimStart(); } else cur = next;
+    }
+    if (cur.trim()) lines.push(cur.trim());
+    return lines;
+  }
+  // the little presenter at the bottom edge: a framed window (the Flow clip is laid into it after rendering)
+  // and a speech bubble with the line he is saying right now
+  function narrator(ctx, t) {
+    const { x, y, w, h, r } = NARR;
+    ctx.save(); ctx.shadowColor = 'rgba(20,30,80,0.35)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 10;
+    rr(ctx, x - 8, y - 8, w + 16, h + 16, r + 8, '#FFFFFF'); ctx.restore();
+    rr(ctx, x, y, w, h, r, '#2B2F45');
+    // name tag
+    rr(ctx, x + 18, y - 66, 190, 52, 26, PURP, '#FFFFFF', 4);
+    txt(ctx, 'ผู้บรรยาย', x + 113, y - 29, 30, '#FFFFFF', { align: 'center' });
+    const line = VO.find((v) => t >= v.t && t < v.end + 0.4);
+    if (!line) return;
+    const a = clamp((t - line.t) / 0.2) * (1 - clamp((t - line.end - 0.2) / 0.2));
+    const bx = x + w + 34, bw = X1 + 100 - bx, by = y + 6;
+    const size = 34, lines = wrap(ctx, line.text, size, bw - 48).slice(0, 6);
+    const bh = Math.max(150, lines.length * size * 1.42 + 44);
+    ctx.save(); ctx.globalAlpha *= a;
+    ctx.translate(0, 12 * (1 - ease.outCubic(clamp((t - line.t) / 0.25))));
+    ctx.save(); ctx.shadowColor = 'rgba(20,30,80,0.25)'; ctx.shadowBlur = 20; ctx.shadowOffsetY = 6;
+    ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 26); ctx.moveTo(bx + 2, by + 60); ctx.lineTo(bx - 30, by + 82); ctx.lineTo(bx + 2, by + 100); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.restore();
+    lines.forEach((l, i) => txt(ctx, l, bx + 24, by + 22 + size + i * size * 1.42, size, INK, { weight: 700 }));
+    ctx.restore();
   }
 
   const SCENES = { hook, where, kinds, steps, results, when, end };
@@ -249,6 +284,7 @@
       const cut = S.S[name][0];
       const f = cut > 0 ? 0.5 * Math.exp(-(t - cut) * 14) : 0;
       if (f > 0.01) { ctx.fillStyle = `rgba(255,255,255,${f})`; ctx.fillRect(0, 0, W, H); }
+      narrator(ctx, t);
     },
     post: { paper: 0, vignette: 0.12, grain: 0.015 },
     fadeOut: 1,
