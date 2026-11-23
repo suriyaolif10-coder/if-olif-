@@ -26,7 +26,7 @@ fx.addMono(I.thwack(), sc.EV.end, 0.3);
 const voice = MIX.loadAudio(path.join(__dirname, 'assets/voice.mp3'), { at: sc.VO_AT, gain: 1, length: DURATION });
 MIX.duck([drums, bass, pad, keys, verb], voice, { depth: 0.6, attack: 0.05, release: 0.5 });
 const stems = { voice, drums, bass, pad, keys, fx, verb: reverb(verb, { room: 0.8 }) };
-const GAIN = { voice: 1.0, drums: 0.5, bass: 0.35, pad: 1.6, keys: 0.9, fx: 0.6, verb: 1 };
+const GAIN = { voice: 2.2, drums: 0.5, bass: 0.35, pad: 1.6, keys: 0.9, fx: 0.6, verb: 1 };
 const mix = MIX.mixdown(stems, GAIN, { stemDir: process.env.STEMS ? path.join(__dirname, 'out') : null });
 Genre.fx && Genre.fx('lofi', mix, { kicks });
 MIX.highpass(mix, 25);
