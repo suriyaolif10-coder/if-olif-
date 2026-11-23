@@ -41,7 +41,8 @@
   const L = VO.map((v) => v.t);
   const DURATION = Math.ceil((VO_AT + VO_LEN + 1.6) * 10) / 10;
   // the narrator (the user's Flow clip) sits in a frame at the bottom edge; film.js draws the frame, the clip is overlaid after rendering
-  const NARR = { x: 40, y: 1500, w: 440, h: 372, r: 30 };
+  // the cut-out presenter (background removed) stands on the bottom edge; tile 426x360 scaled 1.5x
+  const NARR = { x: -70, y: 1362, w: 640, h: 540, feetX: 250, feetY: 1872, headY: 1380 };
 
   const STATUS = 'มีประชากรใหม่ส่งกรมการปกครองตรวจสอบเรียบร้อย (สามารถดำเนินการแก้ไขได้)';
 

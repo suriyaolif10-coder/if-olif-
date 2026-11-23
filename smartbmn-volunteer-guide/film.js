@@ -253,23 +253,21 @@
   // the little presenter at the bottom edge: a framed window (the Flow clip is laid into it after rendering)
   // and a speech bubble with the line he is saying right now
   function narrator(ctx, t) {
-    const { x, y, w, h, r } = NARR;
-    ctx.save(); ctx.shadowColor = 'rgba(20,30,80,0.35)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 10;
-    rr(ctx, x - 8, y - 8, w + 16, h + 16, r + 8, '#FFFFFF'); ctx.restore();
-    rr(ctx, x, y, w, h, r, '#2B2F45');
-    // name tag
-    rr(ctx, x + 18, y - 66, 190, 52, 26, PURP, '#FFFFFF', 4);
-    txt(ctx, 'ผู้บรรยาย', x + 113, y - 29, 30, '#FFFFFF', { align: 'center' });
+    const { feetX, feetY } = NARR;
+    // soft floor shadow under his feet (the cut-out figure is laid over it after rendering)
+    const g = ctx.createRadialGradient(feetX, feetY, 0, feetX, feetY, 170);
+    g.addColorStop(0, 'rgba(20,30,80,0.38)'); g.addColorStop(1, 'rgba(20,30,80,0)');
+    ctx.save(); ctx.translate(feetX, feetY); ctx.scale(1, 0.22); ctx.translate(-feetX, -feetY); ctx.fillStyle = g; ctx.fillRect(feetX - 170, feetY - 170, 340, 340); ctx.restore();
     const line = VO.find((v) => t >= v.t && t < v.end + 0.4);
     if (!line) return;
     const a = clamp((t - line.t) / 0.2) * (1 - clamp((t - line.end - 0.2) / 0.2));
-    const bx = x + w + 34, bw = X1 + 100 - bx, by = y + 6;
+    const bx = 440, bw = X1 + 100 - bx, by = 1470;
     const size = 34, lines = wrap(ctx, line.text, size, bw - 48).slice(0, 6);
-    const bh = Math.max(150, lines.length * size * 1.42 + 44);
+    const bh = Math.max(140, lines.length * size * 1.42 + 44);
     ctx.save(); ctx.globalAlpha *= a;
     ctx.translate(0, 12 * (1 - ease.outCubic(clamp((t - line.t) / 0.25))));
     ctx.save(); ctx.shadowColor = 'rgba(20,30,80,0.25)'; ctx.shadowBlur = 20; ctx.shadowOffsetY = 6;
-    ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 26); ctx.moveTo(bx + 2, by + 60); ctx.lineTo(bx - 30, by + 82); ctx.lineTo(bx + 2, by + 100); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.restore();
+    ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 26); ctx.moveTo(bx + 2, by + 40); ctx.lineTo(bx - 50, by + 30); ctx.lineTo(bx + 2, by + 80); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.restore();
     lines.forEach((l, i) => txt(ctx, l, bx + 24, by + 22 + size + i * size * 1.42, size, INK, { weight: 700 }));
     ctx.restore();
   }
