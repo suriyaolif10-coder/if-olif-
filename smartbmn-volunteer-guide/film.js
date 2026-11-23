@@ -17,10 +17,10 @@
     G.text(ctx, str, x, y, { size: s, fam: THAI, weight, color, align, alpha });
     return s;
   };
-  const popK = (t, t0, d = 0.3) => (t < t0 ? 0 : ease.outBack(clamp((t - t0) / d), 2.2));
+  const popK = (t, t0, d = 0.3) => (t < t0 ? 0 : 0.82 + 0.18 * ease.outBack(clamp((t - t0) / d), 2.2)); // full size almost at once: the hit lands on its frame
   const fadeK = (t, t0, d = 0.25) => clamp((t - t0) / d);
   // draw fn() scaled by a pop around (cx, cy)
-  const pop = (ctx, t, t0, cx, cy, fn, d) => { const k = popK(t, t0, d); if (k <= 0) return; ctx.save(); ctx.globalAlpha *= clamp((t - t0) / 0.12); ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-cx, -cy); fn(); ctx.restore(); };
+  const pop = (ctx, t, t0, cx, cy, fn, d) => { const k = popK(t, t0, d); if (k <= 0) return; ctx.save();  ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-cx, -cy); fn(); ctx.restore(); };
   const finger = (ctx, x, y, t, tap) => { // a hand cursor that presses at `tap`
     const a = clamp((t - tap + 0.6) / 0.4); if (a <= 0) return;
     const press = t >= tap ? Math.max(0, 1 - (t - tap) / 0.25) : 0;
