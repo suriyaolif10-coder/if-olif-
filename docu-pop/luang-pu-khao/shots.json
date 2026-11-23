@@ -1,0 +1,182 @@
+[
+ {
+  "shot": 1,
+  "time": "00:00-00:03",
+  "duration_s": 3,
+  "subtitle": "ชายคนหนึ่ง มีเมีย มีลูกสามคน มีนา มีบ้าน",
+  "text_overlay": "มีครบทุกอย่าง",
+  "search_query_en": "Isan village rice field 1900s old photo",
+  "motion": "Ken Burns slow zoom-in"
+ },
+ {
+  "shot": 2,
+  "time": "00:03-00:06",
+  "duration_s": 3,
+  "subtitle": "แต่วันหนึ่ง เขาทิ้งทุกอย่าง แล้วเดินเข้าป่า",
+  "text_overlay": "ทิ้งทุกอย่าง",
+  "search_query_en": "barefoot monk walking into dark forest path",
+  "motion": "Parallax 3D dolly forward"
+ },
+ {
+  "shot": 3,
+  "time": "00:06-00:09",
+  "duration_s": 3,
+  "subtitle": "เขาคือ หลวงปู่ขาว อนาลโย",
+  "text_overlay": "หลวงปู่ขาว อนาลโย",
+  "search_query_en": "Luang Pu Khao Analayo portrait",
+  "motion": "zoom-in + parallax (หน้าท่านแยกจากพื้นหลัง)"
+ },
+ {
+  "shot": 4,
+  "time": "00:09-00:13",
+  "duration_s": 4,
+  "subtitle": "เกิด 28 ธันวาคม 2431 บ้านบ่อชะเนง อำนาจเจริญ",
+  "text_overlay": "พ.ศ. 2431",
+  "search_query_en": "Amnat Charoen province map Thailand",
+  "motion": "Map Motion: pin drop อำนาจเจริญ"
+ },
+ {
+  "shot": 5,
+  "time": "00:13-00:16",
+  "duration_s": 3,
+  "subtitle": "ชื่อเดิม ขาว โคระถา ลูกชาวนาธรรมดา",
+  "text_overlay": "ลูกชาวนาธรรมดา",
+  "search_query_en": "Isan farmer buffalo rice paddy vintage",
+  "motion": "Ken Burns pan left-to-right"
+ },
+ {
+  "shot": 6,
+  "time": "00:16-00:19",
+  "duration_s": 3,
+  "subtitle": "อายุ 20 พ่อแม่จัดให้แต่งงาน มีลูกด้วยกันสามคน",
+  "text_overlay": "แต่งงานตอนอายุ 20",
+  "search_query_en": "traditional Thai Isan wooden stilt house",
+  "motion": "zoom-in + parallax"
+ },
+ {
+  "shot": 7,
+  "time": "00:19-00:22",
+  "duration_s": 3,
+  "subtitle": "แต่ชีวิตคู่ไม่ราบรื่น สุดท้ายต้องแยกทางกัน",
+  "text_overlay": "แยกทาง",
+  "search_query_en": "broken wooden door old house shadow",
+  "motion": "slow zoom-out + desaturate"
+ },
+ {
+  "shot": 8,
+  "time": "00:22-00:25",
+  "duration_s": 3,
+  "subtitle": "เขาเห็นว่า ความรัก ความหวง คือทุกข์",
+  "text_overlay": "ความหวง = ทุกข์",
+  "search_query_en": "candle flame dark close up",
+  "motion": "Ken Burns slow zoom-in"
+ },
+ {
+  "shot": 9,
+  "time": "00:25-00:28",
+  "duration_s": 3,
+  "subtitle": "พ.ศ. 2462 ออกบวชที่วัดโพธิ์ศรี บ้านเกิด",
+  "text_overlay": "บวช พ.ศ. 2462",
+  "search_query_en": "Thai monk ordination ceremony shaved head",
+  "motion": "Parallax 3D"
+ },
+ {
+  "shot": 10,
+  "time": "00:28-00:31",
+  "duration_s": 3,
+  "subtitle": "ฉายาของท่าน อนาลโย แปลว่า ผู้ไม่มีอาลัย",
+  "text_overlay": "อนาลโย = ไม่อาลัย",
+  "search_query_en": "saffron robe texture sunlight",
+  "motion": "slow push-in + text pop"
+ },
+ {
+  "shot": 11,
+  "time": "00:31-00:34",
+  "duration_s": 3,
+  "subtitle": "ท่านออกตามหาครูที่ยิ่งใหญ่ที่สุดแห่งยุค",
+  "text_overlay": "ตามหาครู",
+  "search_query_en": "forest monk umbrella klot walking",
+  "motion": "Parallax 3D tracking"
+ },
+ {
+  "shot": 12,
+  "time": "00:34-00:37",
+  "duration_s": 3,
+  "subtitle": "หลวงปู่มั่น ภูริทัตโต",
+  "text_overlay": "หลวงปู่มั่น",
+  "search_query_en": "Ajahn Mun Bhuridatta portrait",
+  "motion": "zoom-in + parallax"
+ },
+ {
+  "shot": 13,
+  "time": "00:37-00:41",
+  "duration_s": 4,
+  "subtitle": "ธุดงค์เกือบทุกภาค กับหลวงปู่ฝั้น หลวงปู่แหวน หลวงปู่ตื้อ",
+  "text_overlay": "ธุดงค์ทั่วประเทศ",
+  "search_query_en": "Thailand map dhutanga route mountains",
+  "motion": "Map Motion: เส้นทางวิ่งหลายภาค"
+ },
+ {
+  "shot": 14,
+  "time": "00:41-00:44",
+  "duration_s": 3,
+  "subtitle": "คืนหนึ่ง ท่านนั่งสมาธิอยู่ในกลด",
+  "text_overlay": "กลางป่า ตอนกลางคืน",
+  "search_query_en": "monk meditating under umbrella tent night forest",
+  "motion": "slow zoom-in + vignette"
+ },
+ {
+  "shot": 15,
+  "time": "00:44-00:48",
+  "duration_s": 4,
+  "subtitle": "ช้างป่าตัวใหญ่ เดินเข้ามาหา ยื่นงวงเข้ามาใกล้",
+  "text_overlay": "ช้างป่าเข้ามาหา",
+  "search_query_en": "wild Asian elephant at night forest",
+  "motion": "Parallax 3D: ช้าง foreground ขยับเข้า"
+ },
+ {
+  "shot": 16,
+  "time": "00:48-00:51",
+  "duration_s": 3,
+  "subtitle": "ท่านไม่หนี นั่งแผ่เมตตาอยู่อย่างนั้น",
+  "text_overlay": "ไม่หนี",
+  "search_query_en": "elephant trunk close up calm",
+  "motion": "slow push-in + hold"
+ },
+ {
+  "shot": 17,
+  "time": "00:51-00:55",
+  "duration_s": 4,
+  "subtitle": "พ.ศ. 2501 ท่านมาหยุดที่ถ้ำกลองเพล หนองบัวลำภู",
+  "text_overlay": "วัดถ้ำกลองเพล",
+  "search_query_en": "Wat Tham Klong Phen Nong Bua Lamphu",
+  "motion": "Map Motion: pin drop หนองบัวลำภู"
+ },
+ {
+  "shot": 18,
+  "time": "00:55-00:58",
+  "duration_s": 3,
+  "subtitle": "อยู่ที่นั่นจนวาระสุดท้าย",
+  "text_overlay": "จนวาระสุดท้าย",
+  "search_query_en": "sandstone cave temple forest Thailand",
+  "motion": "Ken Burns slow zoom-out"
+ },
+ {
+  "shot": 19,
+  "time": "00:58-01:02",
+  "duration_s": 4,
+  "subtitle": "16 พฤษภาคม 2526 ท่านละสังขาร อายุ 95 ปี",
+  "text_overlay": "95 ปี · 64 พรรษา",
+  "search_query_en": "sunset over forest silhouette",
+  "motion": "slow zoom-out + fade"
+ },
+ {
+  "shot": 20,
+  "time": "01:02-01:06",
+  "duration_s": 4,
+  "subtitle": "วันนี้ อัฐิของท่าน ยังอยู่ที่พิพิธภัณฑ์ รูปทรงหินสามก้อน",
+  "text_overlay": "ผู้ไม่มีอาลัย",
+  "search_query_en": "Luang Pu Khao Analayo museum Wat Tham Klong Phen",
+  "motion": "Parallax 3D push-in → end card"
+ }
+]

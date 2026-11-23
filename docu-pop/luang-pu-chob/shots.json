@@ -1,0 +1,164 @@
+[
+ {
+  "shot": 1,
+  "image": "H-tigers.jpg",
+  "crop": "ช่องบน",
+  "dialogue": "ถูกเสือล้อมกลางป่า… แต่พระรูปนี้ ไม่หนี",
+  "text_overlay": "**เสือ**ล้อมกลางป่า",
+  "subtitle": "แต่พระรูปนี้ ไม่หนี",
+  "motion": "panel parallax + slow push-in"
+ },
+ {
+  "shot": 2,
+  "image": "C-portrait.jpg",
+  "crop": "เต็มภาพ",
+  "dialogue": "ท่านคือ หลวงปู่ชอบ ฐานสโม",
+  "text_overlay": "**หลวงปู่ชอบ** ฐานสโม",
+  "subtitle": "พระป่าผู้กล้าด้วยเมตตา",
+  "motion": "Ken Burns zoom-in (ขยับกล้องเท่านั้น)"
+ },
+ {
+  "shot": 3,
+  "image": "A-loei-village.jpg",
+  "crop": "เต็มภาพ",
+  "dialogue": "เกิดปีสองพันสี่ร้อยสี่สิบสี่ ที่บ้านโคกมน จังหวัดเลย",
+  "text_overlay": "พ.ศ. **2444**",
+  "subtitle": "บ้านโคกมน อ.วังสะพุง จ.เลย",
+  "motion": "Ken Burns zoom-out"
+ },
+ {
+  "shot": 4,
+  "image": "B-boy-bo.jpg",
+  "crop": "เต็มภาพ",
+  "dialogue": "ชื่อเดิม บ่อ ลูกชาวบ้านธรรมดา",
+  "text_overlay": "เด็กชาย**บ่อ**",
+  "subtitle": "ชื่อเดิม บ่อ ลูกชาวบ้านธรรมดา",
+  "motion": "Ken Burns pan"
+ },
+ {
+  "shot": 5,
+  "image": "B-boy-bo.jpg",
+  "crop": "ซูมหน้า",
+  "dialogue": "ใจรักความสงบ ตั้งแต่ยังเป็นฆราวาส",
+  "text_overlay": "ใจรัก**ความสงบ**",
+  "subtitle": "ตั้งแต่ยังเป็นฆราวาส",
+  "motion": "zoom-in ใกล้"
+ },
+ {
+  "shot": 6,
+  "image": "D-ordain-teacher.jpg",
+  "crop": "ช่องบน",
+  "dialogue": "เมื่อโตขึ้น ท่านออกบวช",
+  "text_overlay": "ออก**บวช**",
+  "subtitle": "ทิ้งชีวิตทางโลก",
+  "motion": "panel parallax"
+ },
+ {
+  "shot": 7,
+  "image": "D-ordain-teacher.jpg",
+  "crop": "ช่องล่าง",
+  "dialogue": "แล้วฝากตัวเป็นศิษย์ หลวงปู่มั่น ภูริทัตโต",
+  "text_overlay": "ศิษย์**หลวงปู่มั่น**",
+  "subtitle": "หลวงปู่มั่น ภูริทัตโต",
+  "motion": "panel parallax"
+ },
+ {
+  "shot": 8,
+  "image": "E-burma-ridge.jpg",
+  "crop": "เต็มภาพ",
+  "dialogue": "ท่านธุดงค์ไกลถึงพม่า นานถึงห้าปี",
+  "text_overlay": "ธุดงค์**พม่า** 5 ปี",
+  "subtitle": "เดินเท้าข้ามป่าเขาชายแดน",
+  "motion": "Ken Burns zoom-out"
+ },
+ {
+  "shot": 9,
+  "image": "E-burma-ridge.jpg",
+  "crop": "ซูมเจดีย์พม่า",
+  "dialogue": "จนพูดภาษาพม่าได้คล่อง",
+  "text_overlay": "พูด**พม่า**คล่อง",
+  "subtitle": "อยู่ป่าเขาจนกลมกลืนกับคนท้องถิ่น",
+  "motion": "zoom-in"
+ },
+ {
+  "shot": 10,
+  "image": "G-moon-walk.jpg",
+  "crop": "เต็มภาพ",
+  "dialogue": "ท่านชอบเดินป่าตอนกลางคืน ใต้แสงจันทร์",
+  "text_overlay": "เดินใต้**แสงจันทร์**",
+  "subtitle": "เดินป่าตอนกลางคืน",
+  "motion": "Ken Burns tilt-up ไปที่พระจันทร์"
+ },
+ {
+  "shot": 11,
+  "image": "H-tigers.jpg",
+  "crop": "ช่องบน (โทนกลางคืน)",
+  "dialogue": "คืนหนึ่ง ฝูงเสือ เดินวนรอบกลด",
+  "text_overlay": "**ฝูงเสือ**รอบกลด",
+  "subtitle": "คืนหนึ่ง กลางป่าลึก",
+  "motion": "panel parallax + night grade"
+ },
+ {
+  "shot": 12,
+  "image": "H-tigers.jpg",
+  "crop": "ช่องล่าง ซูมองค์ท่าน",
+  "dialogue": "ท่านนั่งนิ่ง แผ่เมตตา",
+  "text_overlay": "**แผ่เมตตา**",
+  "subtitle": "ไม่หนี ไม่กลัว",
+  "motion": "slow push-in + night grade"
+ },
+ {
+  "shot": 13,
+  "image": "H-tigers.jpg",
+  "crop": "ช่องล่าง เต็มช่อง",
+  "dialogue": "จนเสือทั้งหมด เดินจากไป",
+  "text_overlay": "เสือ**จากไป**",
+  "subtitle": "เมตตาชนะความกลัว",
+  "motion": "panel parallax"
+ },
+ {
+  "shot": 14,
+  "image": "I-wat-samma.jpg",
+  "crop": "เต็มภาพ",
+  "dialogue": "ท่านกลับมาอยู่วัดป่าสัมมานุสรณ์ ที่บ้านเกิด",
+  "text_overlay": "วัดป่า**สัมมานุสรณ์**",
+  "subtitle": "บ้านโคกมน จังหวัดเลย",
+  "motion": "Ken Burns zoom-out"
+ },
+ {
+  "shot": 15,
+  "image": "I-wat-samma.jpg",
+  "crop": "ซูมศาลา",
+  "dialogue": "สอนให้มักน้อย สันโดษ และเมตตา",
+  "text_overlay": "**มักน้อย** สันโดษ",
+  "subtitle": "และเมตตา",
+  "motion": "zoom-in"
+ },
+ {
+  "shot": 16,
+  "image": "J-old-age.jpg",
+  "crop": "เต็มภาพ",
+  "dialogue": "ในวัยชรา ท่านป่วยเป็นอัมพาต แต่ยังเมตตาศิษย์เสมอ",
+  "text_overlay": "ป่วยแต่ยัง**เมตตา**",
+  "subtitle": "ในวัยชรา ท่านป่วยเป็นอัมพาต",
+  "motion": "slow zoom-in"
+ },
+ {
+  "shot": 17,
+  "image": "K-ending.jpg",
+  "crop": "เต็มภาพ",
+  "dialogue": "แปดมกราคม สองพันห้าร้อยสามสิบแปด ท่านละสังขาร รวมเจ็ดสิบเอ็ดพรรษา",
+  "text_overlay": "**71** พรรษา",
+  "subtitle": "8 มกราคม 2538 ท่านละสังขาร",
+  "motion": "slow zoom-out + fade"
+ },
+ {
+  "shot": 18,
+  "image": "C-portrait.jpg",
+  "crop": "ซูมออก (ข้อความด้านบน)",
+  "dialogue": "พระผู้กล้าเผชิญเสือ ด้วยเมตตา… หลวงปู่ชอบ ฐานสโม",
+  "text_overlay": "กล้าด้วย**เมตตา**",
+  "subtitle": "หลวงปู่ชอบ ฐานสโม · 2444–2538",
+  "motion": "Ken Burns zoom-out → end card"
+ }
+]
