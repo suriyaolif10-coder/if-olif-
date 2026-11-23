@@ -77,7 +77,7 @@
   };
 
   // the lo-fi hats sit a 16th before many beats, so for list items only the picture is measured; the pops still land on the beat
-  for (const k of ['kinds', 'wait', 'edit', 'step1', 'step4', 'res1', 'res2', 'res3', 'friday']) markers[k].sync = 'v';
+  for (const k of ['title', 'kinds', 'wait', 'edit', 'step1', 'step4', 'res1', 'res2', 'res3', 'friday']) markers[k].sync = 'v';
   const subtitles = [];
 
   const SCORE = { FPS, FORMAT, W, H, SAFE, WIDE, STYLE, DURATION, clock, T, BEAT, S, SC, m, chords, chordAt, STATUS, kinds, steps, results, when, pops, taps, markers, subtitles };
